@@ -16,8 +16,8 @@ public class FirebaseService {
         
         // Mock data for now so the app runs smoothly
         return [
-            CashFlowModel(amount: 150000, type: .pemasukan, description: "Penjualan Keripik", date: Date(), counterpartyName: "Budi", paymentStatus: PaymentStatus.lunas.displayName),
-            CashFlowModel(amount: 50000, type: .pengeluaran, description: "Beli Plastik", date: Date().addingTimeInterval(-86400), counterpartyName: "Toko Plastik", paymentStatus: PaymentStatus.lunas.displayName)
+//            CashFlowModel(amount: 150000, type: .pemasukan, description: "Penjualan Keripik", date: Date(), counterpartyName: "Budi", paymentStatus: PaymentStatus.paid.displayName),
+//            CashFlowModel(amount: 50000, type: .pengeluaran, description: "Beli Plastik", date: Date().addingTimeInterval(-86400), counterpartyName: "Toko Plastik", paymentStatus: PaymentStatus.paid.displayName)
         ]
     }
     

@@ -7,7 +7,7 @@ public final class AddIncomeViewModel: ObservableObject {
     @Published public var amount: Int = 0
     @Published public var buyerName = ""
     @Published public var transactionDate = Date()
-    @Published public var paymentStatus: PaymentStatus = .lunas
+    @Published public var paymentStatus: PaymentStatus = .paid
     
     @Published public var isLoading = false
     @Published public var isSaved = false
@@ -38,7 +38,7 @@ public final class AddIncomeViewModel: ObservableObject {
                 description: incomeDescription,
                 date: transactionDate,
                 counterpartyName: buyerName,
-                paymentStatus: paymentStatus.displayName
+                paymentStatus: paymentStatus.title
             )
             
             try await service.saveCashFlowTransaction(income)
