@@ -23,34 +23,50 @@ public struct ExpenseCategorySheetContent: View {
     @Binding var selectedExpenseCategory: String
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 30) {
+        VStack(spacing: 8) {
             Text("Kategori Pengeluaran")
-                .font(.title3.bold())
+                .font(.headline.bold())
+                .padding(.top, 24)
+                .padding(.bottom, 8)
             
             ScrollView {
-                VStack(spacing: 25) {
+                VStack(spacing: 0) {
                     ForEach(expenseCategories, id: \.self) { category in
                         Button(action: {
                             selectedExpenseCategory = category
                             dismiss()
                         }) {
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text(category)
-                                    .font(.body)
-                                    .foregroundStyle(.black)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text(category)
+                                        .font(.body)
+                                        .foregroundStyle(.black)
+                                    
+                                    Spacer()
+                                    
+                                    if selectedExpenseCategory == category {
+                                        Image(systemName: "checkmark")
+                                            .font(.body.bold())
+                                            .foregroundStyle(.blue)
+                                    }
+                                }
+                                .padding()
+                                
+                                Divider()
+                                    .padding(.horizontal, 20)
                             }
                         }
                     }
                 }
-                .padding(.leading)
             }
         }
-        .padding()
-       
+        .presentationDetents([.fraction(0.55), .medium])
+        .presentationDragIndicator(.visible)
+        .background(Color(.systemBackground))
     }
 }
 
 #Preview {
-    ExpenseCategorySheetContent(selectedExpenseCategory: .constant("Bahan Baku"))
+    @Previewable @State var selected = "Listrik, Gas, Air, Sewa"
+    return ExpenseCategorySheetContent(selectedExpenseCategory: $selected)
 }
