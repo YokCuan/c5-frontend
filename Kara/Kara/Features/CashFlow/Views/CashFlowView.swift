@@ -10,7 +10,21 @@ public struct CashFlowView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     // Filter Section
-                    SearchBarFilterButton(viewModel: viewModel)
+                    HStack {
+                        DatePicker("Dari", selection: $viewModel.startDate, displayedComponents: .date)
+                            .labelsHidden()
+                        Text("-")
+                        DatePicker("Sampai", selection: $viewModel.endDate, displayedComponents: .date)
+                            .labelsHidden()
+                        
+                        Spacer()
+                        
+                        Button("Filter") {
+                            Task { await viewModel.loadTransactions() }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(.horizontal)
                     
                     // Summary Cards
                     HStack(spacing: 16) {
@@ -35,7 +49,7 @@ public struct CashFlowView: View {
                     } else {
                         LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                             ForEach(viewModel.groupedTransactions, id: \.key) { group in
-                                Section(header:
+                                Section(header: 
                                     Text(group.key, style: .date)
                                         .font(.caption)
                                         .fontWeight(.bold)
