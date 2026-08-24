@@ -8,42 +8,74 @@ public struct CashFlowTransactionRow: View {
     }
     
     public var body: some View {
-        HStack {
+        HStack(spacing: 12) {
+            
+            // MARK: - Left Content
             VStack(alignment: .leading, spacing: 4) {
+                Text(transaction.counterpartyName)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
                 Text(transaction.description)
                     .font(.subheadline)
-                    .fontWeight(.medium)
-                
-                if !transaction.counterpartyName.isEmpty {
-                    Text(transaction.counterpartyName)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                    .foregroundStyle(.secondary)
             }
             
             Spacer()
             
-            VStack(alignment: .trailing, spacing: 4) {
-                Text(transaction.type == .pemasukan ? "+ Rp \(transaction.amount)" : "- Rp \(transaction.amount)")
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(transaction.type == .pemasukan ? .green : .red)
-                
-                if let status = transaction.paymentStatus {
-                    Text(status)
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.1))
-                        .foregroundColor(.blue)
-                        .cornerRadius(4)
-                }
-            }
+            // MARK: - Amount
+            Text(
+                transaction.type == .pemasukan
+                ? "+ Rp \(transaction.amount)"
+                : "- Rp \(transaction.amount)"
+            )
+            .font(.headline)
+            .fontWeight(.bold)
+            .foregroundStyle(
+                transaction.type == .pemasukan
+                ? .green
+                : .red
+            )
+            
+            // MARK: - Chevron
+            Image(systemName: "chevron.right")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(Color(.systemBackground))
+        .clipShape(
+            RoundedRectangle(cornerRadius: 12)
+        )
+        .overlay(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    transaction.type == .pemasukan
+                    ? Color.green
+                    : Color.red,
+                    lineWidth: 3
+                )
+                .mask(
+                    HStack {
+                        Rectangle()
+                            .frame(width: 3)
+                        Spacer()
+                    }
+                )
+        }
     }
 }
 
 #Preview {
-    CashFlowTransactionRow(transaction: CashFlowModel(amount: 150000, type: .pemasukan, description: "Penjualan Keripik", counterpartyName: "Budi", paymentStatus: "Lunas"))
+    CashFlowTransactionRow(
+        transaction: CashFlowModel(
+            amount: 50000,
+            type: .pemasukan,
+            description: "Penjualan · 18:00",
+            counterpartyName: "Bu Ria",
+            paymentStatus: "Lunas"
+        )
+    )
+    .padding()
 }
