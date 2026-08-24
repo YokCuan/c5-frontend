@@ -47,33 +47,31 @@ struct SearchBarFilterButton: View {
             // Bottom Row: Month Navigator
             HStack {
                 Button {
-                    // Logic to go to previous month
+                    viewModel.previousMonth()
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.primary)
                         .frame(width: 32, height: 32)
-                        .background(Color(UIColor.secondarySystemBackground)
-                            .cornerRadius(8))
+                        .background(Color(UIColor.secondarySystemBackground).cornerRadius(8))
                 }
                 
                 Spacer()
                 
-                Text("Agustus 2026")
+                Text(viewModel.selectedMonthYearString)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundColor(.primary)
                 
                 Spacer()
                 
                 Button {
-                    // Logic to go to next month
+                    viewModel.nextMonth()
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.primary)
                         .frame(width: 32, height: 32)
-                        .background(Color(UIColor.secondarySystemBackground)
-                            .cornerRadius(8))
+                        .background(Color(UIColor.secondarySystemBackground).cornerRadius(8))
                 }
             }
         }

@@ -7,6 +7,12 @@ public class CashFlowViewModel: ObservableObject {
     @Published public var totalIncome: Int = 0
     @Published public var totalExpense: Int = 0
     
+    @Published public var currentDate: Date = Date() {
+            didSet {
+                updateDateBounds()
+            }
+        }
+    
     @Published public var startDate: Date = Date()
     @Published public var endDate: Date = Date()
     
@@ -18,7 +24,44 @@ public class CashFlowViewModel: ObservableObject {
     
     private let service = FirebaseService.shared
     
-    public init() {}
+    public init() {
+            updateDateBounds()
+        }
+    
+    // MARK: - Month Navigation Best Practices
+        
+        public var selectedMonthYearString: String {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "id_ID")
+            formatter.dateFormat = "MMMM yyyy"
+            return formatter.string(from: currentDate)
+        }
+        
+        public func previousMonth() {
+            if let newDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) {
+                currentDate = newDate
+                Task { await loadTransactions() }
+            }
+        }
+        
+        public func nextMonth() {
+            if let newDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) {
+                currentDate = newDate
+                Task { await loadTransactions() }
+            }
+        }
+        
+        // Automatically sets startDate to 1st of month (00:00) and endDate to last day of month (23:59)
+        private func updateDateBounds() {
+            let calendar = Calendar.current
+            
+            if let interval = calendar.dateInterval(of: .month, for: currentDate) {
+                self.startDate = interval.start
+                self.endDate = interval.end.addingTimeInterval(-1)
+            }
+        }
+        
+        // MARK: - Data Fetching
     
     public func loadTransactions() async {
         isLoading = true
