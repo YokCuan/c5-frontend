@@ -11,7 +11,7 @@ public struct Shop: Identifiable, Codable {
     public var id: UUID
     public var ownerId: UUID
     public var name: String
-    public var description: String
+    public var description: String?
     public var address: String?
     public var phone: String?
     
