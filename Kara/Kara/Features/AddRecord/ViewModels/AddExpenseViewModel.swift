@@ -56,7 +56,7 @@ public final class AddExpenseViewModel: ObservableObject {
                 description: fullDescription,
                 date: transactionDate,
                 counterpartyName: storeName,
-                paymentStatus: PaymentStatus.lunas.displayName
+                paymentStatus: PaymentStatus.paid.title
             )
             
             // Save to Firebase
