@@ -7,8 +7,11 @@ public class CashFlowViewModel: ObservableObject {
     @Published public var totalIncome: Int = 0
     @Published public var totalExpense: Int = 0
     
-    @Published public var startDate: Date = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+    @Published public var startDate: Date = Date()
     @Published public var endDate: Date = Date()
+    
+    @Published public var searchText: String = "" // Kept once here
+    @Published public var selectedPaymentStatus: PaymentStatus? = nil
     
     @Published public var isLoading = false
     @Published public var errorMessage: String?
@@ -25,7 +28,7 @@ public class CashFlowViewModel: ObservableObject {
             // Fetch from Firebase Service
             let fetched = try await service.getCashFlowTransactions()
             
-            // Filter by date range (local filtering for simplicity in this example)
+            // Filter by date range
             let filtered = fetched.filter { $0.date >= startDate && $0.date <= endDate }
             
             self.transactions = filtered.sorted { $0.date > $1.date }
