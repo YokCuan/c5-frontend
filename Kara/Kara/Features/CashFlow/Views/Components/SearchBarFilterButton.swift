@@ -26,8 +26,8 @@ struct SearchBarFilterButton: View {
                     TextField("Cari transaksi...", text: $viewModel.searchText)
                         .foregroundColor(.secondary)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal)
+                .padding(.vertical)
                 .background (.primary.opacity(0.12))
                 .cornerRadius(10)
                 
@@ -75,8 +75,8 @@ struct SearchBarFilterButton: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.horizontal)
+        .padding(.vertical)
         .sheet(isPresented: $isShowingFilterSheet) {
             FilterSheetView(
                 selectedPaymentStatus: .constant(nil),
