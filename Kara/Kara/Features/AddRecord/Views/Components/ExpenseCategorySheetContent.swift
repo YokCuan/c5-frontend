@@ -10,56 +10,47 @@ import SwiftUI
 public struct ExpenseCategorySheetContent: View {
     @Environment(\.dismiss) private var dismiss
     
-    let expenseCategories = [
-        "Bahan Baku",
-        "Kemasan",
-        "Listrik, Gas, Air, Sewa",
-        "Pengiriman",
-        "Gaji Pekerja",
-        "Diambil untuk Pribadi",
-        "Lainnya"
-    ]
+    var expenseCategories: [ExpenseCategory] = ExpenseCategory.defaults
     
     @Binding var selectedExpenseCategory: String
     
     public var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 16) {
             Text("Kategori Pengeluaran")
                 .font(.headline.bold())
-                .padding(.top, 24)
-                .padding(.bottom, 8)
             
             ScrollView {
                 VStack(spacing: 0) {
-                    ForEach(expenseCategories, id: \.self) { category in
+                    ForEach(expenseCategories) { category in
                         Button(action: {
-                            selectedExpenseCategory = category
+                            selectedExpenseCategory = category.name
                             dismiss()
                         }) {
                             VStack(spacing: 0) {
                                 HStack {
-                                    Text(category)
+                                    Text(category.name)
                                         .font(.body)
                                         .foregroundStyle(.black)
                                     
                                     Spacer()
                                     
-                                    if selectedExpenseCategory == category {
+                                    if selectedExpenseCategory == category.name {
                                         Image(systemName: "checkmark")
                                             .font(.body.bold())
                                             .foregroundStyle(.blue)
                                     }
                                 }
-                                .padding()
+                                .padding(.vertical)
                                 
                                 Divider()
-                                    .padding(.horizontal, 20)
+                                   
                             }
                         }
                     }
                 }
             }
         }
+        .padding()
         .presentationDetents([.fraction(0.55), .medium])
         .presentationDragIndicator(.visible)
         .background(Color(.systemBackground))
