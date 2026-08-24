@@ -8,6 +8,10 @@
 import SwiftUI
 
 public struct DetailPemasukanView: View {
+    
+    let note: SalesNote
+    @State private var isShowingDelSheet = false
+    
     public var body: some View {
         VStack(spacing: 20) {
             //Catd
@@ -18,18 +22,17 @@ public struct DetailPemasukanView: View {
                 
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Bu Ria")
-                            .font(.title3.bold())
+                        Text(note.customerName)
+                            .font(.title2.bold())
                         Text("Penjualan")
-                            .font(.subheadline)
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(.secondary)
                     }
                     
                     VStack(alignment: .leading, spacing: 5) {
                         Text("JUMLAH DITERIMA")
                             .font(.caption2.bold())
                             .foregroundStyle(.gray)
-                        Text("+ Rp50.000")
+                        Text("+ \(note.paidAmount.toIDR)")
                             .font(.title.bold())
                             .foregroundStyle(.green)
                     }
@@ -41,14 +44,14 @@ public struct DetailPemasukanView: View {
                             Text("Waktu")
                                 .foregroundStyle(.gray)
                             Spacer()
-                            Text("18:00")
+                            Text(note.soldAt.formattedTime())
                                 .bold()
                         }
                         HStack {
                             Text("Tanggal")
                                 .foregroundStyle(.gray)
                             Spacer()
-                            Text("17 Agustus 2026")
+                            Text(note.soldAt.formattedDate())
                                 .bold()
                         }
                     }
@@ -73,7 +76,7 @@ public struct DetailPemasukanView: View {
             
             
             //DelButton
-            Button(action: {}) {
+            Button(action: {isShowingDelSheet = true}) {
                 Text("Hapus Pemasukan")
                     .font(.body.bold())
                     .foregroundStyle(.red)
@@ -81,6 +84,11 @@ public struct DetailPemasukanView: View {
                     .padding()
                     .background(Color.red.opacity(0.1))
                     .cornerRadius(10)
+            }
+            .sheet(isPresented: $isShowingDelSheet){
+                DeleteIncome()
+                    .presentationDetents([.fraction(0.5), .height(.infinity)])
+                    .presentationDragIndicator(.visible)
             }
             
             Spacer()
@@ -93,8 +101,34 @@ public struct DetailPemasukanView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        DetailPemasukanView()
+#Preview("Not Paid") {
+    let dummyShop = Shop(
+        id: UUID(),
+        ownerId: UUID(),
+        name: "Keripik Bu Ria",
+        description: "Usaha Keripik Tempe Sagu"
+    )
+    
+    let dummyNote = SalesNote(
+        id: UUID(),
+        shopId: dummyShop.id,
+        identifier: "#8612",
+        customerName: "Bu Jess",
+        customerPhone: "08123456789",
+        totalAmount: 30000,
+        paidAmount: 30000,
+        status: .paid,
+        noteFileLink: nil,
+        dueAt: Date(),
+        soldAt: Date(),
+        items: [
+            SalesNoteItem(id: UUID(), salesNoteId: UUID(), name: "Keripik Tempe 100 g", quantity: 2, unitPrice: 15000, subtotal: 30000)
+        ]
+    )
+    
+    ZStack {
+        DetailPemasukanView(note: dummyNote)
+        
     }
 }
+
