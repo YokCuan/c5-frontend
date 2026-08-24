@@ -7,25 +7,6 @@
 
 import SwiftUI
 
-private extension Double {
-    var toIDR: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: "id_ID")
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: self)) ?? "Rp0"
-    }
-}
-
-private extension Date {
-    func formattedDate(format: String = "d MMMM yyyy") -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "id_ID")
-        formatter.dateFormat = format
-        return formatter.string(from: self)
-    }
-}
-
 public struct InvoiceComponent: View {
     let note: SalesNote
     var shop: Shop
@@ -50,9 +31,11 @@ public struct InvoiceComponent: View {
                     Text(shop.name)
                         .textCase(.uppercase)
                         .font(.title2.bold())
-                    Text(shop.description)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let description = shop.description {
+                        Text(description)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 
                 Divider()
