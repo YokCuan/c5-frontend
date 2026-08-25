@@ -16,9 +16,9 @@ struct SheetCatatPembayaran: View {
     
     var body: some View {
         VStack {
-            VStack {
+            VStack{
                 Text("Catat Pembayaran")
-                font(.title)
+                    .font(.title)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -32,13 +32,15 @@ struct SheetCatatPembayaran: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             
-            VStack{
+            Spacer()
+                .frame(height: 24)
+            
+            VStack {
                 Text("Jumlah Pembayaran")
                     .font(.callout)
                     .fontWeight(.regular)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
-                
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 HStack {
                     Text("Rp")
                         .font(.callout)
@@ -68,7 +70,7 @@ struct SheetCatatPembayaran: View {
                 }
             }
         }
-        .padding()
+        .padding(.horizontal)
     }
     
     private func recordPayment() {
