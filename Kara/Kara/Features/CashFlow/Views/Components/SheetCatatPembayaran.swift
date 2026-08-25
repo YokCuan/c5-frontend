@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SheetCatatPembayaran: View {
-    @State private var bayar: String = "Masukkan nominal pembayaran"
+    @State private var bayar: String = ""
     var body: some View {
         VStack {
             Text("Catat Pembayaran")
@@ -40,7 +40,7 @@ struct SheetCatatPembayaran: View {
                     .font(.callout)
                     .fontWeight(.regular)
                     .foregroundStyle(.secondary)
-            TextField("Cari transaksi...", text: $bayar)
+            TextField("Catat pembayaran", text: $bayar)
                 .foregroundColor(Color.primary)
                 .font(.title2)
                 .fontWeight(.bold)
@@ -48,10 +48,33 @@ struct SheetCatatPembayaran: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
             .background(Color.secondary.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            
+            Button {
+                recordPayment()
+            } label: {
+                Text("Catat Pembayaran")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                    .background(Color.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding(.horizontal)
+            .padding(.vertical)
         }
         .padding()
     }
 }
+
+private func recordPayment() {
+    Task {
+       //later
+    }
+}
+
 
 #Preview {
     SheetCatatPembayaran()
