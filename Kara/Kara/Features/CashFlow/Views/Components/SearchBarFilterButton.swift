@@ -18,17 +18,17 @@ struct SearchBarFilterButton: View {
         // Filter Section
         VStack(spacing: 16) {
             // Top Row: Search Bar + Filter Button
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 // Search TextField
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary.opacity(0.8))
+                        .foregroundColor(Color.primary)
                     TextField("Cari transaksi...", text: $viewModel.searchText)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.primary)
                 }
                 .padding(.horizontal)
                 .padding(.vertical)
-                .background (.primary.opacity(0.16))
+                .background (.tertiary)
                 .cornerRadius(16)
                 
                 // Filter Button
@@ -37,9 +37,9 @@ struct SearchBarFilterButton: View {
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.primary)
-                        .frame(width: 40, height: 40)
-                        .background(Color(UIColor.secondarySystemBackground))
+                        .foregroundColor(.secondary)
+                        .frame(width: 50, height: 50)
+                        .background(Color.primary.opacity(0.2))
                         .cornerRadius(16)
                 }
             }

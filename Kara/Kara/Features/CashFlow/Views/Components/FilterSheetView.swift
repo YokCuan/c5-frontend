@@ -23,6 +23,7 @@ struct FilterSheetView: View {
     
     @State private var selectedCategory: CategoryFilterOption? = nil
     @State private var isShowingCategorySheet: Bool = false
+    @State private var isShowingDatePickerSheet = false
     
     enum DateRange: String, CaseIterable {
         case last7Days = "7 hari terakhir"
@@ -31,7 +32,7 @@ struct FilterSheetView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 16) {
             
             // MARK: - Custom Header (Bukan Toolbar)
             HStack {
@@ -58,7 +59,7 @@ struct FilterSheetView: View {
             
             // MARK: - Body Content
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     
                     // Rentang waktu
                     Text("Rentang waktu")
@@ -67,7 +68,7 @@ struct FilterSheetView: View {
                         .padding(.horizontal)
                         .padding(.top)
                     
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 16) {
                         ForEach(DateRange.allCases, id: \.self) { range in
                             dateRangeRow(range)
                         }
@@ -137,12 +138,29 @@ struct FilterSheetView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $isShowingCategorySheet) {
+            SheetFilterCategory(
+                selectedCategory: $selectedCategory,
+                parentSheetDismiss: { dismiss() }
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $isShowingDatePickerSheet) {
+            SheetDatePicker(
+                startDate: $startDate,
+                endDate: $endDate,
+                parentSheetDismiss: { dismiss() }
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
     
     @ViewBuilder
     private func dateRangeRow(_ range: DateRange) -> some View {
         Button {
-            selectedDateRange = range
+            selectRange(range)
         } label: {
             HStack {
                 Text(range.rawValue)
@@ -162,7 +180,7 @@ struct FilterSheetView: View {
     
     @ViewBuilder
     private func amountField(label: String, value: Binding<String>) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(label)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -177,8 +195,27 @@ struct FilterSheetView: View {
     }
     
     // MARK: - Functions
+    private func selectRange(_ range: DateRange) {
+        selectedDateRange = range
+        
+        let calendar = Calendar.current
+        let today = Date()
+        
+        switch range {
+        case .last7Days:
+            startDate = calendar.date(byAdding: .day, value: -6, to: today) ?? today
+            endDate = today
+            
+        case .thisMonth:
+            let components = calendar.dateComponents([.year, .month], from: today)
+            startDate = calendar.date(from: components) ?? today
+            endDate = today
+            
+        case .custom:
+            isShowingDatePickerSheet = true
+        }
+    }
     private func resetFilter() {
-        selectedDateRange = nil
         minAmount = ""
         maxAmount = ""
         selectedCategory = nil

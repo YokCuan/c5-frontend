@@ -31,7 +31,7 @@ struct SheetDatePicker: View {
     }
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             
             // MARK: - Custom Header
             HStack {
@@ -65,7 +65,7 @@ struct SheetDatePicker: View {
             .padding(.top)
             
             // MARK: - Input Box (Dari & Ke)
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 // Card "Dari"
                 dateInputCard(
                     title: "Dari",
@@ -121,7 +121,7 @@ struct SheetDatePicker: View {
     @ViewBuilder
     private func dateInputCard(title: String, dateString: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.secondary)

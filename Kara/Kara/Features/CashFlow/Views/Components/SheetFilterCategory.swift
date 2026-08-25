@@ -40,7 +40,7 @@ struct SheetFilterCategory: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 16) {
             
             // MARK: - Custom Header Bar
             HStack {
