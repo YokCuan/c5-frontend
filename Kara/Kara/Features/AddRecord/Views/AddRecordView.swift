@@ -18,7 +18,7 @@ public struct AddRecordView: View {
                 .background(Color(.systemGroupedBackground))
                 
                 if selectedTab == 0 {
-                    IncomeFormView()
+                    AddIncomeView()
                 } else {
                     ExpenseFormView()
                 }
