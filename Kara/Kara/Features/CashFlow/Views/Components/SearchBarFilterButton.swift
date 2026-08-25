@@ -36,9 +36,9 @@ struct SearchBarFilterButton: View {
                     isShowingFilterSheet = true
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease")
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.primary)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
                         .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(16)
                 }
