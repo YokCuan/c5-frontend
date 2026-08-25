@@ -173,7 +173,7 @@ struct FilterSheetView: View {
         }
         .padding()
         .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
     // MARK: - Functions
