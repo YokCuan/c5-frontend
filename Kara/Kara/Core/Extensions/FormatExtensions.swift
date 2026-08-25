@@ -24,4 +24,11 @@ public extension Date {
         formatter.dateFormat = format
         return formatter.string(from: self)
     }
+    
+    func formattedTime(format: String = "HH:mm") -> String {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "id_ID")
+            formatter.dateFormat = format
+            return formatter.string(from: self)
+        }
 }
