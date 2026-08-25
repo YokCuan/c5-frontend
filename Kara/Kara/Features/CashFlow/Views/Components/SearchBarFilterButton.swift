@@ -22,14 +22,14 @@ struct SearchBarFilterButton: View {
                 // Search TextField
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary.opacity(0.6))
+                        .foregroundColor(.secondary.opacity(0.8))
                     TextField("Cari transaksi...", text: $viewModel.searchText)
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal)
                 .padding(.vertical)
-                .background (.primary.opacity(0.12))
-                .cornerRadius(10)
+                .background (.primary.opacity(0.16))
+                .cornerRadius(16)
                 
                 // Filter Button
                 Button {
@@ -40,7 +40,7 @@ struct SearchBarFilterButton: View {
                         .foregroundColor(.primary)
                         .frame(width: 44, height: 44)
                         .background(Color(UIColor.secondarySystemBackground))
-                        .cornerRadius(12)
+                        .cornerRadius(16)
                 }
             }
             
