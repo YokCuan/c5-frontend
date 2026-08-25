@@ -1,5 +1,6 @@
 //
 //  FilterSheetView.swift
+//  Kara
 //
 //  Created by Samuel Bonardo on 23/08/26.
 //
@@ -19,7 +20,9 @@ struct FilterSheetView: View {
     @State private var selectedDateRange: DateRange? = nil
     @State private var minAmount: String = ""
     @State private var maxAmount: String = ""
-    @State private var selectedCategory: String? = nil
+    
+    @State private var selectedCategory: CategoryFilterOption? = nil
+    @State private var isShowingCategorySheet: Bool = false
     
     enum DateRange: String, CaseIterable {
         case last7Days = "7 hari terakhir"
@@ -28,26 +31,32 @@ struct FilterSheetView: View {
     }
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
+            
+            // MARK: - Custom Header (Bukan Toolbar)
             HStack {
-                Text("Filter Kas")
+                Text("Filter Transaksi")
                     .font(.title3)
                     .fontWeight(.bold)
+                    .foregroundStyle(.primary)
                 
                 Spacer()
                 
-                Button("Pulihkan") {
+                Button {
                     resetFilter()
+                } label: {
+                    Text("Pulihkan")
+                        .font(.subheadline)
+                        .underline()
+                        .foregroundStyle(.secondary)
                 }
-                .font(.title3)
-                .fontWeight(.bold)
-                .foregroundStyle(.secondary)
-                .underline()
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 24)
-            .padding(.bottom, 20)
+            .padding(.horizontal)
+            .padding(.top)
+            .padding(.bottom)
             
+            // MARK: - Body Content
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     
@@ -55,15 +64,15 @@ struct FilterSheetView: View {
                     Text("Rentang waktu")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 16)
+                        .padding(.horizontal)
+                        .padding(.top)
                     
                     VStack(alignment: .leading, spacing: 20) {
                         ForEach(DateRange.allCases, id: \.self) { range in
                             dateRangeRow(range)
                         }
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal)
                     
                     Divider()
                     
@@ -71,43 +80,38 @@ struct FilterSheetView: View {
                     Text("Besar transaksi")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 16)
+                        .padding(.horizontal)
+                        .padding(.top)
                     
                     HStack {
                         amountField(label: "Dari", value: $minAmount)
                         amountField(label: "Ke", value: $maxAmount)
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal)
                     
                     Divider()
                     
                     // Kategori
-                    Text("Kategori")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 16)
-                    
                     Button {
-                        // Nanti navigasi ke halaman pilih kategori
+                        isShowingCategorySheet = true
                     } label: {
                         HStack {
-                            Text(selectedCategory ?? "Pilih kategori")
+                            Text(selectedCategory?.title ?? "Pilih kategori")
                                 .font(.headline)
-                                .foregroundStyle(Color.primary)
+                                .foregroundStyle(selectedCategory == nil ? .secondary : Color.primary)
                             
                             Spacer()
                             
                             Image(systemName: "chevron.right")
                                 .foregroundStyle(Color.primary)
                         }
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal)
                     }
+                    .buttonStyle(.plain)
                 }
             }
             
-            // Terapkan filter
+            // MARK: - Bottom Action Button
             Button {
                 applyFilter()
                 dismiss()
@@ -117,12 +121,21 @@ struct FilterSheetView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
+                    .padding(.vertical)
                     .background(Color.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
+            .padding(.horizontal)
+            .padding(.vertical)
+        }
+        .presentationDragIndicator(.visible)
+        .sheet(isPresented: $isShowingCategorySheet) {
+            SheetFilterCategory(
+                selectedCategory: $selectedCategory,
+                parentSheetDismiss: { dismiss() }
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
     }
     
@@ -164,7 +177,6 @@ struct FilterSheetView: View {
     }
     
     // MARK: - Functions
-    
     private func resetFilter() {
         selectedDateRange = nil
         minAmount = ""
@@ -180,22 +192,12 @@ struct FilterSheetView: View {
     }
 }
 
-// MARK: - Working Preview Setup
+// MARK: - SwiftUI Canvas Preview
 #Preview {
-    struct PreviewContainer: View {
-        @State private var status: PaymentStatus? = nil
-        @State private var start = Date()
-        @State private var end = Date()
-        
-        var body: some View {
-            FilterSheetView(
-                selectedPaymentStatus: $status,
-                startDate: $start,
-                endDate: $end,
-                viewModel: CashFlowViewModel()
-            )
-        }
-    }
-    
-    return PreviewContainer()
+    FilterSheetView(
+        selectedPaymentStatus: .constant(nil),
+        startDate: .constant(Date()),
+        endDate: .constant(Date()),
+        viewModel: CashFlowViewModel()
+    )
 }
