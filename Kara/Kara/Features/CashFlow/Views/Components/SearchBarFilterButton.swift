@@ -18,29 +18,29 @@ struct SearchBarFilterButton: View {
         // Filter Section
         VStack(spacing: 16) {
             // Top Row: Search Bar + Filter Button
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 // Search TextField
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary.opacity(0.6))
+                        .foregroundColor(Color.primary)
                     TextField("Cari transaksi...", text: $viewModel.searchText)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.primary)
                 }
                 .padding(.horizontal)
                 .padding(.vertical)
-                .background (.primary.opacity(0.12))
-                .cornerRadius(10)
+                .background (.tertiary)
+                .cornerRadius(16)
                 
                 // Filter Button
                 Button {
                     isShowingFilterSheet = true
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(.primary)
-                        .frame(width: 44, height: 44)
-                        .background(Color(UIColor.secondarySystemBackground))
-                        .cornerRadius(12)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .frame(width: 50, height: 50)
+                        .background(Color.primary.opacity(0.2))
+                        .cornerRadius(16)
                 }
             }
             

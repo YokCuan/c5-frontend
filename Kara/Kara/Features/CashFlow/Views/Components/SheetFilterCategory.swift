@@ -40,7 +40,7 @@ struct SheetFilterCategory: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 16) {
             
             // MARK: - Custom Header Bar
             HStack {
@@ -51,7 +51,7 @@ struct SheetFilterCategory: View {
                     Image(systemName: "chevron.left")
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(Color.primary)
                 }
                 
                 Spacer()
@@ -71,7 +71,7 @@ struct SheetFilterCategory: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.secondary .opacity(0.8))
                 }
             }
             .padding(.horizontal)
