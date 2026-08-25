@@ -8,74 +8,93 @@
 import SwiftUI
 
 struct SheetCatatPembayaran: View {
+    
+    let customerName: String
+    let remainingAmount: Double
+    
     @State private var bayar: String = ""
+    
     var body: some View {
         VStack {
-            Text("Catat Pembayaran")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundStyle(.primary)
-                .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
-            
-            HStack {
-                Text("Bu Sherin")
-                Text("· Sisa")
-                Text("Rp5.000")
-            }
-            .font(.callout)
-            .fontWeight(.regular)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
-            
-            Divider()
-            
-            Text("Jumlah Pembayaran")
+            VStack {
+                Text("Catat Pembayaran")
+                font(.title)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack {
+                    Text(customerName)
+                    Text("· Sisa")
+                    Text(remainingAmount.formatted(.currency(code: "IDR")))
+                }
                 .font(.callout)
-                .fontWeight(.regular)
                 .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
             
-            HStack {
-                Text("Rp")
+            VStack{
+                Text("Jumlah Pembayaran")
                     .font(.callout)
                     .fontWeight(.regular)
                     .foregroundStyle(.secondary)
-            TextField("Catat pembayaran", text: $bayar)
-                .foregroundColor(Color.primary)
-                .font(.title2)
-                .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
+                
+                HStack {
+                    Text("Rp")
+                        .font(.callout)
+                        .fontWeight(.regular)
+                        .foregroundStyle(.secondary)
+                    TextField("Catat pembayaran", text: $bayar)
+                        .foregroundColor(Color.primary)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
+                .background(Color.secondary.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                
+                Button {
+                    recordPayment()
+                } label: {
+                    Text("Catat Pembayaran")
+                        .padding(.vertical)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 48))
+                }
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
-            .background(Color.secondary.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            
-            Button {
-                recordPayment()
-            } label: {
-                Text("Catat Pembayaran")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical)
-                    .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
-            .padding(.horizontal)
-            .padding(.vertical)
         }
         .padding()
     }
-}
-
-private func recordPayment() {
-    Task {
-       //later
+    
+    private func recordPayment() {
+        Task {
+            //later
+        }
     }
 }
 
-
 #Preview {
-    SheetCatatPembayaran()
+    struct PreviewContainer: View {
+        @State private var isShowingSheet = true
+        
+        var body: some View {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+                .sheet(isPresented: $isShowingSheet) {
+                    SheetCatatPembayaran(
+                        customerName: "Bu Sherin",
+                        remainingAmount: 5000
+                    )
+                    .presentationDetents([.height(400)])
+                    .presentationDragIndicator(.visible)
+                }
+        }
+    }
+    
+    return PreviewContainer()
 }
