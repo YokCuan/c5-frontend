@@ -38,7 +38,7 @@ public struct MainTabView: View {
                 case .addIncome:
                     AddIncomeView()
                 case .addExpense:
-                    Text("Halaman Tambah Pengeluaran")
+                    AddExpenseView()
                 }
             }
         }

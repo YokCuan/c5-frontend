@@ -51,6 +51,7 @@ public struct ExpenseCategorySheetContent: View {
             }
         }
         .padding()
+        .padding(.top, 10)
         .presentationDetents([.fraction(0.55), .medium])
         .presentationDragIndicator(.visible)
         .background(Color(.systemBackground))
