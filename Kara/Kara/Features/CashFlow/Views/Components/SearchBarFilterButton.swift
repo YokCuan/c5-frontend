@@ -13,19 +13,26 @@ struct SearchBarFilterButton: View {
     @ObservedObject var viewModel: CashFlowViewModel
     
     @State private var isShowingFilterSheet = false
+    @State private var text: String = ""
     
     var body: some View {
         // Filter Section
-        VStack(spacing: 16) {
+        VStack(spacing: 8) {
             // Top Row: Search Bar + Filter Button
             HStack(spacing: 8) {
                 // Search TextField
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(Color.primary)
-                    TextField("Cari transaksi...", text: $viewModel.searchText)
-                        .foregroundColor(Color.primary)
+                    if text.isEmpty {
+                        Text("Cari transaksi...")
+                            .foregroundColor(Color(UIColor.secondarySystemBackground))
+                    }
+                    
+                    // TextField Utama
+                    TextField("", text: $text)
+                        .foregroundColor(Color(UIColor.secondarySystemBackground))
                 }
+                .foregroundColor(Color(UIColor.secondarySystemBackground))
                 .padding(.horizontal)
                 .padding(.vertical)
                 .background (.tertiary)
@@ -39,7 +46,7 @@ struct SearchBarFilterButton: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.secondary)
                         .frame(width: 50, height: 50)
-                        .background(Color.primary.opacity(0.2))
+                        .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(16)
                 }
             }
@@ -60,7 +67,8 @@ struct SearchBarFilterButton: View {
                 
                 Text(viewModel.selectedMonthYearString)
                     .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color(UIColor.secondarySystemBackground))
+                
                 
                 Spacer()
                 
