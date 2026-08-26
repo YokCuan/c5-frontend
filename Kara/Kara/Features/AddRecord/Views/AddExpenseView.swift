@@ -24,7 +24,7 @@ public struct AddExpenseView: View {
     @State private var dueDate = Date()
     @State private var supplierName = ""
     @State private var supplierPhone = ""
-    @State private var items: [IncomeItemInput] = [IncomeItemInput()]
+    @State private var items: [ExpenseItemInput] = [ExpenseItemInput()]
     @State private var paidAmount = ""
     @State private var selectedExpenseCategory: String = ""
     @State private var showErrors = false
@@ -92,7 +92,7 @@ public struct AddExpenseView: View {
                     }
                     
                     Button {
-                        items.append(IncomeItemInput())
+                        items.append(ExpenseItemInput())
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "plus.circle")

@@ -10,6 +10,8 @@ import SwiftUI
 public struct EditExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     
+    public let expense: Expense
+    
     @State private var transactionDate: Date
     @State private var items: [ExpenseItemInput]
     @State private var paidAmount: String
@@ -21,20 +23,18 @@ public struct EditExpenseView: View {
     @State private var isShowingDelSheet = false
     @State private var showErrors = false
     
-    public init(
-        initialDate: Date = Date(),
-        initialItems: [ExpenseItemInput] = [ExpenseItemInput()],
-        initialPaidAmount: String = "",
-        initialCategory: String = "",
-        initialSupplierName: String = "",
-        initialSupplierPhone: String = ""
-    ) {
-        _transactionDate = State(initialValue: initialDate)
-        _items = State(initialValue: initialItems.isEmpty ? [ExpenseItemInput()] : initialItems)
-        _paidAmount = State(initialValue: initialPaidAmount)
-        _selectedExpenseCategory = State(initialValue: initialCategory)
-        _supplierName = State(initialValue: initialSupplierName)
-        _supplierPhone = State(initialValue: initialSupplierPhone)
+    public init(expense: Expense) {
+        self.expense = expense
+        
+        _transactionDate = State(initialValue: expense.purchasedAt)
+        
+        let mappedItems = expense.items?.map { ExpenseItemInput(name: $0.name ?? "" ) } ?? []
+        _items = State(initialValue: mappedItems.isEmpty ? [ExpenseItemInput()] : mappedItems)
+        
+        _paidAmount = State(initialValue: String(format: "%.0f", expense.paidAmount))
+        _selectedExpenseCategory = State(initialValue: expense.category?.name ?? "")
+        _supplierName = State(initialValue: expense.supplierName ?? "")
+        _supplierPhone = State(initialValue: expense.supplierPhone ?? "")
     }
     
     private var areItemsValid: Bool {
@@ -157,7 +157,8 @@ public struct EditExpenseView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
-                    Button { showCategorySheet = true
+                    Button {
+                        showCategorySheet = true
                     } label: {
                         HStack {
                             Text(selectedExpenseCategory.isEmpty ? "Pilih kategori" : selectedExpenseCategory)
@@ -216,16 +217,16 @@ public struct EditExpenseView: View {
                 }
                 .padding(.top, 8)
                 
-                Button(action: {isShowingDelSheet = true}) {
-                    Text("Hapus Pemasukan")
+                Button(action: { isShowingDelSheet = true }) {
+                    Text("Hapus Pengeluaran")
                         .font(.title3.bold())
                         .foregroundStyle(.red)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(.gray.opacity(0.3))
+                        .background(.gray.opacity(0.15))
                         .cornerRadius(24)
                 }
-                .sheet(isPresented: $isShowingDelSheet){
+                .sheet(isPresented: $isShowingDelSheet) {
                     CashFlowDeleteOutcome()
                         .presentationDetents([.fraction(0.5), .height(.infinity)])
                         .presentationDragIndicator(.visible)
@@ -234,7 +235,6 @@ public struct EditExpenseView: View {
             .padding()
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Edit Pengeluaran")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(
             LinearGradient(
@@ -260,17 +260,25 @@ public struct EditExpenseView: View {
 }
 
 #Preview {
-    NavigationStack {
-        EditExpenseView(
-            initialDate: Date(),
-            initialItems: [
-                ExpenseItemInput(name: "Tepung Terigu Segitiga 25 kg"),
-                ExpenseItemInput(name: "Minyak Goreng 5 Liter")
-            ],
-            initialPaidAmount: "350.000",
-            initialCategory: "Bahan Baku",
-            initialSupplierName: "Toko Sembako Makmur",
-            initialSupplierPhone: "081234567890"
-        )
+    let dummyCategoryId = UUID()
+    let dummyExpense = Expense(
+        id: UUID(),
+        shopId: UUID(),
+        expenseCategoryId: dummyCategoryId,
+        supplierName: "Toko Sembako Makmur",
+        supplierPhone: "081234567890",
+        paidAmount: 350000,
+        purchasedAt: Date(),
+        createdBy: UUID(),
+        updatedBy: UUID(),
+        items: [
+            ExpenseItem(id: UUID(), expenseId: UUID(), name: "Tepung Terigu Segitiga 25 kg"),
+            ExpenseItem(id: UUID(), expenseId: UUID(), name: "Minyak Goreng 5 Liter")
+        ],
+        category: ExpenseCategory(id: dummyCategoryId, name: "Bahan Baku")
+    )
+    
+    return NavigationStack {
+        EditExpenseView(expense: dummyExpense)
     }
 }
