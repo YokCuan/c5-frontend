@@ -19,12 +19,12 @@ struct SalesCard: View {
                 Text (salesNote.customerName)
                     .font(.headline)
                 Spacer()
-                Text ("DP")
+                Text (salesNote.status.title)
                     .font(.caption)
                     .fontWeight(.medium)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.orange)
+                    .background(salesNote.status.themeColor)
                     .foregroundStyle(Color.white)
                     .clipShape(Capsule())
             }
@@ -44,38 +44,63 @@ struct SalesCard: View {
             }
             .foregroundStyle(Color.secondary)
             
-            Divider ()
+//            Divider ()
             
-            HStack {
-                Text ("Sisa Pembayaran")
-                Spacer()
-                Text (remainingAmount.toIDR)
-                    .fontWeight(.bold)
-                    .foregroundStyle(Color.red)
-            }
-            .foregroundStyle(Color.secondary)
-            
-            if let dueAt = salesNote.dueAt {
-                HStack(spacing: 6) {
-                    Image(systemName: "clock")
-                    
-                    Text("Tagih \(dueAt.formatted(date: .long, time: .omitted))")
+            if salesNote.status == .dp || salesNote.status == .notPaid {
+                
+                Divider()
+                HStack {
+                    Text("Sisa Pembayaran")
+                    Spacer()
+                    Text(remainingAmount.toIDR)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.red)
                 }
-                .font(.subheadline)
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
+                
+                if let dueAt = salesNote.dueAt {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock")
+                        Text("Tagih \(dueAt.formatted(date: .long, time: .omitted))")
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.orange)
+                }
             }
             Divider()
-
-            HStack {
-                Text("Lihat Detail")
-                    .foregroundStyle(.blue)
+            Button {
                 
-                Spacer()
-                
-                Image(systemName: "chevron.right.circle")
-                    .foregroundStyle(.blue)
+            } label:{
+                HStack {
+                    Text("Lihat Detail")
+                        .foregroundStyle(.blue)
+                    Spacer()
+                    Image(systemName: "chevron.right.circle")
+                        .foregroundStyle(.blue)
+                }
             }
         }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.white)
+        )
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(salesNote.status.themeColor)
+                .frame(height: 2)
+        }
+        .clipShape(
+            RoundedRectangle(cornerRadius: 16)
+        )
+        .shadow(
+//              color: .black.opacity(0.08),
+            color: salesNote.status.themeColor.opacity(0.1),
+            radius: 8,
+            x: 0,
+            y: 3
+        )
     }
 }
 
