@@ -16,14 +16,14 @@ public struct MainTabView: View {
                 }
                 
                 Tab("Rekap", systemImage: "chart.bar.fill", value: 1) {
-                    RekapView()
+                    Penjualan()
                 }
                 
-                Tab("Tambah", systemImage: "plus", value: 3, role: .search) {
+                Tab("Tambah", systemImage: "plus", value: 2, role: .search) {
                     Color.clear
                 }
             }
-            .onTapGesture {showAddRecord = true}
+            
             .sheet(isPresented: $showAddRecord) {
                 IncomeExpenseChoiceSheet(navigationRoute: $navigationRoute)
             }

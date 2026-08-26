@@ -51,12 +51,15 @@ public final class AddExpenseViewModel: ObservableObject {
         do {
             // Build Model
             let expense = CashFlowModel(
-                amount: amount,
+                id: UUID(),
+                amount: Double(amount),
                 type: .pengeluaran,
                 description: fullDescription,
-                date: transactionDate,
                 counterpartyName: storeName,
-                paymentStatus: PaymentStatus.paid.title
+                paymentStatus: PaymentStatus.paid.title,
+                date: transactionDate,
+                income: nil,
+                expense: nil
             )
             
             // Save to Firebase

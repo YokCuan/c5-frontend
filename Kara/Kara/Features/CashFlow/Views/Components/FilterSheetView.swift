@@ -53,9 +53,7 @@ struct FilterSheetView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal)
-            .padding(.top)
-            .padding(.bottom)
+
             
             // MARK: - Body Content
             ScrollView {
@@ -65,7 +63,6 @@ struct FilterSheetView: View {
                     Text("Rentang waktu")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal)
                         .padding(.top)
                     
                     VStack(alignment: .leading, spacing: 16) {
@@ -73,7 +70,7 @@ struct FilterSheetView: View {
                             dateRangeRow(range)
                         }
                     }
-                    .padding(.horizontal)
+                    
                     
                     Divider()
                     
@@ -81,14 +78,13 @@ struct FilterSheetView: View {
                     Text("Besar transaksi")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal)
                         .padding(.top)
                     
                     HStack {
                         amountField(label: "Dari", value: $minAmount)
                         amountField(label: "Ke", value: $maxAmount)
                     }
-                    .padding(.horizontal)
+                   
                     
                     Divider()
                     
@@ -106,7 +102,7 @@ struct FilterSheetView: View {
                             Image(systemName: "chevron.right")
                                 .foregroundStyle(Color.primary)
                         }
-                        .padding(.horizontal)
+                        
                     }
                     .buttonStyle(.plain)
                 }
@@ -126,9 +122,10 @@ struct FilterSheetView: View {
                     .background(Color.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .padding(.horizontal)
             .padding(.vertical)
         }
+        .padding(.top, 10)
+        .padding()
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $isShowingCategorySheet) {
             SheetFilterCategory(
@@ -152,9 +149,10 @@ struct FilterSheetView: View {
                 endDate: $endDate,
                 parentSheetDismiss: { dismiss() }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.fraction(0.6), .height(.infinity)])
             .presentationDragIndicator(.visible)
         }
+       
     }
     
     @ViewBuilder
