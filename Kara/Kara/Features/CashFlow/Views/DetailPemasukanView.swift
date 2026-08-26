@@ -75,18 +75,17 @@ public struct DetailPemasukanView: View {
             .cornerRadius(10)
             
             
-            //DelButton
-            Button(action: {isShowingDelSheet = true}) {
-                Text("Hapus Pemasukan")
-                    .font(.body.bold())
+            Button(action: { isShowingDelSheet = true }) {
+                Text("Hapus Pengeluaran")
+                    .font(.title3.bold())
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.red.opacity(0.1))
-                    .cornerRadius(10)
+                    .background(.gray.opacity(0.15))
+                    .cornerRadius(24)
             }
-            .sheet(isPresented: $isShowingDelSheet){
-                DeleteIncome()
+            .sheet(isPresented: $isShowingDelSheet) {
+                CashFlowDeleteOutcome()
                     .presentationDetents([.fraction(0.5), .height(.infinity)])
                     .presentationDragIndicator(.visible)
             }
@@ -96,8 +95,23 @@ public struct DetailPemasukanView: View {
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Detail Pemasukan")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(
+            LinearGradient(
+                colors: [Color.karaBlueDark, Color.karaBlue],
+                startPoint: .top,
+                endPoint: .bottom
+            ),
+            for: .navigationBar
+        )
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Edit Pemasukan")
+                    .font(.headline.bold())
+                    .foregroundStyle(.white)
+            }
+        }
     }
 }
 
@@ -126,7 +140,7 @@ public struct DetailPemasukanView: View {
         ]
     )
     
-    ZStack {
+    NavigationStack {
         DetailPemasukanView(note: dummyNote)
         
     }

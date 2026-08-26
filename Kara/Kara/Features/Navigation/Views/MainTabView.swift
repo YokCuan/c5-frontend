@@ -3,44 +3,44 @@ import SwiftUI
 public struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var showAddRecord = false
+    @State private var navigationRoute: AppRoute?
     
     public init() {}
     
+    
     public var body: some View {
-        ZStack(alignment: .bottom) {
+        NavigationStack{
             TabView(selection: $selectedTab) {
-                CashFlowView()
-                    .tabItem {
-                        Image(systemName: "list.bullet.rectangle")
-                        Text("Arus Kas")
-                    }
-                    .tag(0)
+                Tab("Arus Kas", systemImage: "dollarsign.circle.fill", value: 0) {
+                    CashFlowView()
+                }
                 
-                RekapView()
-                    .tabItem {
-                        Image(systemName: "chart.bar.fill")
-                        Text("Rekap")
-                    }
-                    .tag(1)
+                Tab("Rekap", systemImage: "chart.bar.fill", value: 1) {
+                    RekapView()
+                }
+                
+                Tab("Tambah", systemImage: "plus", value: 3, role: .search) {
+                    Color.clear
+                }
             }
-            
-            // Custom Floating Action Button
-            Button(action: {
-                showAddRecord = true
-            }) {
-                Image(systemName: "plus")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .frame(width: 60, height: 60)
-                    .background(Color.blue)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
+            .onTapGesture {showAddRecord = true}
+            .sheet(isPresented: $showAddRecord) {
+                IncomeExpenseChoiceSheet(navigationRoute: $navigationRoute)
             }
-            .offset(y: -20)
-        }
-        .sheet(isPresented: $showAddRecord) {
-            AddRecordView()
+            .onChange(of: selectedTab) { oldTab, newTab in
+                if newTab == 2 {
+                    showAddRecord = true
+                    selectedTab = oldTab
+                }
+            }
+            .navigationDestination(item: $navigationRoute) { route in
+                switch route {
+                case .addIncome:
+                    AddIncomeView()
+                case .addExpense:
+                    AddExpenseView()
+                }
+            }
         }
     }
 }
