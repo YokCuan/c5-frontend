@@ -51,8 +51,12 @@ public struct CashFlowView: View {
                         VStack(spacing: 16) {
                             // Summary Cards
                             HStack(spacing: 16) {
-                                CashFlowSummaryCard(title: "Total Pemasukan", amount: viewModel.totalIncome, isIncome: true)
-                                CashFlowSummaryCard(title: "Total Pengeluaran", amount: viewModel.totalExpense, isIncome: false)
+                                CashFlowSummaryCard(title: "Uang Masuk", amount: Double(viewModel.totalIncome), isIncome: true)
+                                CashFlowSummaryCard(
+                                    title: "Uang Keluar",
+                                    amount: Double(viewModel.totalExpense),
+                                    isIncome: false
+                                )
                             }
                             .padding(.horizontal)
                             
