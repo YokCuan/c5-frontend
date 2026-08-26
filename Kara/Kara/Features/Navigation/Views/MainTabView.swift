@@ -16,7 +16,7 @@ public struct MainTabView: View {
                 }
                 
                 Tab("Rekap", systemImage: "chart.bar.fill", value: 1) {
-                    RekapView()
+                    Penjualan()
                 }
                 
                 Tab("Tambah", systemImage: "plus", value: 2, role: .search) {
