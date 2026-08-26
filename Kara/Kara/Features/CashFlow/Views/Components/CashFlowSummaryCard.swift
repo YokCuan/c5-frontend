@@ -14,7 +14,7 @@ public struct CashFlowSummaryCard: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {
-                Image(systemName: "arrow.up")
+                Image(systemName: isIncome ? "arrow.down" : "arrow.up")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(isIncome ? Color.green : Color.red)
                     .frame(width: 32, height: 32)

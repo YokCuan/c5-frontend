@@ -3,10 +3,10 @@ import Combine
 
 @MainActor
 public class RekapViewModel: ObservableObject {
-    @Published public var totalIncome: Int = 0
-    @Published public var totalExpense: Int = 0
+    @Published public var totalIncome: Double = 0
+    @Published public var totalExpense: Double = 0
     
-    public var netBalance: Int {
+    public var netBalance: Double {
         totalIncome - totalExpense
     }
     

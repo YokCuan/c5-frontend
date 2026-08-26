@@ -7,75 +7,68 @@ public struct CashFlowTransactionRow: View {
         self.transaction = transaction
     }
     
+    private var isIncome: Bool {
+        transaction.type == .pemasukan
+    }
+    
+    private var statusColor: Color {
+        isIncome ? Color(red: 0.12, green: 0.75, blue: 0.35) : Color(red: 0.98, green: 0.28, blue: 0.28)
+    }
+    
     public var body: some View {
-        HStack(spacing: 12) {
-            
-            // MARK: - Left Content
-            VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.counterpartyName)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                
-                Text(transaction.description)
+        NavigationLink {
+            if isIncome, let salesNote = transaction.income {
+                DetailPemasukanView(note: salesNote)
+            } else if let expense = transaction.expense {
+                EditExpenseView(expense: expense)
+            }
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(transaction.counterpartyName)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    
+                    Text(
+                        isIncome
+                        ? "Penjualan"
+                        : (transaction.expense?.category?.name ?? "Pengeluaran")
+                    )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                }
+                
+                Spacer()
+                
+                Text(
+                    isIncome
+                    ? "+ \(transaction.amount.toIDR)"
+                    : "- \(transaction.amount.toIDR)"
+                )
+                .font(.headline.bold())
+                .foregroundStyle(statusColor)
+                
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
             }
-            
-            Spacer()
-            
-            // MARK: - Amount
-            Text(
-                transaction.type == .pemasukan
-                ? "+ Rp \(transaction.amount)"
-                : "- Rp \(transaction.amount)"
-            )
-            .font(.headline)
-            .fontWeight(.bold)
-            .foregroundStyle(
-                transaction.type == .pemasukan
-                ? .green
-                : .red
-            )
-            
-            // MARK: - Chevron
-            Image(systemName: "chevron.right")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(statusColor, lineWidth: 3.5)
+                    .mask(
+                        HStack {
+                            Rectangle().frame(width: 4)
+                            Spacer()
+                        }
+                    )
+            }
+            .shadow(color: Color.black.opacity(0.03), radius: 6, y: 2)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(Color(.systemBackground))
-        .clipShape(
-            RoundedRectangle(cornerRadius: 12)
-        )
-        .overlay(alignment: .leading) {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    transaction.type == .pemasukan
-                    ? Color.green
-                    : Color.red,
-                    lineWidth: 3
-                )
-                .mask(
-                    HStack {
-                        Rectangle()
-                            .frame(width: 3)
-                        Spacer()
-                    }
-                )
-        }
+        .buttonStyle(.plain) 
     }
-}
-
-#Preview {
-    CashFlowTransactionRow(
-        transaction: CashFlowModel(
-            amount: 50000,
-            type: .pemasukan,
-            description: "Penjualan · 18:00",
-            counterpartyName: "Bu Ria",
-            paymentStatus: "Lunas"
-        )
-    )
-    .padding()
 }

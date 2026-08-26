@@ -33,12 +33,15 @@ public final class AddIncomeViewModel: ObservableObject {
         
         do {
             let income = CashFlowModel(
-                amount: amount,
+                id: UUID(),
+                amount: Double(amount),
                 type: .pemasukan,
                 description: incomeDescription,
-                date: transactionDate,
                 counterpartyName: buyerName,
-                paymentStatus: paymentStatus.title
+                paymentStatus: paymentStatus.title,
+                date: transactionDate,
+                income: nil,
+                expense: nil
             )
             
             try await service.saveCashFlowTransaction(income)

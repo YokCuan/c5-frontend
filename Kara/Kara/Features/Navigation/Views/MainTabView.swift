@@ -19,11 +19,11 @@ public struct MainTabView: View {
                     RekapView()
                 }
                 
-                Tab("Tambah", systemImage: "plus", value: 3, role: .search) {
+                Tab("Tambah", systemImage: "plus", value: 2, role: .search) {
                     Color.clear
                 }
             }
-            .onTapGesture {showAddRecord = true}
+            
             .sheet(isPresented: $showAddRecord) {
                 IncomeExpenseChoiceSheet(navigationRoute: $navigationRoute)
             }
