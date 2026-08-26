@@ -9,35 +9,22 @@ import SwiftUI
 
 public struct IncomeExpenseChoiceSheet: View {
     @Environment(\.dismiss) private var dismiss
-//    @Binding var navigationRoute: AppRoute?
+    @Binding var navigationRoute: AppRoute?
     
     public var body: some View {
         VStack(spacing: 24) {
-            ZStack {
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.black)
-                            .frame(width: 44, height: 44)
-                            .background(Color(.systemGray5))
-                            .clipShape(Circle())
-                    }
-                    Spacer()
-                }
-                
+            HStack {
+                Spacer()
                 Text("Pilih Tipe Transaksi")
                     .font(.headline)
+                Spacer()
             }
-            .padding(.top)
-            .padding(.horizontal)
+            .padding(.top, 30)
             
             VStack(spacing: 0) {
                 Button {
                     dismiss()
-//                    navigationRoute = .addIncome
+                    navigationRoute = .addIncome
                 } label: {
                     HStack(spacing: 16) {
                         ZStack {
@@ -65,7 +52,7 @@ public struct IncomeExpenseChoiceSheet: View {
                 
                 Button {
                     dismiss()
-//                    navigationRoute = .addExpense
+                    navigationRoute = .addExpense
                 } label: {
                     HStack(spacing: 16) {
                         ZStack {
@@ -92,12 +79,12 @@ public struct IncomeExpenseChoiceSheet: View {
             
             Spacer()
         }
-        .presentationDetents([.fraction(0.35), .height(260)])
+        .presentationDetents([.fraction(0.5), .height(300)])
         .presentationDragIndicator(.visible)
         .background(Color(.systemBackground))
     }
 }
 
 #Preview {
-    IncomeExpenseChoiceSheet()
+    MainTabView()
 }
