@@ -2,110 +2,118 @@ import SwiftUI
 
 public struct CashFlowView: View {
     @StateObject public var viewModel = CashFlowViewModel()
-    @State var scrollOffset: CGFloat = 0
+    @State private var scrollOffset: CGFloat = 0
     
     public init() {}
     
     public var body: some View {
         NavigationStack {
-            
-            let titleOpacity = max(0, 1 - (scrollOffset / 40.0))
-            let titleHeight = max(0, 40 - scrollOffset)
+            let titleOpacity = max(0, 1 - (scrollOffset / 35.0))
+            let titleHeight = max(0, 36 - scrollOffset)
             
             ZStack(alignment: .top) {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea(.all)
                 
-                LinearGradient(
-                    gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 360)
-                .cornerRadius(20)
-                .ignoresSafeArea(edges: .top)
-                .offset(y: -max(0, scrollOffset))
-                
-                VStack(spacing: 0){
-                    VStack(alignment: .leading, spacing: 8) {
-                        
-                        // Teks Judul "Arus Kas" yang Menyusut & Hilang
+                VStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 24) {
                         if titleHeight > 0 {
                             Text("Arus Kas")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color(UIColor.secondarySystemBackground))
-                                .padding(.horizontal)
+                                .font(.largeTitle.bold())
+                                .foregroundStyle(.white)
+                                .padding(.top, 10)
+                                .padding(.horizontal, 16)
                                 .opacity(titleOpacity)
                                 .frame(height: titleHeight)
                                 .clipped()
                         }
                         
-                        // Filter Section (Tetap Stay di Atas setelah Judul Hilang)
                         SearchBarFilterButton(viewModel: viewModel)
                     }
-                    .padding(.top, 8)
-                    .padding(.bottom, 8)
+                    .padding(.vertical)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        
+                        .ignoresSafeArea(edges: .top)
+                    )
+                    .zIndex(1)
                     
                     ScrollView {
-                        VStack(spacing: 16) {
-                            // Summary Cards
-                            HStack(spacing: 16) {
-                                CashFlowSummaryCard(title: "Total Pemasukan", amount: viewModel.totalIncome, isIncome: true)
-                                CashFlowSummaryCard(title: "Total Pengeluaran", amount: viewModel.totalExpense, isIncome: false)
-                            }
-                            .padding(.horizontal)
-                            
-                            // Transactions List
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .padding(.top, 40)
-                            } else if viewModel.transactions.isEmpty {
-                                VStack {
-                                    Image(systemName: "doc.text.magnifyingglass")
-                                        .font(.largeTitle)
-                                        .foregroundColor(.secondary)
-                                    Text("Belum ada transaksi")
-                                        .foregroundColor(.secondary)
+                        VStack(spacing: 0) {
+                            VStack(spacing: 0) {
+                                HStack(spacing: 14) {
+                                    CashFlowSummaryCard(
+                                        title: "Uang Masuk",
+                                        amount: Double(viewModel.totalIncome),
+                                        isIncome: true
+                                    )
+                                    CashFlowSummaryCard(
+                                        title: "Uang Keluar",
+                                        amount: Double(viewModel.totalExpense),
+                                        isIncome: false
+                                    )
                                 }
-                                .padding(.top, 60)
-                            } else {
-                                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                                    ForEach(viewModel.groupedTransactions, id: \.key) { group in
-                                        Section(header:
-                                                    Text(group.key, style: .date)
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.secondary)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.horizontal)
-                                            .padding(.vertical)
-                                            .background(Color(.systemGroupedBackground))
-                                        ) {
-                                            ForEach(group.value) { transaction in
-                                                CashFlowTransactionRow(transaction: transaction)
-                                                    .padding(.horizontal)
-                                                Divider()
-                                                    .padding(.leading)
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 22)
+                            }
+                            .background(
+                                Color.karaBlue
+                                    .clipShape(
+                                        UnevenRoundedRectangle(
+                                            bottomLeadingRadius: 24,
+                                            bottomTrailingRadius: 24
+                                        )
+                                    )
+                            )
+                            VStack(spacing: 16) {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .padding(.top, 40)
+                                } else if viewModel.transactions.isEmpty {
+                                    VStack(spacing: 8) {
+                                        Image(systemName: "doc.text.magnifyingglass")
+                                            .font(.largeTitle)
+                                            .foregroundStyle(.secondary)
+                                        Text("Belum ada transaksi")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .padding(.top, 60)
+                                } else {
+                                    LazyVStack(spacing: 16) {
+                                        ForEach(viewModel.groupedTransactions, id: \.key) { group in
+                                            VStack(alignment: .leading, spacing: 10) {
+                                                Text(group.key, style: .date)
+                                                    .font(.caption.bold())
+                                                    .foregroundStyle(.secondary)
+                                                    .padding(.horizontal, 4)
+                                                
+                                                VStack(spacing: 10) {
+                                                    ForEach(group.value) { transaction in
+                                                        CashFlowTransactionRow(transaction: transaction)
+                                                    }
+                                                }
                                             }
                                         }
                                     }
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                                    .padding(.bottom, 90)
                                 }
-                                .background(Color(.systemBackground))
-                                .cornerRadius(12)
-                                .padding(.horizontal)
                             }
                         }
                     }
-                    // Menangkap posisi Scroll Y secara realtime
                     .onScrollGeometryChange(for: CGFloat.self) { geometry in
                         geometry.contentOffset.y
-                    } action: { oldValue, newValue in
+                    } action: { _, newValue in
                         scrollOffset = newValue
                     }
                 }
             }
-            // Sembunyikan Nav Bar standar bawaan iOS agar tidak bentrok dengan Custom Header
             .toolbar(.hidden, for: .navigationBar)
             .task {
                 await viewModel.loadTransactions()

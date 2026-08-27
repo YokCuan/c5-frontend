@@ -35,20 +35,11 @@ struct SheetDatePicker: View {
             
             // MARK: - Custom Header
             HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "arrow.left")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.primary)
-                }
                 
                 Text("Atur Rentang Waktu")
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
-                    .padding(.leading)
                 
                 Spacer()
                 
@@ -61,8 +52,6 @@ struct SheetDatePicker: View {
                         .foregroundStyle(Color.secondary .opacity(0.8))
                 }
             }
-            .padding(.horizontal)
-            .padding(.top)
             
             // MARK: - Input Box (Dari & Ke)
             HStack(spacing: 16) {
@@ -84,7 +73,6 @@ struct SheetDatePicker: View {
                     activeField = .end
                 }
             }
-            .padding(.horizontal)
             
             // MARK: - Tombol Pasang
             Button {
@@ -100,7 +88,6 @@ struct SheetDatePicker: View {
                     .background(Color.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.horizontal)
             
             // MARK: - DatePicker Wheel Native
             if activeField == .start {
@@ -115,7 +102,10 @@ struct SheetDatePicker: View {
             
             Spacer()
         }
+        .padding(.top, 10)
+        .padding()
     }
+       
     
     // MARK: - Helper Subview Input Card
     @ViewBuilder

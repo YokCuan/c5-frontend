@@ -5,6 +5,8 @@ import Foundation
 public class FirebaseService {
     public static let shared = FirebaseService()
     
+    private var cashFlowTransactionStorage = AppMockData.cashFlowTransactions
+    
     private init() {}
     
     // MARK: - CashFlow Operations
@@ -15,14 +17,12 @@ public class FirebaseService {
         // return snapshot.documents.compactMap { try? $0.data(as: CashFlowModel.self) }
         
         // Mock data for now so the app runs smoothly
-        return [
-//            CashFlowModel(amount: 150000, type: .pemasukan, description: "Penjualan Keripik", date: Date(), counterpartyName: "Budi", paymentStatus: PaymentStatus.paid.displayName),
-//            CashFlowModel(amount: 50000, type: .pengeluaran, description: "Beli Plastik", date: Date().addingTimeInterval(-86400), counterpartyName: "Toko Plastik", paymentStatus: PaymentStatus.paid.displayName)
-        ]
+        return cashFlowTransactionStorage.sorted { $0.date > $1.date }
     }
     
     public func saveCashFlowTransaction(_ transaction: CashFlowModel) async throws {
         try await Task.sleep(nanoseconds: 1_000_000_000)
+        cashFlowTransactionStorage.append(transaction)
         print("Saved transaction to Firebase: \(transaction.description)")
     }
 }
