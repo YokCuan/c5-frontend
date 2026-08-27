@@ -69,117 +69,118 @@ struct Penjualan: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
+            
+            VStack(alignment: .leading, spacing: 20) {
                 
-                VStack(alignment: .leading, spacing: 20) {
-                    
-                    Text("Penjualan")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    
-                    HStack(spacing: 12) {
-                        HStack(spacing: 16) {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundStyle(.white.opacity(0.5))
-                            TextField(
-                                "",
-                                text: $searchText,
-                                prompt: Text("Cari pembeli atau nota...").foregroundStyle(.white.opacity(0.5))
-                            )
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 12)
-                        .frame(height: 40)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white.opacity(0.1))
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 10,
-                                style: .continuous
-                            )
+                Text("Penjualan")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                
+                HStack(spacing: 12) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.white.opacity(0.5))
+                        TextField(
+                            "",
+                            text: $searchText,
+                            prompt: Text("Cari pembeli atau nota...").foregroundStyle(.white.opacity(0.5))
                         )
-                        
-                        Button {
-                            isShowingFilter = true
-                        } label: {
-                            ZStack(alignment: .topTrailing) {
-                                Image(systemName: "calendar")
-                                    .foregroundStyle(.black)
-                                    .frame(width: 40, height: 40)
-                                    .background(.white)
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 10,
-                                            style: .continuous
-                                        )
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .frame(height: 40)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white.opacity(0.1))
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 10,
+                            style: .continuous
+                        )
+                    )
+                    
+                    Button {
+                        isShowingFilter = true
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.black)
+                                .frame(width: 40, height: 40)
+                                .background(.white)
+                                .clipShape(
+                                    RoundedRectangle(
+                                        cornerRadius: 10,
+                                        style: .continuous
                                     )
-                                
-                                if isAnyFilterActive {
-                                    Circle()
-                                        .fill(Color.red)
-                                        .frame(width: 10, height: 10)
-                                        .offset(x: 2, y: -2)
-                                }
+                                )
+                            
+                            if isAnyFilterActive {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 10, height: 10)
+                                    .offset(x: 2, y: -2)
                             }
                         }
                     }
-                    
-                    HStack(spacing: 9) {
-                        filterButton("Semua", status: nil)
-                        filterButton("Belum Bayar", status: .notPaid)
-                        filterButton("DP", status: .dp)
-                        filterButton("Lunas", status: .paid)
+                }
+                
+                HStack(spacing: 9) {
+                    filterButton("Semua", status: nil)
+                    filterButton("Belum Bayar", status: .notPaid)
+                    filterButton("DP", status: .dp)
+                    filterButton("Lunas", status: .paid)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                
+                if let activeFilterSummary {
+                    Text(activeFilterSummary)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 16)
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea(edges: .top)
+            )
+            
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(filteredNotes) { note in
+                        SalesCard(salesNote: note, onTapDetail: {
+                            selectedNote = note
+                        })
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
-                    
-                    if let activeFilterSummary {
-                        Text(activeFilterSummary)
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.75))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
                 .padding(.bottom, 16)
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .ignoresSafeArea(edges: .top)
-                )
-                
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(filteredNotes) { note in
-                            SalesCard(salesNote: note, onTapDetail: {
-                                selectedNote = note
-                            })
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .padding(.bottom, 16)
-                }
-                .background(Color(.systemGray6))
             }
-            .navigationDestination(item: $selectedNote) { note in
-                InvoiceView(note: note, shop: AppMockData.primaryShop)
-            }
-            .sheet(isPresented: $isShowingFilter) {
-                FilterComponent(
-                    selectedDateRange: $selectedDateRange,
-                    startDate: $startDate,
-                    endDate: $endDate
-                )
-            }
+            .background(Color(.systemGray6))
+        }
+        .navigationDestination(item: $selectedNote) { note in
+            DetailPenjualan(
+                salesNote: note,
+                shop: AppMockData.primaryShop
+            )
+        }
+        .sheet(isPresented: $isShowingFilter) {
+            FilterComponent(
+                selectedDateRange: $selectedDateRange,
+                startDate: $startDate,
+                endDate: $endDate
+            )
         }
     }
     
@@ -252,5 +253,7 @@ struct Penjualan: View {
 }
 
 #Preview {
-    Penjualan()
+    NavigationStack {
+        Penjualan()
+    }
 }
