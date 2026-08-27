@@ -28,7 +28,17 @@ public struct CashFlowView: View {
                                 .clipped()
                         }
                         
-                        SearchBarFilterButton(viewModel: viewModel)
+                        SearchBarFilterButton(
+                            viewModel: viewModel,
+                            searchText: $viewModel.searchText,
+                            selectedPaymentStatus: $viewModel.selectedPaymentStatus,
+                            selectedCategory: $viewModel.selectedCategory,
+                            startDate: $viewModel.startDate,
+                            endDate: $viewModel.endDate,
+                            useCustomDateRange: $viewModel.useCustomDateRange,
+                            minAmountFilter: $viewModel.minAmountFilter,
+                            maxAmountFilter: $viewModel.maxAmountFilter
+                        )
                     }
                     .padding(.vertical)
                     .background(
