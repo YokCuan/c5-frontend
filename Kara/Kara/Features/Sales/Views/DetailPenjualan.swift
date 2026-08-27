@@ -5,7 +5,6 @@
 //  Created by Shelly Mutiara Haq on 27/08/26.
 //
 
-
 import SwiftUI
 
 struct DetailPenjualan: View {
@@ -14,7 +13,6 @@ struct DetailPenjualan: View {
     let shop: Shop
     
     @State private var isShowingDeleteSheet = false
-    @State private var isShowingInvoice = false
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -23,39 +21,6 @@ struct DetailPenjualan: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                HStack {
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.title3)
-                            .foregroundStyle(.black)
-                            .frame(width: 40, height: 40)
-                            .background(.white.opacity(0.4))
-                            .clipShape(Circle())
-                    }
-                    
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .overlay {
-                    Text("Detail Penjualan")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 16)
-                .frame(maxWidth: .infinity)
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    //                .ignoresSafeArea(edges: .top)
-                )
                 VStack(alignment: .leading, spacing: 20) {
                     
                     HStack {
@@ -146,41 +111,35 @@ struct DetailPenjualan: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 20)
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Keripik Tempe 100 g")
-                                .font(.body)
-                            
-                            Text("2 pcs · Rp10.000 / pcs")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Text("Rp20.000")
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                    }
                     
-                    Divider()
-                        .padding(.vertical, 16)
-                    
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Keripik Tempe 100 g")
-                                .font(.body)
+                    if let items = salesNote.items, !items.isEmpty {
+                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(item.name)
+                                        .font(.body)
+                                    
+                                    Text("\(item.quantity) pcs · \(formatRupiah(item.unitPrice)) / pcs")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Text(formatRupiah(item.subtotal))
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                            }
                             
-                            Text("2 pcs · Rp10.000 / pcs")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            if index < items.count - 1 {
+                                Divider()
+                                    .padding(.vertical, 16)
+                            }
                         }
-                        
-                        Spacer()
-                        
-                        Text("Rp20.000")
+                    } else {
+                        Text("Tidak ada rincian barang")
                             .font(.subheadline)
-                            .fontWeight(.bold)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding(16)
@@ -191,18 +150,20 @@ struct DetailPenjualan: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 
-                VStack(spacing: 12) {
-                    
-                    Button {
-                        isShowingInvoice = true
+                    VStack(spacing: 12) {
+                        
+                    NavigationLink {
+                        InvoiceView(note: salesNote, shop: shop)
                     } label: {
-                        Text("Lihat Nota")
+                        Text(
+                            salesNote.status == .paid ? "Lihat Kwitansi": "Lihat Nota"
+                        )
                             .font(.headline)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(.blue)
+                            .background(Color.blue)
                             .clipShape(Capsule())
                     }
                     
@@ -223,19 +184,30 @@ struct DetailPenjualan: View {
                 .padding(.top, 12)
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(
+            LinearGradient(
+                colors: [Color.karaBlueDark, Color.karaBlue],
+                startPoint: .top,
+                endPoint: .bottom
+            ),
+            for: .navigationBar
+        )
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Detail Penjualan")
+                    .font(.headline.bold())
+                    .foregroundStyle(.white)
+            }
+        }
         .sheet(isPresented: $isShowingDeleteSheet) {
             DeleteIncome()
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $isShowingInvoice) {
-            InvoiceView(
-                note: salesNote,
-                shop: shop
-            )
-        }
-//        .ignoresSafeArea(edges: .top)
     }
+    
     private var statusText: String {
         switch salesNote.status {
         case .paid:
@@ -246,6 +218,7 @@ struct DetailPenjualan: View {
             return "BELUM DIBAYAR"
         }
     }
+    
     private var statusColor: Color {
         switch salesNote.status {
         case .paid:
@@ -269,26 +242,12 @@ private func formatRupiah(_ amount: Double) -> String {
         from: NSNumber(value: amount)
     ) ?? "Rp0"
 }
+
 #Preview {
-    DetailPenjualan(
-        salesNote: SalesNote(
-            id: UUID(),
-            shopId: UUID(),
-            identifier: "#8612",
-            customerName: "Bu Sherin",
-            customerPhone: "08123456789",
-            totalAmount: 50000,
-            paidAmount: 45000,
-            status: .dp,
-            noteFileLink: nil,
-            dueAt: Date(),
-            soldAt: Date(),
-            items: nil
-        ),
-        shop: Shop(
-                    ownerId: UUID(),
-                    name: "Keripik Bu Ria",
-                    description: "Usaha Keripik Tempe Sagu"
-                )
-    )
+    NavigationStack {
+        DetailPenjualan(
+            salesNote: AppMockData.salesNotes[0],
+            shop: AppMockData.primaryShop
+        )
+    }
 }
