@@ -10,18 +10,18 @@ import SwiftUI
 struct FilterSheetView: View {
     
     @Binding var selectedPaymentStatus: PaymentStatus?
+    @Binding var selectedCategory: CategoryFilterOption?
     @Binding var startDate: Date
     @Binding var endDate: Date
+    @Binding var useCustomDateRange: Bool
+    @Binding var minAmountFilter: String
+    @Binding var maxAmountFilter: String
     
     @ObservedObject var viewModel: CashFlowViewModel
     
     @Environment(\.dismiss) private var dismiss
     
     @State private var selectedDateRange: DateRange? = nil
-    @State private var minAmount: String = ""
-    @State private var maxAmount: String = ""
-    
-    @State private var selectedCategory: CategoryFilterOption? = nil
     @State private var isShowingCategorySheet: Bool = false
     @State private var isShowingDatePickerSheet = false
     
@@ -54,6 +54,7 @@ struct FilterSheetView: View {
                 .buttonStyle(.plain)
             }
 
+            activeFilterChips
             
             // MARK: - Body Content
             ScrollView {
@@ -81,8 +82,8 @@ struct FilterSheetView: View {
                         .padding(.top)
                     
                     HStack {
-                        amountField(label: "Dari", value: $minAmount)
-                        amountField(label: "Ke", value: $maxAmount)
+                        amountField(label: "Dari", value: $minAmountFilter)
+                        amountField(label: "Ke", value: $maxAmountFilter)
                     }
                    
                     
@@ -135,14 +136,6 @@ struct FilterSheetView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $isShowingCategorySheet) {
-            SheetFilterCategory(
-                selectedCategory: $selectedCategory,
-                parentSheetDismiss: { dismiss() }
-            )
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
-        }
         .sheet(isPresented: $isShowingDatePickerSheet) {
             SheetDatePicker(
                 startDate: $startDate,
@@ -151,6 +144,18 @@ struct FilterSheetView: View {
             )
             .presentationDetents([.fraction(0.6), .height(.infinity)])
             .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            syncSelectedDateRange()
+        }
+        .onChange(of: startDate) { _, _ in
+            syncSelectedDateRange()
+        }
+        .onChange(of: endDate) { _, _ in
+            syncSelectedDateRange()
+        }
+        .onChange(of: useCustomDateRange) { _, _ in
+            syncSelectedDateRange()
         }
        
     }
@@ -203,26 +208,103 @@ struct FilterSheetView: View {
         case .last7Days:
             startDate = calendar.date(byAdding: .day, value: -6, to: today) ?? today
             endDate = today
+            useCustomDateRange = true
             
         case .thisMonth:
-            let components = calendar.dateComponents([.year, .month], from: today)
-            startDate = calendar.date(from: components) ?? today
-            endDate = today
+            let monthStart = monthStartDate(for: viewModel.selectedDate)
+            let monthEnd = monthEndDate(for: viewModel.selectedDate)
+            startDate = monthStart
+            endDate = monthEnd
+            useCustomDateRange = false
             
         case .custom:
+            useCustomDateRange = true
             isShowingDatePickerSheet = true
         }
     }
     private func resetFilter() {
-        minAmount = ""
-        maxAmount = ""
+        minAmountFilter = ""
+        maxAmountFilter = ""
         selectedCategory = nil
         selectedPaymentStatus = nil
+        useCustomDateRange = false
+        let monthStart = monthStartDate(for: viewModel.selectedDate)
+        let monthEnd = monthEndDate(for: viewModel.selectedDate)
+        startDate = monthStart
+        endDate = monthEnd
+        viewModel.applyFilters()
     }
     
     private func applyFilter() {
-        Task {
-            await viewModel.loadTransactions()
+        viewModel.applyFilters()
+    }
+
+    private func monthStartDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: date)
+        return calendar.date(from: components) ?? date
+    }
+
+    private func monthEndDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        guard
+            let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStartDate(for: date)),
+            let end = calendar.date(byAdding: .day, value: -1, to: nextMonth)
+        else {
+            return date
+        }
+        return end
+    }
+    
+    private func syncSelectedDateRange() {
+        let calendar = Calendar.current
+        let monthStart = monthStartDate(for: viewModel.selectedDate)
+        let monthEnd = monthEndDate(for: viewModel.selectedDate)
+        
+        if startDate == monthStart && endDate == monthEnd && !useCustomDateRange {
+            selectedDateRange = .thisMonth
+            return
+        }
+        
+        if calendar.isDate(startDate, inSameDayAs: calendar.date(byAdding: .day, value: -6, to: Date()) ?? Date())
+            && calendar.isDate(endDate, inSameDayAs: Date())
+            && useCustomDateRange {
+            selectedDateRange = .last7Days
+            return
+        }
+        
+        if useCustomDateRange {
+            selectedDateRange = .custom
+        } else {
+            selectedDateRange = nil
+        }
+    }
+    
+    @ViewBuilder
+    private var activeFilterChips: some View {
+        let chips = [
+            selectedPaymentStatus?.title,
+            selectedCategory?.title,
+            selectedDateRange?.rawValue
+        ].compactMap { $0 }
+        
+        if chips.isEmpty {
+            EmptyView()
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(chips, id: \.self) { chip in
+                        Text(chip)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.blue)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.blue.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
 }
@@ -231,8 +313,12 @@ struct FilterSheetView: View {
 #Preview {
     FilterSheetView(
         selectedPaymentStatus: .constant(nil),
+        selectedCategory: .constant(nil),
         startDate: .constant(Date()),
         endDate: .constant(Date()),
+        useCustomDateRange: .constant(false),
+        minAmountFilter: .constant(""),
+        maxAmountFilter: .constant(""),
         viewModel: CashFlowViewModel()
     )
 }
