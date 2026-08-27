@@ -10,6 +10,7 @@ import SwiftUI
 struct Penjualan: View {
     
     @State private var selectedStatus: PaymentStatus? = nil
+    @State private var isShowingFilter = false
     
     private let dummyNotes: [SalesNote] = [
         SalesNote(
@@ -120,6 +121,7 @@ struct Penjualan: View {
                         Text("Cari pembeli atau nota...")
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(1)
+                        Spacer()
                     }
                     .padding(.horizontal, 12)
                     .frame(height: 40)
@@ -133,9 +135,9 @@ struct Penjualan: View {
                     )
                     
                     Button {
-                        
+                        isShowingFilter = true
                     } label: {
-                        Image(systemName: "line.3.horizontal.decrease")
+                        Image(systemName: "calendar")
                             .foregroundStyle(.black)
                             .frame(width: 40, height: 40)
                             .background(.white)
@@ -161,8 +163,12 @@ struct Penjualan: View {
             .padding(.top, 16)
             .padding(.bottom, 16)
             .background(
-                Color(red: 0.02, green: 0.18, blue: 0.32)
-                    .ignoresSafeArea(edges: .top)
+                LinearGradient(
+                    gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea(edges: .top)
             )
             
             // MARK: - Sales List
@@ -179,9 +185,12 @@ struct Penjualan: View {
             .background(Color(.systemGray6))
             
         }
-//        .ignoresSafeArea(edges: .top)
+        .sheet(isPresented: $isShowingFilter) {
+            
+            FilterComponent()
+            //        .ignoresSafeArea(edges: .top)
+        }
     }
-    
     // MARK: - Filter Button
     private func filterButton(
         _ title: String,
@@ -209,6 +218,7 @@ struct Penjualan: View {
                 )
                 .clipShape(Capsule())
         }
+        
     }
 }
 
