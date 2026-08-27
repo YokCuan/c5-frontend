@@ -15,11 +15,12 @@ struct FilterComponent: View {
         case custom = "Atur rentang tanggal"
     }
     
-    @State private var selectedDateRange: DateRange? = nil
-    @State private var isShowingDatePicker = false
+    @Binding var selectedDateRange: DateRange?
+    @Binding var startDate: Date
+    @Binding var endDate: Date
     
-    @State private var startDate = Date()
-    @State private var endDate = Date()
+    @State private var isShowingDatePicker = false
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(spacing: 16) {
@@ -34,7 +35,7 @@ struct FilterComponent: View {
                 Spacer()
                 
                 Button {
-                    // Nanti untuk reset filter
+                    resetFilter()
                 } label: {
                     Text("Pulihkan")
                         .font(.subheadline)
@@ -60,11 +61,7 @@ struct FilterComponent: View {
                 ForEach(DateRange.allCases, id: \.self) { range in
                     
                     Button {
-                        selectedDateRange = range
-                        
-                        if range == .custom {
-                            isShowingDatePicker = true
-                        }
+                        selectRange(range)
                     } label: {
                         HStack(spacing: 16) {
                             
@@ -94,6 +91,21 @@ struct FilterComponent: View {
             .padding(.horizontal, 16)
             
             Spacer()
+            
+            Button {
+                applyFilter()
+                dismiss()
+            } label: {
+                Text("Terapkan Filter")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                    .background(Color.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding()
         }
         
         // MARK: - Date Range Sheet
@@ -109,8 +121,58 @@ struct FilterComponent: View {
             .presentationDragIndicator(.visible)
         }
     }
+    
+    private func resetFilter() {
+        selectedDateRange = nil
+        let today = Date()
+        startDate = today
+        endDate = today
+    }
+    
+    private func applyFilter() {
+        dismiss()
+    }
+    
+    private func selectRange(_ range: DateRange) {
+        selectedDateRange = range
+        
+        let calendar = Calendar.current
+        let today = Date()
+        
+        switch range {
+        case .last7Days:
+            startDate = calendar.date(byAdding: .day, value: -6, to: today) ?? today
+            endDate = today
+        case .thisMonth:
+            startDate = monthStartDate(for: today)
+            endDate = monthEndDate(for: today)
+        case .custom:
+            isShowingDatePicker = true
+        }
+    }
+    
+    private func monthStartDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: date)
+        return calendar.date(from: components) ?? date
+    }
+    
+    private func monthEndDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        guard
+            let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStartDate(for: date)),
+            let end = calendar.date(byAdding: .day, value: -1, to: nextMonth)
+        else {
+            return date
+        }
+        return end
+    }
 }
 
 #Preview {
-    FilterComponent()
+    FilterComponent(
+        selectedDateRange: .constant(nil),
+        startDate: .constant(Date()),
+        endDate: .constant(Date())
+    )
 }
