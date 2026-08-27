@@ -49,10 +49,10 @@ public struct InvoiceView: View {
                             self.showCatatPembayaran = true
                         } label: {
                             Text("Catat Pembayaran")
-                                .font(.headline)
-                                .foregroundColor(.white)
+                                .font(.title3.bold())
+                                .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 50)
+                                .padding()
                                 .background(Color.blue)
                                 .cornerRadius(24)
                         }
@@ -64,10 +64,10 @@ public struct InvoiceView: View {
                             preview: SharePreview(shareButtonLabel, image: imageToShare)   // <- ganti dari "Nota Pembayaran"
                         ) {
                             Text(shareButtonLabel)   // <- ganti dari Text("Bagikan Nota")
-                                .font(.headline)
+                                .font(.title3.bold())
                                 .foregroundColor(isFullyPaid ? .white : .black)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 50)
+                                .padding()
                                 .background(isFullyPaid ? Color.blue : Color(.systemGray5))
                                 .cornerRadius(24)
                         }
@@ -127,57 +127,22 @@ public struct InvoiceView: View {
     }
 }
 
-// MARK: - Preview Sample Data
-extension Shop {
-    static let sampleForPreview = Shop(
-        ownerId: UUID(),
-        name: "Keripik Bu Ria",
-        description: "Usaha Keripik Tempe Sagu"
-    )
-}
-
-extension SalesNote {
-    static let sampleUnpaid = SalesNote(
-        id: UUID(),
-        shopId: UUID(),
-        identifier: "8614",
-        customerName: "Bu Sherin",
-        customerPhone: "081234567890",
-        totalAmount: 50000,
-        paidAmount: 0,
-        status: .notPaid,
-        noteFileLink: nil,
-        dueAt: Calendar.current.date(byAdding: .day, value: 30, to: Date()),
-        soldAt: Date(),
-        items: nil
-    )
-    
-    static let samplePaid = SalesNote(
-        id: UUID(),
-        shopId: UUID(),
-        identifier: "8615",
-        customerName: "Bu Sherin",
-        customerPhone: "081234567890",
-        totalAmount: 50000,
-        paidAmount: 50000,
-        status: .paid,
-        noteFileLink: nil,
-        dueAt: nil,
-        soldAt: Date(),
-        items: nil
-    )
-}
-
 // MARK: - Preview: Belum Lunas
 #Preview("Belum Lunas") {
     NavigationStack {
-        InvoiceView(note: .sampleUnpaid, shop: .sampleForPreview)
+        InvoiceView(
+            note: AppMockData.salesNotes.first { $0.status != .paid } ?? AppMockData.salesNotes[2],
+            shop: AppMockData.primaryShop
+        )
     }
 }
 
 // MARK: - Preview: Lunas
 #Preview("Lunas") {
     NavigationStack {
-        InvoiceView(note: .samplePaid, shop: .sampleForPreview)
+        InvoiceView(
+            note: AppMockData.salesNotes.first { $0.status == .paid } ?? AppMockData.salesNotes[0],
+            shop: AppMockData.primaryShop
+        )
     }
 }

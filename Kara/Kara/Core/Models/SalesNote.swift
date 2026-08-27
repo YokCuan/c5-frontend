@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct SalesNote: Identifiable, Codable {
+public struct SalesNote: Identifiable, Codable, Hashable {
     public var id: UUID
     public var shopId: UUID
     public var identifier: String

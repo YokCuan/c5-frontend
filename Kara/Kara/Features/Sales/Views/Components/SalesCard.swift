@@ -10,6 +10,8 @@ import SwiftUI
 
 struct SalesCard: View {
     let salesNote: SalesNote
+    let onTapDetail: () -> Void
+
     private var remainingAmount: Double {
             max(0, salesNote.totalAmount - salesNote.paidAmount)
         }
@@ -69,7 +71,7 @@ struct SalesCard: View {
             }
             Divider()
             Button {
-                
+                onTapDetail()
             } label:{
                 HStack {
                     Text("Lihat Detail")
@@ -105,5 +107,8 @@ struct SalesCard: View {
 }
 
 #Preview("DP Paid") {
-    SalesCard(salesNote: AppMockData.salesNotes[1])
+    SalesCard(
+        salesNote: AppMockData.salesNotes[1],
+        onTapDetail: {}
+    )
 }
