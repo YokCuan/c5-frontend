@@ -39,7 +39,7 @@ struct SheetDatePicker: View {
                 Text("Atur Rentang Waktu")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -48,7 +48,7 @@ struct SheetDatePicker: View {
                     parentSheetDismiss?()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
+                        .font(.headline)
                         .foregroundStyle(Color.secondary .opacity(0.8))
                 }
             }
@@ -73,20 +73,23 @@ struct SheetDatePicker: View {
                     activeField = .end
                 }
             }
+            .font(.body)
+            .fontWeight(.bold)
+            .foregroundStyle(Color.black)
+            .cornerRadius(10)
             
             // MARK: - Tombol Pasang
             Button {
                 dismiss()
             } label: {
                 Text("Terapkan")
-                    .font(.headline)
+                    .font(.body)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .foregroundStyle(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical)
                     .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 48))
             }
             
             // MARK: - DatePicker Wheel Native
@@ -99,10 +102,8 @@ struct SheetDatePicker: View {
                     .datePickerStyle(.wheel)
                     .labelsHidden()
             }
-            
-            Spacer()
         }
-        .padding(.top, 10)
+        .padding(.top, 8)
         .padding()
     }
        

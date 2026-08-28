@@ -18,7 +18,7 @@ struct SheetCatatPembayaran: View {
         VStack (spacing: 32) {
             VStack{
                 Text("Catat Pembayaran")
-                    .font(.title)
+                    .font(.headline)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -27,7 +27,7 @@ struct SheetCatatPembayaran: View {
                     Text("· Sisa")
                     Text(remainingAmount.formatted(.currency(code: "IDR")))
                 }
-                .font(.callout)
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -45,7 +45,7 @@ struct SheetCatatPembayaran: View {
                         .foregroundStyle(.gray)
                     TextField("0", value: $bayar, format: .number.locale(Locale(identifier: "id_ID")))
                         .keyboardType(.numberPad)                        .foregroundColor(Color.black)
-                        .font(.title2)
+                        .font(.body)
                         .fontWeight(.bold)
                 }
                 .padding()
@@ -59,7 +59,7 @@ struct SheetCatatPembayaran: View {
             } label: {
                 Text("Catat Pembayaran")
                     .padding(.vertical)
-                    .font(.title3)
+                    .font(.body)
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
