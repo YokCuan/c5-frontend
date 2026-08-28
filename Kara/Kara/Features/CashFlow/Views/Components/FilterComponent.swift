@@ -28,9 +28,9 @@ struct FilterComponent: View {
             // MARK: - Header
             HStack {
                 Text("Filter Transaksi")
-                    .font(.title3)
+                    .font(.default)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -38,15 +38,14 @@ struct FilterComponent: View {
                     resetFilter()
                 } label: {
                     Text("Pulihkan")
-                        .font(.subheadline)
+                        .font(.default)
+                        .fontWeight(.bold)
                         .underline()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 24)
-            .padding(.top)
-            .padding(.bottom)
+            .padding(.top, 16)
             
             
             // MARK: - Rentang Waktu
@@ -54,9 +53,8 @@ struct FilterComponent: View {
                 
                 Text("Rentang waktu")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
-//                    .padding(.horizontal)
-                    .padding(.top)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.gray)
                 
                 ForEach(DateRange.allCases, id: \.self) { range in
                     
@@ -66,9 +64,9 @@ struct FilterComponent: View {
                         HStack(spacing: 16) {
                             
                             Text(range.rawValue)
-                                .font(.title3)
+                                .font(.subheadline)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(.black)
                             
                             Spacer()
                             
@@ -81,14 +79,14 @@ struct FilterComponent: View {
                             .foregroundStyle(
                                 selectedDateRange == range
                                 ? .blue
-                                : .secondary
+                                : .gray
                             )
                         }
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
             
             Spacer()
             
@@ -105,8 +103,8 @@ struct FilterComponent: View {
                     .background(Color.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .padding()
         }
+        .padding(16)
         
         // MARK: - Date Range Sheet
         .sheet(isPresented: $isShowingDatePicker) {
