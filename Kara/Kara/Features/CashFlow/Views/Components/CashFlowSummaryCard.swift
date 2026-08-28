@@ -12,15 +12,12 @@ public struct CashFlowSummaryCard: View {
     }
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .center, spacing: 24) {
             HStack(spacing: 8) {
-                Image(systemName: isIncome ? "arrow.down" : "arrow.up")
+                Image(systemName: isIncome ? "arrow.down.right" : "arrow.up.right")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(isIncome ? Color.green : Color.red)
-                    .frame(width: 32, height: 32)
-                    .background(
-                        isIncome ? Color.green.opacity(0.15) : Color.red.opacity(0.15)
-                    )
+                    .frame(width: 16, height: 16)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 
                 Text(title)
@@ -38,8 +35,8 @@ public struct CashFlowSummaryCard: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+//        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
 }
 
