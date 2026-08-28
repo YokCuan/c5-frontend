@@ -28,7 +28,7 @@ struct FilterComponent: View {
             // MARK: - Header
             HStack {
                 Text("Filter Transaksi")
-                    .font(.default)
+                    .font(.body)
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
                 
@@ -38,7 +38,7 @@ struct FilterComponent: View {
                     resetFilter()
                 } label: {
                     Text("Pulihkan")
-                        .font(.default)
+                        .font(.body)
                         .fontWeight(.bold)
                         .underline()
                         .foregroundStyle(.gray)

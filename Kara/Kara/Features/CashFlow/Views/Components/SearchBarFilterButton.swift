@@ -67,7 +67,7 @@ struct SearchBarFilterButton: View {
                         prompt: Text("Cari transaksi...")
                             .foregroundColor(Color.white.opacity(0.8))
                     )
-                    .font(.default)
+                    .font(.body)
                 }
                 .padding(.horizontal, 14)
                 .frame(height: 42)
