@@ -52,7 +52,7 @@ struct SheetFilterCategory: View {
                     parentSheetDismiss?()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
+                        .font(.headline)
                         .foregroundStyle(Color.secondary.opacity(0.8))
                 }
                 .frame(width: 32, height: 32)
@@ -68,8 +68,6 @@ struct SheetFilterCategory: View {
                     categoryRow(option: .all)
                 } header: {
                     Text("SEMUA KATEGORI")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 
                 // Section Pemasukan (Header teks di luar selectable)
@@ -79,8 +77,6 @@ struct SheetFilterCategory: View {
                     categoryRow(option: .incomeStatus(.notPaid))
                 } header: {
                     Text("PEMASUKAN")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 
                 // Section Pengeluaran (Header teks di luar selectable)
@@ -90,10 +86,10 @@ struct SheetFilterCategory: View {
                     }
                 } header: {
                     Text("PENGELUARAN")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             }
+            .font(.caption)
+            .foregroundStyle(.black)
             .listStyle(.insetGrouped)
         }
         .background(Color(.systemGroupedBackground))
