@@ -11,33 +11,34 @@ public class APIService {
     public static let shared = APIService()
     private init() {}
     
-    private let baseURL = "https://kara-backend-khbo.onrender.com"
+    private let baseURL = "http://127.0.0.1:8080"
     
     func fetchCashFlows(shopId: UUID) async throws -> [CashFlowModel] {
-        let urlString = "\(baseURL)/cashflows/\(shopId.uuidString)"
-        
-        guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
+            let urlString = "\(baseURL)/cashflows/\(shopId.uuidString)"
+             
+            guard let url = URL(string: urlString) else {
+                throw URLError(.badURL)
+            }
+             
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+             
+            let (data, response) = try await URLSession.shared.data(for: request)
+             
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                // 👇 TAMBAHKAN INI UNTUK MELIHAT PESAN ERROR DARI RENDER DI KONSOL
+                if let errorString = String(data: data, encoding: .utf8) {
+                    print("RENDER ERROR RESPONSE: \(errorString)")
+                }
+                throw URLError(.badServerResponse)
+            }
+             
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+             
+            return try decoder.decode([CashFlowModel].self, from: data)
         }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorisation")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(
-            httpResponse
-                .statusCode) else{
-            throw URLError(.badServerResponse)
-        }
-        
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        
-        return try decoder.decode([CashFlowModel].self, from: data)
-    }
     
     struct SalesNotesResponse: Decodable {
         let salesNote: SalesNote
@@ -257,7 +258,7 @@ public class APIService {
             return try decoder.decode([ExpenseCategory].self, from: data)
         }
     
-    public func recordPayment(salesNoteId: UUID, shopId: UUID, paidAmount: Double, userId: UUID) async throws -> SalesNote {
+    public func recordPayment(salesNoteId: UUID, shopId: UUID, paidAmount: Double, userId: UUID) async throws {
             let urlString = "\(baseURL)/sales_notes/paid-amount/\(shopId.uuidString)/\(salesNoteId.uuidString)"
             guard let url = URL(string: urlString) else { throw URLError(.badURL) }
              
@@ -275,16 +276,11 @@ public class APIService {
             let (data, response) = try await URLSession.shared.data(for: request)
              
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                if let errorString = String(data: data, encoding: .utf8) {
+                    print("SERVER ERROR RECORD PAYMENT: \(errorString)")
+                }
                 throw URLError(.badServerResponse)
             }
-             
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
             
-            let result = try decoder.decode(SalesNotesResponse.self, from: data)
-            var salesNote = result.salesNote
-            salesNote.items = result.salesNoteItems
-             
-            return salesNote
         }
 }

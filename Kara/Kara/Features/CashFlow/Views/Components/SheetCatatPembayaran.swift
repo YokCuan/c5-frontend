@@ -118,28 +118,28 @@ struct SheetCatatPembayaran: View {
     }
     
     private func recordPayment() {
-        guard let amount = parsedBayarAmount else { return }
-        
-        Task {
-            isLoading = true
-            errorMessage = nil
+            guard let amount = parsedBayarAmount else { return }
             
-            do {
-                _ = try await APIService.shared.recordPayment(
-                    salesNoteId: salesNoteId,
-                    shopId: shopId,
-                    paidAmount: amount,
-                    userId: userId
-                )
-                isLoading = false
-                dismiss()
-                onSuccess?()
-            } catch {
-                errorMessage = "Gagal mencatat pembayaran: \(error.localizedDescription)"
-                isLoading = false
+            Task {
+                isLoading = true
+                errorMessage = nil
+                
+                do {
+                    try await APIService.shared.recordPayment(
+                        salesNoteId: salesNoteId,
+                        shopId: shopId,
+                        paidAmount: amount,
+                        userId: userId
+                    )
+                    isLoading = false
+                    dismiss()
+                    onSuccess?()
+                } catch {
+                    errorMessage = "Gagal mencatat pembayaran: \(error.localizedDescription)"
+                    isLoading = false
+                }
             }
         }
-    }
 }
 
 #Preview {

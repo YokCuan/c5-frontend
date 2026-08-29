@@ -126,6 +126,7 @@ struct FilterSheetView: View {
             .padding(.vertical)
         }
         .padding(.horizontal)
+        .padding(.top, 32)
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $isShowingCategorySheet) {
             SheetFilterCategory(
