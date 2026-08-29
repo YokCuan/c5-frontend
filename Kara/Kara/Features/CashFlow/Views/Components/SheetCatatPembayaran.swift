@@ -12,64 +12,62 @@ struct SheetCatatPembayaran: View {
     let customerName: String
     let remainingAmount: Double
     
-    @State private var bayar: String = ""
+    @State private var bayar: Int = 0
     
     var body: some View {
-        VStack {
+        VStack (spacing: 32) {
             VStack{
                 Text("Catat Pembayaran")
-                    .font(.title)
+                    .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack {
                     Text(customerName)
                     Text("· Sisa")
                     Text(remainingAmount.formatted(.currency(code: "IDR")))
                 }
-                .font(.callout)
-                .foregroundStyle(.secondary)
+                .font(.subheadline)
+                .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             
-            Spacer()
-                .frame(height: 24)
-            
             VStack {
                 Text("Jumlah Pembayaran")
-                    .font(.callout)
+                    .font(.footnote)
                     .fontWeight(.regular)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.gray)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack {
-                    Text("Rp")
-                        .font(.callout)
+                    Text("Rp ")
+                        .font(.body)
                         .fontWeight(.regular)
-                        .foregroundStyle(.secondary)
-                    TextField("Catat pembayaran", text: $bayar)
-                        .foregroundColor(Color.primary)
-                        .font(.title2)
+                        .foregroundStyle(.gray)
+                    TextField("0", value: $bayar, format: .number.locale(Locale(identifier: "id_ID")))
+                        .keyboardType(.numberPad)                        .foregroundColor(Color.black)
+                        .font(.body)
                         .fontWeight(.bold)
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
-                .background(Color.secondary.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                
-                Button {
-                    recordPayment()
-                } label: {
-                    Text("Catat Pembayaran")
-                        .padding(.vertical)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 48))
-                }
+                .background(Color.gray.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            
+            Button {
+                recordPayment()
+            } label: {
+                Text("Catat Pembayaran")
+                    .padding(.vertical)
+                    .font(.body)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 48))
             }
         }
+        
         .padding(.horizontal)
     }
     

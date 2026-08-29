@@ -25,7 +25,7 @@ struct DeleteIncome: View {
             
             Text ("Transaksi ini akan dihapus secara permanen dan tidak dapat dibatalkan.")
                 .font(.body)
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 12)
             
@@ -37,7 +37,7 @@ struct DeleteIncome: View {
             .background(.red)
             .foregroundColor(.white)
             .fontWeight(.semibold)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
             
             Button("Batalkan") {
                 dismiss()
@@ -47,7 +47,7 @@ struct DeleteIncome: View {
             .background(Color.gray.opacity(0.5))
             .foregroundColor(.black)
             .fontWeight(.semibold)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
             
         }
         .padding(20)

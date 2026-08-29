@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchBarFilterButton: View {
     @ObservedObject var viewModel: CashFlowViewModel
-
+    
     @Binding var searchText: String
     @Binding var selectedPaymentStatus: PaymentStatus?
     @Binding var selectedCategory: CategoryFilterOption?
@@ -18,8 +18,9 @@ struct SearchBarFilterButton: View {
     @Binding var useCustomDateRange: Bool
     @Binding var minAmountFilter: String
     @Binding var maxAmountFilter: String
-
+    
     @State private var isShowingFilterSheet = false
+    @State private var isShowingDatePickerSheet = false
     
     private var isAnyFilterActive: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -44,45 +45,41 @@ struct SearchBarFilterButton: View {
         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             parts.append("Cari: \(searchText.trimmingCharacters(in: .whitespacesAndNewlines))")
         }
-        
-        if useCustomDateRange {
-            parts.append("Rentang aktif")
-        }
-        
+                
         return parts.isEmpty ? nil : parts.joined(separator: " • ")
     }
-
+    
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 12) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.4))
-
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.8))
+                    
                     TextField(
                         "",
                         text: $searchText,
-                        prompt: Text("Cari transaksi...").foregroundColor(Color.white.opacity(0.4))
+                        prompt: Text("Cari transaksi...")
+                            .foregroundColor(Color.white.opacity(0.8))
                     )
-                    .foregroundStyle(.white)
-                    .font(.subheadline)
+                    .font(.body)
                 }
                 .padding(.horizontal, 14)
-                .frame(height: 48)
+                .frame(height: 42)
                 .background(Color.white.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                
                 Button {
                     isShowingFilterSheet = true
                 } label: {
                     ZStack(alignment: .topTrailing) {
                         Image(systemName: "line.3.horizontal.decrease")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(Color(red: 0.05, green: 0.22, blue: 0.38))
-                            .frame(width: 48, height: 48)
-                            .background(isAnyFilterActive ? Color.white : Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .foregroundStyle(Color.white.opacity(0.8))
+                            .frame(width: 42, height: 42)
+                            .background(isAnyFilterActive ? Color.white.opacity(0.12) : Color.white.opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                         
                         if isAnyFilterActive {
                             Circle()
@@ -93,34 +90,38 @@ struct SearchBarFilterButton: View {
                     }
                 }
             }
-
+            
             HStack {
                 Button {
                     viewModel.previousMonth()
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 36, height: 36)
+                        .foregroundStyle(.white.opacity(0.8))
+                        .frame(width: 32, height: 32)
                         .background(Color.white.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-
+                
                 Spacer()
-
-                Text(viewModel.selectedMonthYearString)
-                    .font(.headline.bold())
-                    .foregroundStyle(.white)
-
+                
+                Button {
+                    isShowingDatePickerSheet = true
+                } label: {
+                    Text(viewModel.selectedMonthYearString)
+                        .font(.headline.bold())
+                        .foregroundStyle(.white)
+                }
+                
                 Spacer()
-
+                
                 Button {
                     viewModel.nextMonth()
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 36, height: 36)
+                        .foregroundStyle(.white.opacity(0.8))
+                        .frame(width: 32, height: 32)
                         .background(Color.white.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
@@ -129,12 +130,13 @@ struct SearchBarFilterButton: View {
             if let activeFilterSummary {
                 Text(activeFilterSummary)
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.75))
+                    .foregroundStyle(.white.opacity(0.8))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
+        //summoning filter roll-up sheet
         .sheet(isPresented: $isShowingFilterSheet) {
             FilterSheetView(
                 selectedPaymentStatus: $selectedPaymentStatus,
@@ -146,6 +148,18 @@ struct SearchBarFilterButton: View {
                 maxAmountFilter: $maxAmountFilter,
                 viewModel: viewModel
             )
+            .presentationDetents([.fraction(0.7), .large])
+            .presentationDragIndicator(.visible)
+        }
+
+        .sheet(isPresented: $isShowingDatePickerSheet) {
+            SheetDatePicker(
+                startDate: $startDate,
+                endDate: $endDate,
+                parentSheetDismiss: { isShowingDatePickerSheet = false }
+            )
+            .presentationDetents([.fraction(0.75)])
+            .presentationDragIndicator(.visible)
         }
         .onChange(of: searchText) { _, _ in
             viewModel.applyFilters()

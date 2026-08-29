@@ -25,6 +25,8 @@ struct FilterSheetView: View {
     @State private var isShowingCategorySheet: Bool = false
     @State private var isShowingDatePickerSheet = false
     
+    @State private var amount: Int = 0
+    
     enum DateRange: String, CaseIterable {
         case last7Days = "7 hari terakhir"
         case thisMonth = "Bulan Ini"
@@ -32,39 +34,41 @@ struct FilterSheetView: View {
     }
     
     var body: some View {
-        VStack(spacing: 16) {
-            
-            // MARK: - Custom Header (Bukan Toolbar)
-            HStack {
-                Text("Filter Transaksi")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+        ScrollView {
+            VStack(spacing: 16) {
                 
-                Spacer()
-                
-                Button {
-                    resetFilter()
-                } label: {
-                    Text("Pulihkan")
-                        .font(.subheadline)
-                        .underline()
-                        .foregroundStyle(.secondary)
+                // MARK: - Custom Header (Bukan Toolbar)
+                HStack {
+                    Text("Filter Transaksi")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.black)
+                    
+                    Spacer()
+                    
+                    Button {
+                        resetFilter()
+                    } label: {
+                        Text("Pulihkan")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .underline()
+                            .foregroundStyle(.gray)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
-            }
-
-            activeFilterChips
-            
-            // MARK: - Body Content
-            ScrollView {
+                .padding(.top, 16)
+                
+                activeFilterChips
+                
+                // MARK: - Body Content
                 VStack(alignment: .leading, spacing: 16) {
                     
                     // Rentang waktu
                     Text("Rentang waktu")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.top)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.gray)
                     
                     VStack(alignment: .leading, spacing: 16) {
                         ForEach(DateRange.allCases, id: \.self) { range in
@@ -72,68 +76,79 @@ struct FilterSheetView: View {
                         }
                     }
                     
-                    
                     Divider()
                     
                     // Besar transaksi
                     Text("Besar transaksi")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.top)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.gray)
                     
-                    HStack {
+                    
+                    HStack (spacing: 16) {
                         amountField(label: "Dari", value: $minAmountFilter)
                         amountField(label: "Ke", value: $maxAmountFilter)
                     }
-                   
+                    .font(.subheadline)
+                    .cornerRadius(8)
+                    .frame(maxWidth: .infinity, alignment:.center)
+                    
                     
                     Divider()
                     
                     // Kategori
+                    Text("Kategori")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.gray)
+                    
                     Button {
                         isShowingCategorySheet = true
                     } label: {
                         HStack {
                             Text(selectedCategory?.title ?? "Pilih kategori")
-                                .font(.headline)
-                                .foregroundStyle(selectedCategory == nil ? .secondary : Color.primary)
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.black)
                             
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .foregroundStyle(Color.primary)
+                                .foregroundStyle(Color.black)
                         }
-                        
                     }
                     .buttonStyle(.plain)
                 }
+                
+                // MARK: - Bottom Action Button
+                Button {
+                    applyFilter()
+                    dismiss()
+                } label: {
+                    Text("Terapkan Filter")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                        .background(Color.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 48))
+                }
             }
-            
-            // MARK: - Bottom Action Button
-            Button {
-                applyFilter()
-                dismiss()
-            } label: {
-                Text("Terapkan Filter")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical)
-                    .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
-            .padding(.vertical)
+            .padding(.top, 8)
+            .padding()
         }
-        .padding(.top, 10)
-        .padding()
+        .background(Color(.systemBackground))
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $isShowingCategorySheet) {
             SheetFilterCategory(
                 selectedCategory: $selectedCategory,
                 parentSheetDismiss: { dismiss() }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.fraction(0.75)])
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $isShowingDatePickerSheet) {
@@ -142,7 +157,7 @@ struct FilterSheetView: View {
                 endDate: $endDate,
                 parentSheetDismiss: { dismiss() }
             )
-            .presentationDetents([.fraction(0.6), .height(.infinity)])
+            .presentationDetents([.fraction(0.75)])
             .presentationDragIndicator(.visible)
         }
         .onAppear {
@@ -157,7 +172,6 @@ struct FilterSheetView: View {
         .onChange(of: useCustomDateRange) { _, _ in
             syncSelectedDateRange()
         }
-       
     }
     
     @ViewBuilder
@@ -167,15 +181,15 @@ struct FilterSheetView: View {
         } label: {
             HStack {
                 Text(range.rawValue)
-                    .font(.title3)
+                    .font(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
                 Image(systemName: selectedDateRange == range ? "largecircle.fill.circle" : "circle")
-                    .font(.title2)
-                    .foregroundStyle(selectedDateRange == range ? .blue : .secondary)
+                    .font(.subheadline)
+                    .foregroundStyle(selectedDateRange == range ? .blue : .gray)
             }
         }
         .buttonStyle(.plain)
@@ -183,14 +197,29 @@ struct FilterSheetView: View {
     
     @ViewBuilder
     private func amountField(label: String, value: Binding<String>) -> some View {
+        let intBinding = Binding<Int>(
+            get: { Int(value.wrappedValue) ?? 0 },
+            set: { value.wrappedValue = $0 == 0 ? "" : String($0) }
+        )
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .fontWeight(.bold)
+                .foregroundStyle(.gray)
             
-            TextField("Rp0", text: value)
-                .keyboardType(.numberPad)
-                .font(.headline)
+            HStack (spacing: 0){
+                Text("Rp ")
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.gray)
+                
+                TextField("0", value: intBinding, format: .number.locale(Locale(identifier: "id_ID")))
+                    .keyboardType(.numberPad)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.black)
+                    .multilineTextAlignment(.leading)
+            }
         }
         .padding()
         .background(Color(.secondarySystemBackground))
@@ -238,13 +267,13 @@ struct FilterSheetView: View {
     private func applyFilter() {
         viewModel.applyFilters()
     }
-
+    
     private func monthStartDate(for date: Date) -> Date {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month], from: date)
         return calendar.date(from: components) ?? date
     }
-
+    
     private func monthEndDate(for date: Date) -> Date {
         let calendar = Calendar.current
         guard
@@ -303,13 +332,13 @@ struct FilterSheetView: View {
                             .clipShape(Capsule())
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(alignment: .leading)
             }
         }
     }
 }
 
-// MARK: - SwiftUI Canvas Preview
+// MARK: - Preview
 #Preview {
     FilterSheetView(
         selectedPaymentStatus: .constant(nil),

@@ -43,7 +43,7 @@ struct SheetFilterCategory: View {
                 
                 Text("Pilih kategori")
                     .font(.headline.bold())
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -52,8 +52,8 @@ struct SheetFilterCategory: View {
                     parentSheetDismiss?()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(Color.secondary.opacity(0.8))
+                        .font(.headline)
+                        .foregroundStyle(Color.gray.opacity(0.8))
                 }
                 .frame(width: 32, height: 32)
             }
@@ -68,8 +68,6 @@ struct SheetFilterCategory: View {
                     categoryRow(option: .all)
                 } header: {
                     Text("SEMUA KATEGORI")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 
                 // Section Pemasukan (Header teks di luar selectable)
@@ -79,8 +77,6 @@ struct SheetFilterCategory: View {
                     categoryRow(option: .incomeStatus(.notPaid))
                 } header: {
                     Text("PEMASUKAN")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 
                 // Section Pengeluaran (Header teks di luar selectable)
@@ -90,10 +86,10 @@ struct SheetFilterCategory: View {
                     }
                 } header: {
                     Text("PENGELUARAN")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             }
+            .font(.caption)
+            .foregroundStyle(.black)
             .listStyle(.insetGrouped)
         }
         .background(Color(.systemGroupedBackground))
@@ -109,7 +105,7 @@ struct SheetFilterCategory: View {
             HStack {
                 Text(option.title)
                     .font(.body)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 

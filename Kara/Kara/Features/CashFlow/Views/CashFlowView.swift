@@ -87,10 +87,10 @@ public struct CashFlowView: View {
                                     VStack(spacing: 8) {
                                         Image(systemName: "doc.text.magnifyingglass")
                                             .font(.largeTitle)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(.gray)
                                         Text("Belum ada transaksi")
                                             .font(.subheadline)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(.gray)
                                     }
                                     .padding(.top, 60)
                                 } else {
@@ -99,7 +99,7 @@ public struct CashFlowView: View {
                                             VStack(alignment: .leading, spacing: 10) {
                                                 Text(group.key, style: .date)
                                                     .font(.caption.bold())
-                                                    .foregroundStyle(.secondary)
+                                                    .foregroundStyle(.gray)
                                                     .padding(.horizontal, 4)
                                                 
                                                 VStack(spacing: 10) {
@@ -136,6 +136,15 @@ public struct CashFlowView: View {
         }
     }
 }
+
+#if DEBUG
+extension CashFlowViewModel {
+    static var preview: CashFlowViewModel {
+        let vm = CashFlowViewModel()
+        return vm
+    }
+}
+#endif
 
 #Preview {
     CashFlowView()

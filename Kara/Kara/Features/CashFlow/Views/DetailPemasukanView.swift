@@ -25,7 +25,7 @@ public struct DetailPemasukanView: View {
                         Text(note.customerName)
                             .font(.title2.bold())
                         Text("Penjualan")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                     }
                     
                     VStack(alignment: .leading, spacing: 5) {
@@ -59,7 +59,7 @@ public struct DetailPemasukanView: View {
                 .padding()
             }
             .background(.white)
-            .cornerRadius(15)
+            .cornerRadius(16)
             .shadow(color: .black.opacity(0.05), radius: 5, y: 4)
             
             //Warning
@@ -82,7 +82,7 @@ public struct DetailPemasukanView: View {
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.gray.opacity(0.15))
-                    .cornerRadius(24)
+                    .cornerRadius(48)
             }
             .sheet(isPresented: $isShowingDelSheet) {
                 CashFlowDeleteOutcome()

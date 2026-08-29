@@ -39,7 +39,7 @@ struct SheetDatePicker: View {
                 Text("Atur Rentang Waktu")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -48,8 +48,8 @@ struct SheetDatePicker: View {
                     parentSheetDismiss?()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(Color.secondary .opacity(0.8))
+                        .font(.headline)
+                        .foregroundStyle(Color.gray .opacity(0.8))
                 }
             }
             
@@ -73,36 +73,47 @@ struct SheetDatePicker: View {
                     activeField = .end
                 }
             }
+            .font(.body)
+            .fontWeight(.bold)
+            .foregroundStyle(Color.black)
+            .cornerRadius(10)
             
             // MARK: - Tombol Pasang
             Button {
                 dismiss()
             } label: {
                 Text("Terapkan")
-                    .font(.headline)
+                    .font(.body)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .foregroundStyle(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical)
                     .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 48))
             }
             
             // MARK: - DatePicker Wheel Native
             if activeField == .start {
-                DatePicker("", selection: $startDate, displayedComponents: .date)
-                    .datePickerStyle(.wheel)
-                    .labelsHidden()
+                DatePicker(
+                    "",
+                    selection: $startDate,
+                    in: ...endDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
             } else {
-                DatePicker("", selection: $endDate, displayedComponents: .date)
-                    .datePickerStyle(.wheel)
-                    .labelsHidden()
+                DatePicker(
+                    "",
+                    selection: $endDate,
+                    in: startDate...,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
             }
-            
-            Spacer()
         }
-        .padding(.top, 10)
+        .padding(.top, 8)
         .padding()
     }
        
@@ -114,18 +125,18 @@ struct SheetDatePicker: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(title)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.gray)
                 
                 HStack {
                     Text(dateString)
                         .font(.subheadline)
                         .fontWeight(.bold)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.black)
                     
                     Spacer()
                     
                     Image(systemName: "calendar")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                 }
             }
             .padding()
