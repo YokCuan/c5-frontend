@@ -18,7 +18,7 @@ public struct CashFlowSummaryCard: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(isIncome ? Color.green : Color.red)
                     .frame(width: 16, height: 16)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 
                 Text(title)
                     .font(.subheadline)

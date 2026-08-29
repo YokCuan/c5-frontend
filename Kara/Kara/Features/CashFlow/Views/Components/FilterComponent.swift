@@ -101,7 +101,7 @@ struct FilterComponent: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical)
                     .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: 48))
             }
         }
         .padding(16)
