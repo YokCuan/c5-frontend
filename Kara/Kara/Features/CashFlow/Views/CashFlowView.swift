@@ -8,25 +8,23 @@ public struct CashFlowView: View {
     
     public var body: some View {
         NavigationStack {
-            let titleOpacity = max(0, 1 - (scrollOffset / 35.0))
-            let titleHeight = max(0, 36 - scrollOffset)
+            let isScrolled = scrollOffset > 30
             
             ZStack(alignment: .top) {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea(.all)
                 
+                Color.karaBlue
+                       .frame(height: 360)                       .ignoresSafeArea(edges: .top)
+                
                 VStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 24) {
-                        if titleHeight > 0 {
-                            Text("Arus Kas")
-                                .font(.largeTitle.bold())
-                                .foregroundStyle(.white)
-                                .padding(.top, 10)
-                                .padding(.horizontal, 16)
-                                .opacity(titleOpacity)
-                                .frame(height: titleHeight)
-                                .clipped()
-                        }
+                    VStack(alignment: .leading, spacing: 24) {                            Text("Arus Kas")
+                            .font(isScrolled ? .title2 : .largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                            .padding(.top, 10)
+                            .padding(.horizontal, 16)
+                            .animation(.easeOut(duration: 0.2), value: isScrolled)
                         
                         SearchBarFilterButton(
                             viewModel: viewModel,
@@ -47,7 +45,6 @@ public struct CashFlowView: View {
                             startPoint: .top,
                             endPoint: .bottom
                         )
-                        
                         .ignoresSafeArea(edges: .top)
                     )
                     .zIndex(1)
@@ -75,7 +72,7 @@ public struct CashFlowView: View {
                                     .clipShape(
                                         UnevenRoundedRectangle(
                                             bottomLeadingRadius: 24,
-                                            bottomTrailingRadius: 24
+                                            bottomTrailingRadius: 24,
                                         )
                                     )
                             )
