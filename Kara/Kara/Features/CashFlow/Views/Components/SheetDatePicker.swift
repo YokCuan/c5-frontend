@@ -94,13 +94,23 @@ struct SheetDatePicker: View {
             
             // MARK: - DatePicker Wheel Native
             if activeField == .start {
-                DatePicker("", selection: $startDate, displayedComponents: .date)
-                    .datePickerStyle(.wheel)
-                    .labelsHidden()
+                DatePicker(
+                    "",
+                    selection: $startDate,
+                    in: ...endDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
             } else {
-                DatePicker("", selection: $endDate, displayedComponents: .date)
-                    .datePickerStyle(.wheel)
-                    .labelsHidden()
+                DatePicker(
+                    "",
+                    selection: $endDate,
+                    in: startDate...,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
             }
         }
         .padding(.top, 8)
