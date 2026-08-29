@@ -137,6 +137,17 @@ public struct CashFlowView: View {
     }
 }
 
+#if DEBUG
+extension CashFlowViewModel {
+    static var preview: CashFlowViewModel {
+        let vm = CashFlowViewModel()
+        // Isi data dummy manual di sini, JANGAN panggil loadTransactions()
+        // Sesuaikan property di bawah dengan yang beneran ada di ViewModel kamu
+        return vm
+    }
+}
+#endif
+
 #Preview {
     CashFlowView()
 }

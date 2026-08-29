@@ -21,6 +21,7 @@ struct SearchBarFilterButton: View {
     
     @State private var isShowingFilterSheet = false
     @State private var isShowingDatePickerSheet = false
+//    @State private var filterSheetHeight: CGFloat = 400
     
     private var isAnyFilterActive: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -46,9 +47,9 @@ struct SearchBarFilterButton: View {
             parts.append("Cari: \(searchText.trimmingCharacters(in: .whitespacesAndNewlines))")
         }
         
-        if useCustomDateRange {
-            parts.append("Rentang aktif")
-        }
+//        if useCustomDateRange {
+//            parts.append("Rentang aktif")
+//        }
         
         return parts.isEmpty ? nil : parts.joined(separator: " • ")
     }
@@ -140,7 +141,7 @@ struct SearchBarFilterButton: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
-
+        //summoning filter roll-up sheet
         .sheet(isPresented: $isShowingFilterSheet) {
             FilterSheetView(
                 selectedPaymentStatus: $selectedPaymentStatus,
@@ -152,14 +153,17 @@ struct SearchBarFilterButton: View {
                 maxAmountFilter: $maxAmountFilter,
                 viewModel: viewModel
             )
+            .presentationDetents([.fraction(0.7), .large])
+            .presentationDragIndicator(.visible)
         }
+
         .sheet(isPresented: $isShowingDatePickerSheet) {
             SheetDatePicker(
                 startDate: $startDate,
                 endDate: $endDate,
                 parentSheetDismiss: { isShowingDatePickerSheet = false }
             )
-            .presentationDetents([.fraction(0.6), .height(.infinity)])
+            .presentationDetents([.fraction(0.75)])
             .presentationDragIndicator(.visible)
         }
         .onChange(of: searchText) { _, _ in
