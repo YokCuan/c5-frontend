@@ -11,7 +11,7 @@ public class APIService {
     public static let shared = APIService()
     private init() {}
     
-    private let baseURL = "http://127.0.0.1:8080"
+    private let baseURL = "https://kara-backend-khbo.onrender.com"
     
     func fetchCashFlows(shopId: UUID) async throws -> [CashFlowModel] {
             let urlString = "\(baseURL)/cashflows/\(shopId.uuidString)"
@@ -27,7 +27,6 @@ public class APIService {
             let (data, response) = try await URLSession.shared.data(for: request)
              
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                // 👇 TAMBAHKAN INI UNTUK MELIHAT PESAN ERROR DARI RENDER DI KONSOL
                 if let errorString = String(data: data, encoding: .utf8) {
                     print("RENDER ERROR RESPONSE: \(errorString)")
                 }
@@ -109,7 +108,6 @@ public class APIService {
         let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                    // 👇 TAMBAHKAN BARIS INI UNTUK MELIHAT PESAN ERROR DARI SERVER DI KONSOL XCODE
                     if let errorString = String(data: data, encoding: .utf8) {
                         print("SERVER ERROR RESPONSE (-1011): \(errorString)")
                     }
