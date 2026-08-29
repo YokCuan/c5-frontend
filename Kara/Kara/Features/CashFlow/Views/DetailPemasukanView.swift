@@ -9,13 +9,52 @@ import SwiftUI
 
 public struct DetailPemasukanView: View {
     
-    let note: SalesNote
+    let salesNoteID: UUID
+    
+    @State private var note: SalesNote? = nil
+    @State private var isLoading = true
+    @State private var errorMessage: String? = nil
+    @Environment(\.dismiss) private var dismiss
     @State private var isShowingDelSheet = false
     
+    public init(salesNoteId: UUID) {
+        self.salesNoteID = salesNoteId
+    }
+    
+    public init(note: SalesNote) {
+        self.salesNoteID = note.id
+        self._note = State(initialValue: note)
+        self._isLoading = State(initialValue: false)
+    }
+    
     public var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Memuat data penjualan...")
+            } else if let errorMessage {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.largeTitle)
+                        .foregroundStyle(.orange)
+                    Text(errorMessage)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } else if let note {
+                detailContent(note: note)
+            }
+        }
+        .task {
+            if note == nil {
+                await fetchSalesNoteDetail()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func detailContent(note: SalesNote) -> some View {
         VStack(spacing: 20) {
-            //Catd
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 Rectangle()
                     .fill(Color.green)
                     .frame(height: 4)
@@ -24,8 +63,8 @@ public struct DetailPemasukanView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(note.customerName)
                             .font(.title2.bold())
-                        Text("Penjualan")
-                            .foregroundStyle(.gray)
+                        Text("Penjualan · \(note.identifier)")
+                            .foregroundStyle(.secondary)
                     }
                     
                     VStack(alignment: .leading, spacing: 5) {
@@ -62,7 +101,6 @@ public struct DetailPemasukanView: View {
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.05), radius: 5, y: 4)
             
-            //Warning
             HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "exclamationmark.circle")
                 Text("Pemasukan dari penjualan tidak bisa diedit. Ubah data di halaman Penjualan")
@@ -74,9 +112,8 @@ public struct DetailPemasukanView: View {
             .background(Color.blue.opacity(0.1))
             .cornerRadius(10)
             
-            
             Button(action: { isShowingDelSheet = true }) {
-                Text("Hapus Pengeluaran")
+                Text("Hapus Pemasukan")
                     .font(.title3.bold())
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity)
@@ -85,8 +122,14 @@ public struct DetailPemasukanView: View {
                     .cornerRadius(48)
             }
             .sheet(isPresented: $isShowingDelSheet) {
-                CashFlowDeleteOutcome()
-                    .presentationDetents([.fraction(0.5), .height(.infinity)])
+                DeleteIncome(
+                        salesNoteId: note.id,
+                        shopId: note.shopId,
+                        onDeleted: {
+                            dismiss()
+                        }
+                    )
+                    .presentationDetents([.fraction(0.5)])
                     .presentationDragIndicator(.visible)
             }
             
@@ -107,42 +150,34 @@ public struct DetailPemasukanView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Edit Pemasukan")
+                Text("Detail Pemasukan")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
             }
         }
     }
-}
-
-#Preview("Not Paid") {
-    let dummyShop = Shop(
-        id: UUID(),
-        ownerId: UUID(),
-        name: "Keripik Bu Ria",
-        description: "Usaha Keripik Tempe Sagu"
-    )
     
-    let dummyNote = SalesNote(
-        id: UUID(),
-        shopId: dummyShop.id,
-        identifier: "#8612",
-        customerName: "Bu Jess",
-        customerPhone: "08123456789",
-        totalAmount: 30000,
-        paidAmount: 30000,
-        status: .paid,
-        noteFileLink: nil,
-        dueAt: Date(),
-        soldAt: Date(),
-        items: [
-            SalesNoteItem(id: UUID(), salesNoteId: UUID(), name: "Keripik Tempe 100 g", quantity: 2, unitPrice: 15000, subtotal: 30000)
-        ]
-    )
-    
-    NavigationStack {
-        DetailPemasukanView(note: dummyNote)
+    @MainActor
+    private func fetchSalesNoteDetail() async {
+        isLoading = true
+        errorMessage = nil
         
+        do {
+            self.note = try await APIService.shared
+                .fetchSalesNoteDetail(
+                    id: salesNoteID,
+                    shopId: AppMockData.primaryShop.id
+                )
+            self.isLoading = false
+        } catch {
+            self.errorMessage = "Gagal memuat detail penjualan: \(error.localizedDescription)"
+            self.isLoading = false
+        }
     }
 }
 
+#Preview {
+    NavigationStack {
+        DetailPemasukanView(note: PreviewFixtures.dpSalesNote)
+    }
+}

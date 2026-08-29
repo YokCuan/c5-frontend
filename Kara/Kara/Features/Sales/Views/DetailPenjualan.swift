@@ -12,6 +12,7 @@ struct DetailPenjualan: View {
     let salesNote: SalesNote
     let shop: Shop
     
+    @Environment(\.dismiss) private var dismiss
     @State private var isShowingDeleteSheet = false
     
     var body: some View {
@@ -202,7 +203,13 @@ struct DetailPenjualan: View {
             }
         }
         .sheet(isPresented: $isShowingDeleteSheet) {
-            DeleteIncome()
+            DeleteIncome(
+                    salesNoteId: salesNote.id,
+                    shopId: salesNote.shopId,
+                    onDeleted: {
+                        dismiss()
+                    }
+                )
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
@@ -246,7 +253,7 @@ private func formatRupiah(_ amount: Double) -> String {
 #Preview {
     NavigationStack {
         DetailPenjualan(
-            salesNote: AppMockData.salesNotes[0],
+            salesNote: PreviewFixtures.paidSalesNote,
             shop: AppMockData.primaryShop
         )
     }

@@ -176,7 +176,7 @@ public struct InvoiceComponent: View {
 
 #Preview("Not Paid") {
     let dummyShop = AppMockData.primaryShop
-    let dummyNote = AppMockData.salesNotes[0]
+    let dummyNote = PreviewFixtures.notPaidSalesNote
 
     ZStack {
         Color(.systemGroupedBackground).ignoresSafeArea()
@@ -187,7 +187,7 @@ public struct InvoiceComponent: View {
 
 #Preview("DP Paid") {
     let dummyShop = AppMockData.primaryShop
-    let dummyNote = AppMockData.salesNotes[1]
+    let dummyNote = PreviewFixtures.dpSalesNote
 
     ZStack {
         Color(.systemGroupedBackground).ignoresSafeArea()

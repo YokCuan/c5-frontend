@@ -8,7 +8,7 @@ public struct CashFlowTransactionRow: View {
     }
     
     private var isIncome: Bool {
-        transaction.type == .pemasukan
+        transaction.type == .salesNote
     }
     
     private var statusColor: Color {
@@ -17,24 +17,22 @@ public struct CashFlowTransactionRow: View {
     
     public var body: some View {
         NavigationLink {
-            if isIncome, let salesNote = transaction.income {
-                DetailPemasukanView(note: salesNote)
-            } else if let expense = transaction.expense {
-                EditExpenseView(expense: expense)
+            Group {
+                if isIncome {
+                    DetailPemasukanView(salesNoteId: transaction.id)
+                } else {
+                    EditExpenseView(expenseId: transaction.id)
+                }
             }
         } label: {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(transaction.counterpartyName)
+                    Text(transaction.title)
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
                     
-                    Text(
-                        isIncome
-                        ? "Penjualan"
-                        : (transaction.expense?.category?.name ?? "Pengeluaran")
-                    )
+                    Text(transaction.categoryType)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 }

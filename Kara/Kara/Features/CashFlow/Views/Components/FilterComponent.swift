@@ -25,7 +25,6 @@ struct FilterComponent: View {
     var body: some View {
         VStack(spacing: 16) {
             
-            // MARK: - Header
             HStack {
                 Text("Filter Transaksi")
                     .font(.body)
@@ -48,7 +47,6 @@ struct FilterComponent: View {
             .padding(.top, 16)
             
             
-            // MARK: - Rentang Waktu
             VStack(alignment: .leading, spacing: 16) {
                 
                 Text("Rentang waktu")
@@ -106,7 +104,6 @@ struct FilterComponent: View {
         }
         .padding(16)
         
-        // MARK: - Date Range Sheet
         .sheet(isPresented: $isShowingDatePicker) {
             SheetDatePicker(
                 startDate: $startDate,

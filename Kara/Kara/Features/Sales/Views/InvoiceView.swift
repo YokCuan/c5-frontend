@@ -23,7 +23,6 @@ public struct InvoiceView: View {
         self.shop = shop
     }
     
-    // Computed Properties — taruh di atas body
     private var isFullyPaid: Bool {
         note.status == .paid
     }
@@ -61,9 +60,9 @@ public struct InvoiceView: View {
                     if let imageToShare = renderedInvoiceImage {
                         ShareLink(
                             item: imageToShare,
-                            preview: SharePreview(shareButtonLabel, image: imageToShare)   // <- ganti dari "Nota Pembayaran"
+                            preview: SharePreview(shareButtonLabel, image: imageToShare)
                         ) {
-                            Text(shareButtonLabel)   // <- ganti dari Text("Bagikan Nota")
+                            Text(shareButtonLabel)
                                 .font(.title3.bold())
                                 .foregroundColor(isFullyPaid ? .white : .black)
                                 .frame(maxWidth: .infinity)
@@ -98,7 +97,7 @@ public struct InvoiceView: View {
                 }
             }
             ToolbarItem(placement: .principal) {
-                Text(navigationTitleText)   // <- ganti ini
+                Text(navigationTitleText)
                     .font(.headline.bold())
                     .foregroundStyle(.white)
             }
@@ -108,14 +107,19 @@ public struct InvoiceView: View {
         }
         .sheet(isPresented: $showCatatPembayaran) {
             SheetCatatPembayaran(
-                customerName: note.customerName,
-                remainingAmount: note.totalAmount - note.paidAmount
+                salesNoteId: note.id,
+                        shopId: note.shopId,
+                        userId: AppMockData.currentUser.id,
+                        customerName: note.customerName,
+                        remainingAmount: note.totalAmount - note.paidAmount,
+                onSuccess: {
+                    dismiss()
+                }
             )
             .presentationDetents([.height(400)])
             .presentationDragIndicator(.visible)
         }
     }
-    // MARK: - Functions
     @MainActor
     private func renderInvoiceToImage() async {
         let renderer = ImageRenderer(content: InvoiceComponent(note: note, shop: shop))
@@ -127,21 +131,19 @@ public struct InvoiceView: View {
     }
 }
 
-// MARK: - Preview: Belum Lunas
 #Preview("Belum Lunas") {
     NavigationStack {
         InvoiceView(
-            note: AppMockData.salesNotes.first { $0.status != .paid } ?? AppMockData.salesNotes[2],
+            note: PreviewFixtures.notPaidSalesNote,
             shop: AppMockData.primaryShop
         )
     }
 }
 
-// MARK: - Preview: Lunas
 #Preview("Lunas") {
     NavigationStack {
         InvoiceView(
-            note: AppMockData.salesNotes.first { $0.status == .paid } ?? AppMockData.salesNotes[0],
+            note: PreviewFixtures.paidSalesNote,
             shop: AppMockData.primaryShop
         )
     }

@@ -15,7 +15,7 @@ public struct CashFlowView: View {
                     .ignoresSafeArea(.all)
                 
                 Color.karaBlue
-                       .frame(height: 360)                       .ignoresSafeArea(edges: .top)
+                       .frame(height: 250)                       .ignoresSafeArea(edges: .top)
                 
                 VStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: 24) {                            Text("Arus Kas")
@@ -123,7 +123,7 @@ public struct CashFlowView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .task {
-                await viewModel.loadTransactions()
+                await viewModel.loadTransactions(shopId: AppMockData.primaryShop.id)
             }
             .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") { viewModel.errorMessage = nil }

@@ -9,32 +9,33 @@ import SwiftUI
 
 public struct EditExpenseView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var categoryStore: CategoryStore
     
-    public let expense: Expense
+    let expenseId: UUID
     
-    @State private var transactionDate: Date
-    @State private var items: [ExpenseItemInput]
-    @State private var paidAmount: String
-    @State private var selectedExpenseCategory: String
-    @State private var supplierName: String
-    @State private var supplierPhone: String
+    @State private var expense: Expense? = nil
+    @State private var isLoading = true
+    @State private var isSaving = false
+    @State private var errorMessage: String? = nil
+    
+    @State private var transactionDate: Date = Date()
+    @State private var items: [ExpenseItemInput] = []
+    @State private var paidAmount: String = ""
+    @State private var selectedExpenseCategory: UUID? = nil
+    @State private var supplierName: String = ""
+    @State private var supplierPhone: String = ""
     
     @State private var showCategorySheet = false
     @State private var isShowingDelSheet = false
     @State private var showErrors = false
     
-    public init(expense: Expense) {
-        self.expense = expense
-        
-        _transactionDate = State(initialValue: expense.purchasedAt)
-        
-        let mappedItems = expense.items?.map { ExpenseItemInput(name: $0.name ?? "" ) } ?? []
-        _items = State(initialValue: mappedItems.isEmpty ? [ExpenseItemInput()] : mappedItems)
-        
-        _paidAmount = State(initialValue: String(format: "%.0f", expense.paidAmount))
-        _selectedExpenseCategory = State(initialValue: expense.category?.name ?? "")
-        _supplierName = State(initialValue: expense.supplierName ?? "")
-        _supplierPhone = State(initialValue: expense.supplierPhone ?? "")
+    public init(expenseId: UUID) {
+        self.expenseId = expenseId
+    }
+    
+    private var selectedCategoryName: String {
+        guard let id = selectedExpenseCategory else { return "" }
+        return categoryStore.categories.first(where: { $0.id == id })?.name ?? ""
     }
     
     private var areItemsValid: Bool {
@@ -45,10 +46,44 @@ public struct EditExpenseView: View {
     }
     
     private var isPaidAmountValid: Bool {
-        !paidAmount.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let cleaned = paidAmount.replacingOccurrences(of: ",", with: "")
+            .replacingOccurrences(of: ".", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let amount = Double(cleaned) else { return false }
+        return amount > 0
+    }
+    
+    private var parsedPaidAmount: Double {
+        let cleaned = paidAmount.replacingOccurrences(of: ",", with: "")
+            .replacingOccurrences(of: ".", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return Double(cleaned) ?? 0.0
     }
     
     public var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Memuat data pengeluaran...")
+            } else if let errorMessage {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.largeTitle)
+                        .foregroundStyle(.orange)
+                    Text(errorMessage)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                formContent
+            }
+        }
+        .task {
+            await categoryStore.fetchCategoriesIfNeeded()
+            await fetchExpenseDetail()
+        }
+    }
+    
+    private var formContent: some View {
         ScrollView {
             VStack(spacing: 14) {
                 HStack {
@@ -161,9 +196,11 @@ public struct EditExpenseView: View {
                         showCategorySheet = true
                     } label: {
                         HStack {
-                            Text(selectedExpenseCategory.isEmpty ? "Pilih kategori" : selectedExpenseCategory)
-                                .font(.body)
-                                .foregroundStyle(selectedExpenseCategory.isEmpty ? Color(.placeholderText) : Color.primary)
+                            Text(
+                                selectedCategoryName.isEmpty ? "Pilih kategori" : selectedCategoryName
+                            )
+                            .font(.body)
+                            .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.primary)
                             
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -202,19 +239,29 @@ public struct EditExpenseView: View {
                 
                 Button {
                     if areItemsValid && isPaidAmountValid {
-                        dismiss()
+                        Task {
+                            await updateExpense()
+                        }
                     } else {
                         showErrors = true
                     }
                 } label: {
-                    Text("Simpan Perubahan")
-                        .font(.title3.bold())
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(24)
+                    Group {
+                        if isSaving {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Simpan Perubahan")
+                                .font(.title3.bold())
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(24)
                 }
+                .disabled(isSaving)
                 .padding(.top, 8)
                 
                 Button(action: { isShowingDelSheet = true }) {
@@ -227,9 +274,14 @@ public struct EditExpenseView: View {
                         .cornerRadius(24)
                 }
                 .sheet(isPresented: $isShowingDelSheet) {
-                    CashFlowDeleteOutcome()
-                        .presentationDetents([.fraction(0.5), .height(.infinity)])
-                        .presentationDragIndicator(.visible)
+                    CashFlowDeleteOutcome(
+                        expenseId: expenseId,
+                        shopId: AppMockData.primaryShop.id
+                    ) {
+                        dismiss()
+                    }
+                    .presentationDetents([.fraction(0.45)])
+                    .presentationDragIndicator(.visible)
                 }
             }
             .padding()
@@ -252,33 +304,88 @@ public struct EditExpenseView: View {
                     .foregroundStyle(.white)
             }
         }
-
         .sheet(isPresented: $showCategorySheet) {
-            ExpenseCategorySheetContent(selectedExpenseCategory: $selectedExpenseCategory)
+            ExpenseCategorySheetContent(selectedExpenseCategoryId: $selectedExpenseCategory)
+        }
+    }
+    
+    private func setupForm(with expense: Expense) {
+        transactionDate = expense.purchasedAt
+        let mappedItems = expense.items?.map { ExpenseItemInput(name: $0.name ?? "") } ?? []
+        items = mappedItems.isEmpty ? [ExpenseItemInput()] : mappedItems
+        paidAmount = String(format: "%.0f", expense.paidAmount)
+        selectedExpenseCategory = expense.expenseCategoryId
+        supplierName = expense.supplierName ?? ""
+        supplierPhone = expense.supplierPhone ?? ""
+    }
+    
+    @MainActor
+    private func fetchExpenseDetail() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let fetchedExpense = try await APIService.shared.fetchExpenseDetail(
+                id: expenseId,
+                shopId: AppMockData.primaryShop.id
+            )
+            self.expense = fetchedExpense
+            setupForm(with: fetchedExpense)
+            self.isLoading = false
+        } catch {
+            self.errorMessage = "Gagal memuat detail pengeluaran: \(error.localizedDescription)"
+            self.isLoading = false
+        }
+    }
+    
+    @MainActor
+    private func updateExpense() async {
+        guard let categoryId = selectedExpenseCategory else {
+            errorMessage = "Kategori wajib dipilih."
+            return
+        }
+        
+        isSaving = true
+        errorMessage = nil
+        
+        let itemsArray: [[String: String]] = items.compactMap { item in
+            let trimmed = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? nil : ["name": trimmed]
+        }
+        
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let formattedDate = formatter.string(from: transactionDate)
+        
+        let rawBody: [String: Any] = [
+            "expenseCategoryId": categoryId.uuidString,
+            "supplierName": supplierName.trimmingCharacters(in: .whitespacesAndNewlines),
+            "supplierPhone": supplierPhone.trimmingCharacters(in: .whitespacesAndNewlines),
+            "paidAmount": parsedPaidAmount,
+            "purchasedAt": formattedDate,
+            "createdBy": AppMockData.currentUser.id.uuidString,
+            "updatedBy": AppMockData.currentUser.id.uuidString,
+            "items": itemsArray
+        ]
+        
+        do {
+            try await APIService.shared.patchExpense(
+                id: expenseId,
+                shopId: AppMockData.primaryShop.id,
+                body: rawBody
+            )
+            isSaving = false
+            dismiss()
+        } catch {
+            isSaving = false
+            self.errorMessage = "Gagal menyimpan perubahan: \(error.localizedDescription)"
         }
     }
 }
 
 #Preview {
-    let dummyCategoryId = UUID()
-    let dummyExpense = Expense(
-        id: UUID(),
-        shopId: UUID(),
-        expenseCategoryId: dummyCategoryId,
-        supplierName: "Toko Sembako Makmur",
-        supplierPhone: "081234567890",
-        paidAmount: 350000,
-        purchasedAt: Date(),
-        createdBy: UUID(),
-        updatedBy: UUID(),
-        items: [
-            ExpenseItem(id: UUID(), expenseId: UUID(), name: "Tepung Terigu Segitiga 25 kg"),
-            ExpenseItem(id: UUID(), expenseId: UUID(), name: "Minyak Goreng 5 Liter")
-        ],
-        category: ExpenseCategory(id: dummyCategoryId, name: "Bahan Baku")
-    )
-    
-    return NavigationStack {
-        EditExpenseView(expense: dummyExpense)
+    NavigationStack {
+        EditExpenseView(expenseId: UUID())
+            .environmentObject(CategoryStore.shared)
     }
 }

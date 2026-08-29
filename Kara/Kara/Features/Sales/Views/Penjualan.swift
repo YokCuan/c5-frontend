@@ -16,8 +16,14 @@ struct Penjualan: View {
     @State private var selectedDateRange: FilterComponent.DateRange? = nil
     @State private var startDate: Date = Date()
     @State private var endDate: Date = Date()
+
     @State private var isShowingFilterSheet = false
     @State private var scrollOffset: CGFloat = 0
+
+    @State private var salesNotes: [SalesNote] = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+
     
     private var isAnyFilterActive: Bool {
         selectedStatus != nil
@@ -50,7 +56,7 @@ struct Penjualan: View {
     }
     
     private var filteredNotes: [SalesNote] {
-        AppMockData.salesNotes.filter { note in
+        salesNotes.filter { note in
             let matchesStatus = selectedStatus == nil || note.status == selectedStatus
             let matchesDateRange = matchesDateRange(for: note.soldAt)
             let searchableText = [
@@ -139,7 +145,7 @@ struct Penjualan: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
                 .padding(.top, 16)
                 .padding(.bottom, 16)
                 .background(
@@ -152,119 +158,159 @@ struct Penjualan: View {
                 )
                 
                 ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(filteredNotes) { note in
-                            SalesCard(salesNote: note, onTapDetail: {
-                                selectedNote = note
-                            })
+                    VStack(spacing: 16) {
+                        if isLoading && salesNotes.isEmpty {
+                            ProgressView()
+                                .padding(.top, 40)
+                        } else if let errorMessage {
+                            VStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.largeTitle)
+                                    .foregroundStyle(.orange)
+                                Text(errorMessage)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(.top, 60)
+                            .padding(.horizontal, 24)
+                        } else if filteredNotes.isEmpty {
+                            VStack(spacing: 8) {
+                                Image(systemName: "doc.text.magnifyingglass")
+                                    .font(.largeTitle)
+                                    .foregroundStyle(.secondary)
+                                Text("Tidak ada penjualan")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.top, 60)
+                        } else {
+                            LazyVStack(spacing: 12) {
+                                ForEach(filteredNotes) { note in
+                                    SalesCard(salesNote: note, onTapDetail: {
+                                        selectedNote = note
+                                    })
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            }
                         }
-                        .frame(maxWidth: .infinity, alignment: .center)
                     }
+                    .frame(maxWidth: .infinity)
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     .padding(.bottom, 16)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(.systemGray6))
                 .onScrollGeometryChange(for: CGFloat.self) { geometry in
                     geometry.contentOffset.y
                 } action: { _, newValue in
                     scrollOffset = newValue
                 }
-                .toolbar(.hidden, for: .navigationBar)
-                .navigationDestination(item: $selectedNote) { note in
-                    DetailPenjualan(
-                        salesNote: note,
-                        shop: AppMockData.primaryShop
-                    )
-                }
-                .sheet(isPresented: $isShowingFilter) {
-                    FilterComponent(
-                        selectedDateRange: $selectedDateRange,
-                        startDate: $startDate,
-                        endDate: $endDate
-                    )
-                }
-                //            .navigationDestination(item: $selectedNote) { note in
-                //                DetailPenjualan(
-                //                    salesNote: note,
-                //                    shop: AppMockData.primaryShop
-                //                )
-                //            }
+            }
+            .navigationDestination(item: $selectedNote) { note in
+                DetailPenjualan(
+                    salesNote: note,
+                    shop: AppMockData.primaryShop
+                )
+            }
+            .sheet(isPresented: $isShowingFilter) {
+                FilterComponent(
+                    selectedDateRange: $selectedDateRange,
+                    startDate: $startDate,
+                    endDate: $endDate
+                )
             }
         }
-    }
-        
-        private func filterButton(
-            _ title: String,
-            status: PaymentStatus?
-        ) -> some View {
-            Button {
-                selectedStatus = status
-            } label: {
-                Text(title)
-                    .font(.footnote)
-                    .foregroundStyle(
-                        selectedStatus == status
-                        ? .black
-                        : .white.opacity(0.8)
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(
-                        selectedStatus == status
-                        ? Color.white
-                        : Color.white.opacity(0.08)
-                    )
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-                    .clipShape(Capsule())
-            }
-        }
-        
-        private func matchesDateRange(for soldAt: Date) -> Bool {
-            guard let selectedDateRange else {
-                return true
-            }
-            
-            let calendar = Calendar.current
-            let noteDay = calendar.startOfDay(for: soldAt)
-            
-            switch selectedDateRange {
-            case .last7Days:
-                let start = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -6, to: Date()) ?? Date())
-                let end = calendar.startOfDay(for: Date())
-                return noteDay >= start && noteDay <= end
-            case .thisMonth:
-                let start = monthStartDate(for: Date())
-                let end = monthEndDate(for: Date())
-                return noteDay >= start && noteDay <= end
-            case .custom:
-                let lowerBound = calendar.startOfDay(for: min(startDate, endDate))
-                let upperBound = calendar.startOfDay(for: max(startDate, endDate))
-                return noteDay >= lowerBound && noteDay <= upperBound
-            }
-        }
-        
-        private func monthStartDate(for date: Date) -> Date {
-            let calendar = Calendar.current
-            let components = calendar.dateComponents([.year, .month], from: date)
-            return calendar.date(from: components) ?? date
-        }
-        
-        private func monthEndDate(for date: Date) -> Date {
-            let calendar = Calendar.current
-            guard
-                let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStartDate(for: date)),
-                let end = calendar.date(byAdding: .day, value: -1, to: nextMonth)
-            else {
-                return date
-            }
-            return end
+        .task {
+            await loadSalesNotes()
         }
     }
     
-    #Preview {
-        NavigationStack {
-            Penjualan()
+    private func filterButton(
+        _ title: String,
+        status: PaymentStatus?
+    ) -> some View {
+        Button {
+            selectedStatus = status
+        } label: {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(
+                    selectedStatus == status
+                    ? .black
+                    : .white.opacity(0.8)
+                )
+                .padding(.horizontal, 16)
+                .padding(.vertical, 7)
+                .background(
+                    selectedStatus == status
+                    ? Color.white
+                    : Color.white.opacity(0.08)
+                )
+                .clipShape(Capsule())
         }
     }
+    
+    private func matchesDateRange(for soldAt: Date) -> Bool {
+        guard let selectedDateRange else {
+            return true
+        }
+        
+        let calendar = Calendar.current
+        let noteDay = calendar.startOfDay(for: soldAt)
+        
+        switch selectedDateRange {
+        case .last7Days:
+            let start = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -6, to: Date()) ?? Date())
+            let end = calendar.startOfDay(for: Date())
+            return noteDay >= start && noteDay <= end
+        case .thisMonth:
+            let start = monthStartDate(for: Date())
+            let end = monthEndDate(for: Date())
+            return noteDay >= start && noteDay <= end
+        case .custom:
+            let lowerBound = calendar.startOfDay(for: min(startDate, endDate))
+            let upperBound = calendar.startOfDay(for: max(startDate, endDate))
+            return noteDay >= lowerBound && noteDay <= upperBound
+        }
+    }
+    
+    private func monthStartDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: date)
+        return calendar.date(from: components) ?? date
+    }
+    
+    private func monthEndDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        guard
+            let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStartDate(for: date)),
+            let end = calendar.date(byAdding: .day, value: -1, to: nextMonth)
+        else {
+            return date
+        }
+        return end
+    }
+    
+    @MainActor
+    private func loadSalesNotes() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            salesNotes = try await APIService.shared.fetchSalesNotes(shopId: AppMockData.primaryShop.id)
+        } catch {
+            errorMessage = "Gagal memuat penjualan: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
+    }
+}
+
+#Preview {
+    NavigationStack {
+        Penjualan()
+    }
+}

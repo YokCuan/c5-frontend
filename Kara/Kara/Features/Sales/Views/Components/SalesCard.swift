@@ -108,7 +108,7 @@ struct SalesCard: View {
 
 #Preview("DP Paid") {
     SalesCard(
-        salesNote: AppMockData.salesNotes[1],
+        salesNote: PreviewFixtures.dpSalesNote,
         onTapDetail: {}
     )
 }
