@@ -21,7 +21,6 @@ struct SearchBarFilterButton: View {
     
     @State private var isShowingFilterSheet = false
     @State private var isShowingDatePickerSheet = false
-//    @State private var filterSheetHeight: CGFloat = 400
     
     private var isAnyFilterActive: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -46,11 +45,7 @@ struct SearchBarFilterButton: View {
         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             parts.append("Cari: \(searchText.trimmingCharacters(in: .whitespacesAndNewlines))")
         }
-        
-//        if useCustomDateRange {
-//            parts.append("Rentang aktif")
-//        }
-        
+                
         return parts.isEmpty ? nil : parts.joined(separator: " • ")
     }
     

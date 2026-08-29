@@ -26,7 +26,7 @@ struct CashFlowDeleteOutcome: View {
             
             Text ("Transaksi ini akan dihapus secara permanen dan tidak dapat dibatalkan.")
                 .font(.body)
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 12)
             

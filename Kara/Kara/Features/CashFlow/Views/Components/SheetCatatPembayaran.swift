@@ -20,7 +20,7 @@ struct SheetCatatPembayaran: View {
                 Text("Catat Pembayaran")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack {
                     Text(customerName)
@@ -28,7 +28,7 @@ struct SheetCatatPembayaran: View {
                     Text(remainingAmount.formatted(.currency(code: "IDR")))
                 }
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             

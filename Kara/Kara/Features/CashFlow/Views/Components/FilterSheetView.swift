@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-//struct HeightPreferenceKey: PreferenceKey {
-//    static var defaultValue: CGFloat = 0
-//    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-//        value = nextValue()
-//    }
-//}
-
 struct FilterSheetView: View {
     
     @Binding var selectedPaymentStatus: PaymentStatus?
@@ -23,7 +16,6 @@ struct FilterSheetView: View {
     @Binding var useCustomDateRange: Bool
     @Binding var minAmountFilter: String
     @Binding var maxAmountFilter: String
-//    @Binding var contentHeight: CGFloat   // <-- untuk func reduce ukur layar
     
     @ObservedObject var viewModel: CashFlowViewModel
     
@@ -111,85 +103,76 @@ struct FilterSheetView: View {
                         .foregroundStyle(.gray)
                     
                     Button {
-                                            isShowingCategorySheet = true
-                                        } label: {
-                                            HStack {
-                                                Text(selectedCategory?.title ?? "Pilih kategori")
-                                                    .font(.subheadline)
-                                                    .fontWeight(.bold)
-                                                    .foregroundStyle(.black)
-                                                
-                                                Spacer()
-                                                
-                                                Image(systemName: "chevron.right")
-                                                    .foregroundStyle(Color.black)
-                                            }
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-            
-            // MARK: - Bottom Action Button
-            Button {
-                applyFilter()
-                dismiss()
-            } label: {
-                Text("Terapkan Filter")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical)
-                    .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 48))
-            }
-        }
-            .padding(.top, 8)
-                        .padding()
-//                        .background(
-//                            GeometryReader { geometry in
-//                                Color.clear
-//                                    .preference(key: HeightPreferenceKey.self, value: geometry.size.height)
-//                            }
-//                        )
+                        isShowingCategorySheet = true
+                    } label: {
+                        HStack {
+                            Text(selectedCategory?.title ?? "Pilih kategori")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.black)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(Color.black)
+                        }
                     }
-//                    .onPreferenceChange(HeightPreferenceKey.self) { newHeight in
-////                        contentHeight = newHeight
-//                    }
-                    .background(Color(.systemBackground))
-                    .onTapGesture {
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                    }
-                    .presentationDragIndicator(.visible)
-                    .sheet(isPresented: $isShowingCategorySheet) {
-                        SheetFilterCategory(
-                            selectedCategory: $selectedCategory,
-                            parentSheetDismiss: { dismiss() }
-                        )
-                        .presentationDetents([.fraction(0.75)])
-                        .presentationDragIndicator(.visible)
-                    }
-                    .sheet(isPresented: $isShowingDatePickerSheet) {
-                        SheetDatePicker(
-                            startDate: $startDate,
-                            endDate: $endDate,
-                            parentSheetDismiss: { dismiss() }
-                        )
-                        .presentationDetents([.fraction(0.75)])
-                        .presentationDragIndicator(.visible)
-                    }
-                    .onAppear {
-                        syncSelectedDateRange()
-                    }
-                    .onChange(of: startDate) { _, _ in
-                        syncSelectedDateRange()
-                    }
-                    .onChange(of: endDate) { _, _ in
-                        syncSelectedDateRange()
-                    }
-                    .onChange(of: useCustomDateRange) { _, _ in
-                        syncSelectedDateRange()
-                    }
+                    .buttonStyle(.plain)
                 }
+                
+                // MARK: - Bottom Action Button
+                Button {
+                    applyFilter()
+                    dismiss()
+                } label: {
+                    Text("Terapkan Filter")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                        .background(Color.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 48))
+                }
+            }
+            .padding(.top, 8)
+            .padding()
+        }
+        .background(Color(.systemBackground))
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+        .presentationDragIndicator(.visible)
+        .sheet(isPresented: $isShowingCategorySheet) {
+            SheetFilterCategory(
+                selectedCategory: $selectedCategory,
+                parentSheetDismiss: { dismiss() }
+            )
+            .presentationDetents([.fraction(0.75)])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $isShowingDatePickerSheet) {
+            SheetDatePicker(
+                startDate: $startDate,
+                endDate: $endDate,
+                parentSheetDismiss: { dismiss() }
+            )
+            .presentationDetents([.fraction(0.75)])
+            .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            syncSelectedDateRange()
+        }
+        .onChange(of: startDate) { _, _ in
+            syncSelectedDateRange()
+        }
+        .onChange(of: endDate) { _, _ in
+            syncSelectedDateRange()
+        }
+        .onChange(of: useCustomDateRange) { _, _ in
+            syncSelectedDateRange()
+        }
+    }
     
     @ViewBuilder
     private func dateRangeRow(_ range: DateRange) -> some View {
@@ -222,7 +205,7 @@ struct FilterSheetView: View {
             Text(label)
                 .font(.subheadline)
                 .fontWeight(.bold)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.gray)
             
             HStack (spacing: 0){
                 Text("Rp ")

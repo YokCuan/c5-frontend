@@ -25,7 +25,7 @@ public struct DetailPemasukanView: View {
                         Text(note.customerName)
                             .font(.title2.bold())
                         Text("Penjualan")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                     }
                     
                     VStack(alignment: .leading, spacing: 5) {

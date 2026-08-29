@@ -49,7 +49,7 @@ struct SheetDatePicker: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.headline)
-                        .foregroundStyle(Color.secondary .opacity(0.8))
+                        .foregroundStyle(Color.gray .opacity(0.8))
                 }
             }
             
@@ -125,18 +125,18 @@ struct SheetDatePicker: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(title)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.gray)
                 
                 HStack {
                     Text(dateString)
                         .font(.subheadline)
                         .fontWeight(.bold)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.black)
                     
                     Spacer()
                     
                     Image(systemName: "calendar")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                 }
             }
             .padding()

@@ -23,7 +23,7 @@ public struct CashFlowSummaryCard: View {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.gray)
             }
             
             Text(amount.toIDR)
@@ -36,7 +36,6 @@ public struct CashFlowSummaryCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-//        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
 }
 

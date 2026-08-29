@@ -43,7 +43,7 @@ struct SheetFilterCategory: View {
                 
                 Text("Pilih kategori")
                     .font(.headline.bold())
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -53,7 +53,7 @@ struct SheetFilterCategory: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.headline)
-                        .foregroundStyle(Color.secondary.opacity(0.8))
+                        .foregroundStyle(Color.gray.opacity(0.8))
                 }
                 .frame(width: 32, height: 32)
             }
@@ -105,7 +105,7 @@ struct SheetFilterCategory: View {
             HStack {
                 Text(option.title)
                     .font(.body)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
