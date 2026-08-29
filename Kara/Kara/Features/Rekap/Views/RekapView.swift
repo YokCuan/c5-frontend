@@ -77,7 +77,7 @@ public struct RekapView: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Rekap Transaksi")
             .task {
-                await viewModel.loadRekap()
+                await viewModel.loadRekap(shopId: AppMockData.primaryShop.id)
             }
         }
     }

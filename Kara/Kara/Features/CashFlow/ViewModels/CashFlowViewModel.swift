@@ -17,7 +17,7 @@ public class CashFlowViewModel: ObservableObject {
     @Published public var minAmountFilter: String = ""
     @Published public var maxAmountFilter: String = ""
     
-    private let service = FirebaseService.shared
+    private let service = APIService.shared
     
     public init() {
         syncMonthDateRange()
@@ -32,20 +32,20 @@ public class CashFlowViewModel: ObservableObject {
     
     public var totalIncome: Double {
         transactions
-            .filter { $0.type == .pemasukan }
+            .filter { $0.type == .salesNote }
             .reduce(0) { $0 + $1.amount }
     }
     
     public var totalExpense: Double {
         transactions
-            .filter { $0.type == .pengeluaran }
+            .filter { $0.type == .expense }
             .reduce(0) { $0 + $1.amount }
     }
     
     public var groupedTransactions: [(key: Date, value: [CashFlowModel])] {
         let calendar = Calendar.current
         let grouped = Dictionary(grouping: transactions) { item in
-            calendar.startOfDay(for: item.date)
+            calendar.startOfDay(for: item.occurredAt)
         }
         return grouped.sorted { $0.key > $1.key }
     }
@@ -69,12 +69,13 @@ public class CashFlowViewModel: ObservableObject {
     }
     
     @MainActor
-    public func loadTransactions() async {
+    public func loadTransactions(shopId: UUID) async {
         isLoading = true
         errorMessage = nil
         
         do {
-            self.allTransactions = try await service.getCashFlowTransactions()
+            self.allTransactions = try await service
+                .fetchCashFlows(shopId: shopId)
             applyFilters()
             self.isLoading = false
         } catch {
@@ -92,7 +93,8 @@ public class CashFlowViewModel: ObservableObject {
         let maxAmount = Double(maxAmountFilter.replacingOccurrences(of: ",", with: "")) ?? .greatestFiniteMagnitude
         
         transactions = allTransactions.filter { transaction in
-            let transactionDay = calendar.startOfDay(for: transaction.date)
+            let transactionDay = calendar.startOfDay(for: transaction.occurredAt)
+            
             guard transactionDay >= normalizedStartDate, transactionDay <= normalizedEndDate else {
                 return false
             }
@@ -101,23 +103,17 @@ public class CashFlowViewModel: ObservableObject {
                 return false
             }
             
-            if let status = selectedPaymentStatus, transaction.paymentStatus != status.title {
-                return false
-            }
-            
             if let selectedCategory {
                 switch selectedCategory {
                 case .all:
                     break
-                case .incomeStatus(let status):
-                    guard transaction.type == .pemasukan, transaction.paymentStatus == status.title else {
-                        return false
-                    }
+                case .incomeStatus:
+                    guard transaction.type == .salesNote else { return false }
                 case .expenseItem(let category):
-                    guard transaction.type == .pengeluaran,
-                          transaction.expense?.category?.id == category.id || transaction.expense?.category?.name == category.name else {
-                        return false
-                    }
+                    guard transaction.type == .expense else { return false }
+                    
+                    let categoryName = transaction.categoryType
+                    guard categoryName.lowercased() == category.name.lowercased() else { return false }
                 }
             }
             
@@ -126,11 +122,10 @@ public class CashFlowViewModel: ObservableObject {
             }
             
             let searchableText = [
-                transaction.counterpartyName,
+                transaction.title,
                 transaction.description,
-                transaction.paymentStatus,
-                transaction.income?.identifier,
-                transaction.expense?.category?.name
+                transaction.categoryType,
+                String(Int(transaction.amount))
             ]
             .compactMap { $0 }
             .joined(separator: " ")

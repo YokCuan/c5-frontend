@@ -15,14 +15,12 @@ struct SheetDatePicker: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    // State lokal untuk memilih input "Dari" atau "Ke" yang sedang aktif
     @State private var activeField: DateField = .start
     
     enum DateField {
         case start, end
     }
     
-    // Formatter untuk menampilkan tanggal (contoh: 19 Agu 2026)
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "id_ID")
@@ -33,7 +31,6 @@ struct SheetDatePicker: View {
     var body: some View {
         VStack(spacing: 16) {
             
-            // MARK: - Custom Header
             HStack {
                 
                 Text("Atur Rentang Waktu")
@@ -53,9 +50,7 @@ struct SheetDatePicker: View {
                 }
             }
             
-            // MARK: - Input Box (Dari & Ke)
             HStack(spacing: 16) {
-                // Card "Dari"
                 dateInputCard(
                     title: "Dari",
                     dateString: dateFormatter.string(from: startDate),
@@ -64,7 +59,6 @@ struct SheetDatePicker: View {
                     activeField = .start
                 }
                 
-                // Card "Ke"
                 dateInputCard(
                     title: "Ke",
                     dateString: dateFormatter.string(from: endDate),
@@ -78,7 +72,6 @@ struct SheetDatePicker: View {
             .foregroundStyle(Color.black)
             .cornerRadius(10)
             
-            // MARK: - Tombol Pasang
             Button {
                 dismiss()
             } label: {
@@ -92,7 +85,6 @@ struct SheetDatePicker: View {
                     .clipShape(RoundedRectangle(cornerRadius: 48))
             }
             
-            // MARK: - DatePicker Wheel Native
             if activeField == .start {
                 DatePicker(
                     "",
@@ -118,7 +110,6 @@ struct SheetDatePicker: View {
     }
        
     
-    // MARK: - Helper Subview Input Card
     @ViewBuilder
     private func dateInputCard(title: String, dateString: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
@@ -151,7 +142,6 @@ struct SheetDatePicker: View {
     }
 }
 
-// MARK: - Preview
 #Preview {
     SheetDatePicker(
         startDate: .constant(Date()),

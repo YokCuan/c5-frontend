@@ -1,40 +1,34 @@
 import Foundation
 
-public enum CashflowTransactionType: String {
-    case pemasukan
-    case pengeluaran
+public enum CashFlowItemType: String, Codable {
+    case salesNote = "sales_note"
+    case expense = "expense"
 }
 
-public struct CashFlowModel: Identifiable {
+public struct CashFlowModel: Identifiable, Codable {
     public let id: UUID
     public let amount: Double
-    public let type: CashflowTransactionType
-    public let description: String
-    public let counterpartyName: String // Customer Name atau Supplier Name
-    public let paymentStatus: String
-    public let date: Date
-    public let income: SalesNote?
-    public let expense: Expense?
-    
+    public let occurredAt: Date
+    public let type: CashFlowItemType
+    public let categoryType: String
+    public let title: String
+    public let description: String?
+
     public init(
-        id: UUID = UUID(),
+        id: UUID,
         amount: Double,
-        type: CashflowTransactionType,
-        description: String,
-        counterpartyName: String,
-        paymentStatus: String,
-        date: Date,
-        income: SalesNote? = nil,
-        expense: Expense? = nil
+        occurredAt: Date,
+        type: CashFlowItemType,
+        categoryType: String,
+        title: String,
+        description: String? = nil
     ) {
         self.id = id
         self.amount = amount
+        self.occurredAt = occurredAt
         self.type = type
+        self.categoryType = categoryType
+        self.title = title
         self.description = description
-        self.counterpartyName = counterpartyName
-        self.paymentStatus = paymentStatus
-        self.date = date
-        self.income = income
-        self.expense = expense
     }
 }

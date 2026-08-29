@@ -1,55 +1,134 @@
-import SwiftUI
+//
+//  AddSalesNoteViewModel.swift
+//  Kara
+//
+//  Created by Jessica Evangeline Winardy on 29/08/26.
+//
+
+import Foundation
 import Combine
 
+public struct SalesNoteItemInput: Identifiable {
+    public let id: UUID
+    public var name: String
+    public var quantityText: String
+    public var unitPriceText: String
+
+    public init(id: UUID = UUID(), name: String = "", quantityText: String = "", unitPriceText: String = "") {
+        self.id = id
+        self.name = name
+        self.quantityText = quantityText
+        self.unitPriceText = unitPriceText
+    }
+}
+
 @MainActor
-public final class AddIncomeViewModel: ObservableObject {
-    @Published public var incomeDescription = ""
-    @Published public var amount: Int = 0
-    @Published public var buyerName = ""
-    @Published public var transactionDate = Date()
-    @Published public var paymentStatus: PaymentStatus = .paid
+public final class AddSalesNoteViewModel: ObservableObject {
+    @Published public var customerName: String = ""
+    @Published public var customerPhone: String = ""
+    @Published public var soldAt: Date = Date()
+    @Published public var dueAt: Date = Date()
+    @Published public var hasDueDate: Bool = false
+    @Published public var items: [SalesNoteItemInput] = [SalesNoteItemInput()]
+    @Published public var paidAmountText: String = ""
     
-    @Published public var isLoading = false
-    @Published public var isSaved = false
-    @Published public var errorMessage: String?
-    
-    private let service = FirebaseService.shared
+    @Published public var isLoading: Bool = false
+    @Published public var isSaved: Bool = false
+    @Published public var errorMessage: String? = nil
     
     public init() {}
     
-    public func save() async {
-        guard amount > 0 else {
-            self.errorMessage = "Jumlah pemasukan harus lebih dari 0."
+    public var areItemsValid: Bool {
+        guard !items.isEmpty else { return false }
+        return items.allSatisfy { item in
+            let isNameValid = !item.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            let qty = Double(item.quantityText.replacingOccurrences(of: ",", with: "")) ?? 0
+            let price = Double(item.unitPriceText.replacingOccurrences(of: ",", with: "").replacingOccurrences(of: ".", with: "")) ?? 0
+            return isNameValid && qty > 0 && price >= 0
+        }
+    }
+    
+    public var isPaidAmountValid: Bool {
+        guard let amount = parsedPaidAmount else { return false }
+        return amount >= 0
+    }
+    
+    public var parsedPaidAmount: Double? {
+        let cleanedText = paidAmountText.replacingOccurrences(of: ",", with: "")
+            .replacingOccurrences(of: ".", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return Double(cleanedText)
+    }
+    
+    public func addItem() {
+        items.append(SalesNoteItemInput())
+    }
+    
+    public func removeItem(id: UUID) {
+        if items.count > 1 {
+            items.removeAll { $0.id == id }
+        }
+    }
+    
+    public func createSalesNote(shopId: UUID, userId: UUID) async {
+        guard !customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            self.errorMessage = "Nama pembeli tidak boleh kosong."
             return
         }
         
-        guard !incomeDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            self.errorMessage = "Deskripsi tidak boleh kosong."
+        guard areItemsValid else {
+            self.errorMessage = "Pastikan nama barang, jumlah (qty), dan harga satuan terisi dengan benar."
+            return
+        }
+        
+        guard let paidAmount = parsedPaidAmount, isPaidAmountValid else {
+            self.errorMessage = "Jumlah yang dibayar tidak valid."
             return
         }
         
         isLoading = true
         errorMessage = nil
         
-        do {
-            let income = CashFlowModel(
-                id: UUID(),
-                amount: Double(amount),
-                type: .pemasukan,
-                description: incomeDescription,
-                counterpartyName: buyerName,
-                paymentStatus: paymentStatus.title,
-                date: transactionDate,
-                income: nil,
-                expense: nil
-            )
-            
-            try await service.saveCashFlowTransaction(income)
-            isSaved = true
-        } catch {
-            self.errorMessage = error.localizedDescription
+        let itemsArray: [[String: Any]] = items.map { item in
+            let qty = Double(item.quantityText.replacingOccurrences(of: ",", with: "")) ?? 0
+            let price = Double(item.unitPriceText.replacingOccurrences(of: ",", with: "").replacingOccurrences(of: ".", with: "")) ?? 0
+            return [
+                "name": item.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                "quantity": qty,
+                "unitPrice": price
+            ]
         }
         
-        isLoading = false
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let formattedSoldAt = formatter.string(from: soldAt)
+        let formattedDueAt = hasDueDate ? formatter.string(from: dueAt) : nil
+        
+        var rawBody: [String: Any] = [
+            "shopId": shopId.uuidString,
+            "customerName": customerName.trimmingCharacters(in: .whitespacesAndNewlines),
+            "customerPhone": customerPhone.trimmingCharacters(in: .whitespacesAndNewlines),
+            "paidAmount": paidAmount,
+            "noteFileLink": NSNull(),
+            "soldAt": formattedSoldAt,
+            "createdBy": userId.uuidString,
+            "updatedBy": userId.uuidString,
+            "items": itemsArray
+        ]
+        
+        if let formattedDueAt {
+            rawBody["dueAt"] = formattedDueAt
+        } else {
+            rawBody["dueAt"] = NSNull()
+        }
+        
+        do {
+            try await APIService.shared.createSalesNote(body: rawBody)
+            self.isSaved = true
+            self.isLoading = false
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+        }
     }
 }

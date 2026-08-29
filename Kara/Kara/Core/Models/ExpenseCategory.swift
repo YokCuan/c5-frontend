@@ -17,9 +17,3 @@ public struct ExpenseCategory: Identifiable, Codable, Hashable {
     }
 }
 
-// Dummy Data
-public extension ExpenseCategory {
-    static var defaults: [ExpenseCategory] {
-        AppMockData.expenseCategories
-    }
-}

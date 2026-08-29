@@ -123,7 +123,7 @@ public struct CashFlowView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .task {
-                await viewModel.loadTransactions()
+                await viewModel.loadTransactions(shopId: AppMockData.primaryShop.id)
             }
             .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") { viewModel.errorMessage = nil }

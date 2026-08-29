@@ -47,4 +47,5 @@ public struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .environmentObject(CategoryStore.shared)
 }

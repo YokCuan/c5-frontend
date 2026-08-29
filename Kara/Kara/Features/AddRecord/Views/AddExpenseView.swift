@@ -19,36 +19,38 @@ public struct ExpenseItemInput: Identifiable {
 
 public struct AddExpenseView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var categoryStore: CategoryStore
     
-    @State private var transactionDate = Date()
-    @State private var dueDate = Date()
-    @State private var supplierName = ""
-    @State private var supplierPhone = ""
-    @State private var items: [ExpenseItemInput] = [ExpenseItemInput()]
-    @State private var paidAmount = ""
-    @State private var selectedExpenseCategory: String = ""
+    @StateObject private var viewModel = AddExpenseViewModel()
+    
     @State private var showErrors = false
     @State private var showCategorySheet = false
     
-    
-    private var areItemsValid: Bool {
-        guard !items.isEmpty else { return false }
-        return items.allSatisfy {
-            !$0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
-    }
-    
-    private var isPaidAmountValid: Bool {
-        !paidAmount.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    private var selectedCategoryName: String {
+        guard let id = viewModel.selectedExpenseCategoryId else { return "" }
+        return categoryStore.categories.first(where: { $0.id == id })?.name ?? ""
     }
     
     public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
+                if let apiError = viewModel.errorMessage {
+                    HStack(spacing: 6) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text(apiError)
+                        Spacer()
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(12)
+                }
+                
                 HStack {
                     Text("Tanggal")
                     Spacer()
-                    DatePicker("", selection: $transactionDate, displayedComponents: .date)
+                    DatePicker("", selection: $viewModel.transactionDate, displayedComponents: .date)
                         .datePickerStyle(.compact)
                 }
                 .padding(.leading, 6)
@@ -56,24 +58,22 @@ public struct AddExpenseView: View {
                 .background(Color.white)
                 .cornerRadius(24)
                 
-                
-                
                 VStack(alignment: .leading, spacing: 16) {
                     Text("DETAIL BARANG")
                         .font(.caption2.bold())
                         .foregroundStyle(.secondary)
                     
-                    ForEach($items) { $item in
+                    ForEach($viewModel.items) { $item in
                         HStack {
                             VStack(spacing: 10) {
                                 HStack {
                                     TextField("cth. Tepung 10 kg", text: $item.name)
                                     Spacer()
                                     
-                                    if items.count > 1 {
+                                    if viewModel.items.count > 1 {
                                         Button {
                                             withAnimation(.easeInOut(duration: 0.2)) {
-                                                items.removeAll { $0.id == item.id }
+                                                viewModel.removeItem(id: item.id)
                                             }
                                         } label: {
                                             Image(systemName: "trash")
@@ -83,8 +83,7 @@ public struct AddExpenseView: View {
                                     }
                                 }
                                 
-                                
-                                if items.count > 1 {
+                                if viewModel.items.count > 1 {
                                     Divider()
                                 }
                             }
@@ -92,7 +91,7 @@ public struct AddExpenseView: View {
                     }
                     
                     Button {
-                        items.append(ExpenseItemInput())
+                        viewModel.addItem()
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "plus.circle")
@@ -106,17 +105,16 @@ public struct AddExpenseView: View {
                 .background(Color.white)
                 .cornerRadius(24)
                 
-                if showErrors && !areItemsValid {
+                if showErrors && !viewModel.areItemsValid {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.circle")
-                        Text("Nama barang dan harga wajib diisi")
+                        Text("Nama barang wajib diisi")
                         Spacer()
                     }
                     .font(.caption)
                     .foregroundStyle(.red)
                     .padding(.top, -8)
                 }
-                
                 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Jumlah yang Dibayar")
@@ -126,7 +124,7 @@ public struct AddExpenseView: View {
                     HStack(spacing: 6) {
                         Text("Rp")
                             .foregroundStyle(.secondary)
-                        TextField("15.000", text: $paidAmount)
+                        TextField("15.000", text: $viewModel.paidAmountText)
                             .font(.title3.bold())
                             .keyboardType(.numberPad)
                     }
@@ -135,7 +133,7 @@ public struct AddExpenseView: View {
                 .background(Color.white)
                 .cornerRadius(24)
                 
-                if showErrors && !isPaidAmountValid {
+                if showErrors && !viewModel.isPaidAmountValid {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.circle")
                         Text("Jumlah yang dibayar wajib diisi")
@@ -151,12 +149,13 @@ public struct AddExpenseView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
-                    Button { showCategorySheet = true
+                    Button {
+                        showCategorySheet = true
                     } label: {
                         HStack {
-                            Text(selectedExpenseCategory.isEmpty ? "Pilih kategori" : selectedExpenseCategory)
+                            Text(selectedCategoryName.isEmpty ? "Pilih kategori" : selectedCategoryName)
                                 .font(.body)
-                                .foregroundStyle(selectedExpenseCategory.isEmpty ? Color(.placeholderText) : Color.primary)
+                                .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.primary)
                             
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -169,14 +168,12 @@ public struct AddExpenseView: View {
                 .background(Color.white)
                 .cornerRadius(24)
                 
-                
-                
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Dibeli dari")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        TextField("Toko Pak El", text: $supplierName)
+                        TextField("Toko Pak El", text: $viewModel.supplierName)
                     }
                     
                     Divider()
@@ -187,7 +184,7 @@ public struct AddExpenseView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                        TextField("08.....", text: $supplierPhone)
+                        TextField("08.....", text: $viewModel.supplierPhone)
                             .keyboardType(.phonePad)
                             .font(.body)
                     }
@@ -196,27 +193,39 @@ public struct AddExpenseView: View {
                 .background(Color.white)
                 .cornerRadius(24)
                 
-                
                 Button {
-                    if  areItemsValid && isPaidAmountValid {
-                        dismiss()
+                    if viewModel.areItemsValid && viewModel.isPaidAmountValid {
+                        Task {
+                            await viewModel.createExpense(
+                                shopId: AppMockData.primaryShop.id,
+                                userId: AppMockData.currentUser.id
+                            )
+                        }
                     } else {
                         showErrors = true
                     }
                 } label: {
-                    Text("Simpan")
-                        .font(.title3.bold())
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(24)
+                    Group {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Simpan")
+                                .font(.title3.bold())
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(24)
                 }
+                .disabled(viewModel.isLoading)
             }
             .padding()
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Tambah Pengluaran")
+        .navigationTitle("Tambah Pengeluaran")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(
             LinearGradient(
@@ -235,7 +244,15 @@ public struct AddExpenseView: View {
             }
         }
         .sheet(isPresented: $showCategorySheet) {
-            ExpenseCategorySheetContent(selectedExpenseCategory: $selectedExpenseCategory)
+            ExpenseCategorySheetContent(selectedExpenseCategoryId: $viewModel.selectedExpenseCategoryId)
+        }
+        .onChange(of: viewModel.isSaved) { oldValue, newValue in
+            if newValue {
+                dismiss()
+            }
+        }
+        .task {
+            await categoryStore.fetchCategoriesIfNeeded()
         }
     }
 }
@@ -243,5 +260,6 @@ public struct AddExpenseView: View {
 #Preview {
     NavigationStack {
         AddExpenseView()
+            .environmentObject(CategoryStore.shared)
     }
 }

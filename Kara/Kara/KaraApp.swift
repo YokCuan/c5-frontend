@@ -2,13 +2,15 @@ import SwiftUI
 
 @main
 struct KaraApp: App {
-    init() {
-        // TODO: FirebaseApp.configure()
-    }
+    @StateObject private var categoryStore = CategoryStore.shared
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(categoryStore)
+                .task {
+                    await CategoryStore.shared.fetchCategoriesIfNeeded()
+                }
         }
     }
 }

@@ -10,8 +10,15 @@ import SwiftUI
 struct DeleteIncome: View {
     @Environment(\.dismiss) private var dismiss
     
+    public var salesNoteId: UUID
+    public var shopId: UUID
+    public var onDeleted: (() -> Void)? = nil
+    
+    @State private var isLoading = false
+    @State private var errorMessage: String? = nil
+    
     var body: some View {
-        VStack (spacing : 16) {
+        VStack(spacing: 16) {
             Image(systemName: "trash")
                 .font(.title2)
                 .foregroundStyle(Color.red)
@@ -23,21 +30,50 @@ struct DeleteIncome: View {
                 .font(.title3)
                 .fontWeight(.bold)
             
-            Text ("Transaksi ini akan dihapus secara permanen dan tidak dapat dibatalkan.")
+            Text("Transaksi ini akan dihapus secara permanen dan tidak dapat dibatalkan.")
                 .font(.body)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 12)
             
-            Button("Hapus") {
-                
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(.red)
-            .foregroundColor(.white)
-            .fontWeight(.semibold)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            
+            Button {
+                Task {
+                    isLoading = true
+                    errorMessage = nil
+                    do {
+                        try await APIService.shared.deleteSalesNote(id: salesNoteId, shopId: shopId)
+                        isLoading = false
+                        dismiss()
+                        onDeleted?()
+                    } catch {
+                        errorMessage = "Gagal menghapus: \(error.localizedDescription)"
+                        isLoading = false
+                    }
+                }
+            } label: {
+                Group {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text("Hapus")
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.red)
+                .foregroundColor(.white)
+                .fontWeight(.semibold)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .disabled(isLoading)
             
             Button("Batalkan") {
                 dismiss()
@@ -48,15 +84,16 @@ struct DeleteIncome: View {
             .foregroundColor(.black)
             .fontWeight(.semibold)
             .clipShape(RoundedRectangle(cornerRadius: 14))
-            
+            .disabled(isLoading)
+
         }
         .padding(20)
     }
 }
 
-
 #Preview {
-
-    DeleteIncome()
-
+    DeleteIncome(
+        salesNoteId: UUID(),
+        shopId: AppMockData.primaryShop.id
+    )
 }

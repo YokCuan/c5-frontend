@@ -34,37 +34,34 @@ struct FilterSheetView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
+        VStack(spacing: 16) {
+            
+            HStack {
+                Text("Filter Transaksi")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                
+                Spacer()
                 
                 // MARK: - Custom Header (Bukan Toolbar)
-                HStack {
-                    Text("Filter Transaksi")
+                Button {
+                    resetFilter()
+                } label: {
+                    Text("Pulihkan")
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundStyle(.black)
-                    
-                    Spacer()
-                    
-                    Button {
-                        resetFilter()
-                    } label: {
-                        Text("Pulihkan")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .underline()
-                            .foregroundStyle(.gray)
-                    }
-                    .buttonStyle(.plain)
+                        .underline()
+                        .foregroundStyle(.gray)
                 }
-                .padding(.top, 16)
-                
-                activeFilterChips
-                
-                // MARK: - Body Content
+                .buttonStyle(.plain)
+            }
+
+            activeFilterChips
+            
+            ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     
-                    // Rentang waktu
                     Text("Rentang waktu")
                         .font(.subheadline)
                         .fontWeight(.bold)
@@ -78,12 +75,10 @@ struct FilterSheetView: View {
                     
                     Divider()
                     
-                    // Besar transaksi
                     Text("Besar transaksi")
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundStyle(.gray)
-                    
                     
                     HStack (spacing: 16) {
                         amountField(label: "Dari", value: $minAmountFilter)
@@ -93,14 +88,7 @@ struct FilterSheetView: View {
                     .cornerRadius(8)
                     .frame(maxWidth: .infinity, alignment:.center)
                     
-                    
                     Divider()
-                    
-                    // Kategori
-                    Text("Kategori")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.gray)
                     
                     Button {
                         isShowingCategorySheet = true
@@ -119,29 +107,25 @@ struct FilterSheetView: View {
                     }
                     .buttonStyle(.plain)
                 }
-                
-                // MARK: - Bottom Action Button
-                Button {
-                    applyFilter()
-                    dismiss()
-                } label: {
-                    Text("Terapkan Filter")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical)
-                        .background(Color.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 48))
-                }
             }
-            .padding(.top, 8)
-            .padding()
+            
+            // MARK: - Bottom Action Button
+            Button {
+                applyFilter()
+                dismiss()
+            } label: {
+                Text("Terapkan Filter")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                    .background(Color.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding(.vertical)
         }
-        .background(Color(.systemBackground))
-        .onTapGesture {
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        }
+        .padding(.horizontal)
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $isShowingCategorySheet) {
             SheetFilterCategory(
@@ -226,7 +210,6 @@ struct FilterSheetView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
-    // MARK: - Functions
     private func selectRange(_ range: DateRange) {
         selectedDateRange = range
         
@@ -251,6 +234,7 @@ struct FilterSheetView: View {
             isShowingDatePickerSheet = true
         }
     }
+    
     private func resetFilter() {
         minAmountFilter = ""
         maxAmountFilter = ""
@@ -338,7 +322,6 @@ struct FilterSheetView: View {
     }
 }
 
-// MARK: - Preview
 #Preview {
     FilterSheetView(
         selectedPaymentStatus: .constant(nil),
