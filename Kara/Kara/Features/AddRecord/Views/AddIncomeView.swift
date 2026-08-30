@@ -30,6 +30,18 @@ public struct AddIncomeView: View {
         !viewModel.customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
+    private var isPaidAmountExceedingTotal: Bool {
+        let paid = viewModel.parsedPaidAmount ?? 0
+        return calculatedTotal > 0 && paid > calculatedTotal
+    }
+
+    private var isFormValid: Bool {
+        isCustomerNameValid
+        && viewModel.areItemsValid
+        && viewModel.isPaidAmountValid
+        && !isPaidAmountExceedingTotal
+    }
+    
     public var body: some View {
         ZStack {
             ScrollView {
@@ -39,6 +51,11 @@ public struct AddIncomeView: View {
                         Spacer()
                         DatePicker("", selection: $viewModel.soldAt, displayedComponents: .date)
                             .datePickerStyle(.compact)
+                            .foregroundStyle(.blue)
+                            .environment(\.locale, Locale (identifier: "id_ID"))
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.bold())
+                            .foregroundStyle(.gray)
                     }
                     .padding(.leading, 6)
                     .padding(10)
@@ -51,6 +68,12 @@ public struct AddIncomeView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             TextField("Bu Ria", text: $viewModel.customerName)
+                                .onChange(of: viewModel.customerName) { _, newValue in
+                                            let formatted = newValue.capitalized
+                                            if formatted != newValue {
+                                                viewModel.customerName = formatted
+                                            }
+                                        }
                         }
                         
                         Divider()
@@ -199,11 +222,26 @@ public struct AddIncomeView: View {
                     .padding()
                     .background(Color.white)
                     .cornerRadius(24)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(isPaidAmountExceedingTotal ? Color.red : Color.clear, lineWidth: 2)
+                    )
                     
                     if showErrors && !viewModel.isPaidAmountValid {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
                             Text("Jumlah yang dibayar wajib diisi")
+                            Spacer()
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .padding(.top, -8)
+                    }
+                    
+                    if isPaidAmountExceedingTotal {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.circle")
+                            Text("Nominal melebihi total harga barang")
                             Spacer()
                         }
                         .font(.caption)
@@ -304,14 +342,14 @@ public struct AddIncomeView: View {
                                     .tint(.white)
                             } else {
                                 Text("Simpan")
-                                    .font(.title3.bold())
+                                    .font(.body.bold())
                                     .foregroundStyle(.white)
                             }
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.blue)
-                        .cornerRadius(24)
+                        .cornerRadius(48)
                     }
                     .disabled(viewModel.isLoading)
                 }
@@ -335,6 +373,10 @@ public struct AddIncomeView: View {
                         .font(.headline.bold())
                         .foregroundStyle(.white)
                 }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             }
         }
     }

@@ -26,11 +26,6 @@ public struct AddExpenseView: View {
     @State private var showErrors = false
     @State private var showCategorySheet = false
     
-    private var selectedCategoryName: String {
-        guard let id = viewModel.selectedExpenseCategoryId else { return "" }
-        return categoryStore.categories.first(where: { $0.id == id })?.name ?? ""
-    }
-    
     public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
@@ -53,7 +48,6 @@ public struct AddExpenseView: View {
                     DatePicker("", selection: $viewModel.transactionDate, displayedComponents: .date)  .datePickerStyle(.compact)
                         .foregroundStyle(.blue)
                         .environment(\.locale, Locale (identifier: "id_ID"))
-                    
                     Image(systemName: "chevron.right")
                         .font(.footnote.bold())
                         .foregroundStyle(.gray)
@@ -177,8 +171,14 @@ public struct AddExpenseView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Dibeli dari")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("Toko Pak El", text: $viewModel.supplierName)
+                            .onChange(of: viewModel.supplierName) { _, newValue in
+                                let formatted = newValue.capitalized
+                                if formatted != newValue {
+                                    viewModel.supplierName = formatted
+                                }
+                            }
                     }
                     
                     Divider()
@@ -187,7 +187,7 @@ public struct AddExpenseView: View {
                         HStack {
                             Text("Nomor Telepon / Kontak (opsional)")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
                         }
                         TextField("08.....", text: $viewModel.supplierPhone)
                             .keyboardType(.phonePad)
@@ -216,14 +216,14 @@ public struct AddExpenseView: View {
                                 .tint(.white)
                         } else {
                             Text("Simpan")
-                                .font(.title3.bold())
+                                .font(.body.bold())
                                 .foregroundStyle(.white)
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.blue)
-                    .cornerRadius(24)
+                    .cornerRadius(48)
                 }
                 .disabled(viewModel.isLoading)
             }
@@ -264,6 +264,26 @@ public struct AddExpenseView: View {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
+    
+    private var selectedCategoryName: String {
+        guard let id = viewModel.selectedExpenseCategoryId else { return "" }
+        return categoryStore.categories.first(where: { $0.id == id })?.name ?? ""
+    }
+    
+    private var isFormValid: Bool {
+        viewModel.areItemsValid
+        && viewModel.isPaidAmountValid
+        && viewModel.selectedExpenseCategoryId != nil
+        //        && isSupplierNameValid
+    }
+    
+//    private var isSupplierNameValid: Bool {
+//#if DEBUG
+//        return true   // bypass sementara pas development
+//#else
+//        return !viewModel.supplierName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+//#endif
+//    }
 }
 
 #Preview {
