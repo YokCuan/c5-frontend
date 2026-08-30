@@ -27,7 +27,7 @@ struct CashFlowDeleteOutcome: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             
             Text("Hapus Pengeluaran?")
-                .font(.title3)
+                .font(.body)
                 .fontWeight(.bold)
             
             Text("Transaksi ini akan dihapus secara permanen dan tidak dapat dibatalkan.")
@@ -63,6 +63,7 @@ struct CashFlowDeleteOutcome: View {
                         .tint(.white)
                 } else {
                     Text("Hapus")
+                        .frame(maxWidth: .infinity)
                 }
             }
             .frame(maxWidth: .infinity)
