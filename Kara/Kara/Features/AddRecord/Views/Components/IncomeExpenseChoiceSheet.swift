@@ -31,7 +31,7 @@ public struct IncomeExpenseChoiceSheet: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color.green.opacity(0.2))
                                 .frame(width: 44, height: 44)
-                            Image(systemName: "arrow.down")
+                            Image(systemName: "arrow.down.right")
                                 .font(.body.bold())
                                 .foregroundStyle(.green)
                         }
@@ -39,7 +39,7 @@ public struct IncomeExpenseChoiceSheet: View {
                             Text("Pemasukan")
                                 .font(.body.bold())
                                 .foregroundStyle(.black)
-                            Text("Catat pemasukan baru")
+                            Text("Catat penjualan baru")
                                 .font(.subheadline)
                                 .foregroundStyle(.gray)
                         }
@@ -59,7 +59,7 @@ public struct IncomeExpenseChoiceSheet: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.red.opacity(0.2))
                                 .frame(width: 44, height: 44)
-                            Image(systemName: "arrow.up")
+                            Image(systemName: "arrow.up.right")
                                 .font(.body.bold())
                                 .foregroundStyle(.red.opacity(0.8))
                         }
