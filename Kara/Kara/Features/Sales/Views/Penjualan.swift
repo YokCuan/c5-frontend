@@ -10,7 +10,6 @@ import SwiftUI
 struct Penjualan: View {
     
     @State private var selectedStatus: PaymentStatus? = nil
-    @State private var isShowingFilter = false
     @State private var selectedNote: SalesNote? = nil
     @State private var searchText: String = ""
     @State private var selectedDateRange: FilterComponent.DateRange? = nil
@@ -214,7 +213,7 @@ struct Penjualan: View {
                     shop: AppMockData.primaryShop
                 )
             }
-            .sheet(isPresented: $isShowingFilter) {
+            .sheet(isPresented: $isShowingFilterSheet) {
                 FilterComponent(
                     selectedDateRange: $selectedDateRange,
                     startDate: $startDate,
