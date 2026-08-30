@@ -14,10 +14,6 @@ public struct CashFlowView: View {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea(.all)
                 
-                Color.karaBlue
-                    .frame(height: 42)
-                    .ignoresSafeArea(edges: .top)
-                
                 VStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: 24) {                            Text("Arus Kas")
                             .font(isScrolled ? .title2 : .largeTitle)
@@ -40,7 +36,6 @@ public struct CashFlowView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     .padding(.bottom, 16)
-                    
                     .background(
                         LinearGradient(
                             gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
@@ -123,7 +118,6 @@ public struct CashFlowView: View {
                     }
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
             .task {
                 await viewModel.loadTransactions(shopId: AppMockData.primaryShop.id)
             }
