@@ -51,8 +51,9 @@ public struct AddExpenseView: View {
                     Text("Tanggal")
                     Spacer()
                     DatePicker("", selection: $viewModel.transactionDate, displayedComponents: .date)  .datePickerStyle(.compact)
-                        .tint(.blue)
-                        
+                        .foregroundStyle(.blue)
+                        .environment(\.locale, Locale (identifier: "id_ID"))
+                    
                     Image(systemName: "chevron.right")
                         .font(.footnote.bold())
                         .foregroundStyle(.gray)
@@ -257,6 +258,10 @@ public struct AddExpenseView: View {
         }
         .task {
             await categoryStore.fetchCategoriesIfNeeded()
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
 }
