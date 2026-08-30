@@ -60,7 +60,7 @@ public struct AddExpenseView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("DETAIL BARANG")
                         .font(.caption2.bold())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     ForEach($viewModel.items) { $item in
                         HStack {
@@ -118,11 +118,11 @@ public struct AddExpenseView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Jumlah yang Dibayar")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     HStack(spacing: 6) {
                         Text("Rp")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("15.000", text: $viewModel.paidAmountText)
                             .font(.title3.bold())
                             .keyboardType(.numberPad)
@@ -146,7 +146,7 @@ public struct AddExpenseView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Kategori")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     Button {
                         showCategorySheet = true
@@ -154,7 +154,7 @@ public struct AddExpenseView: View {
                         HStack {
                             Text(selectedCategoryName.isEmpty ? "Pilih kategori" : selectedCategoryName)
                                 .font(.body)
-                                .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.primary)
+                                .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.black)
                             
                             Spacer()
                             Image(systemName: "chevron.right")

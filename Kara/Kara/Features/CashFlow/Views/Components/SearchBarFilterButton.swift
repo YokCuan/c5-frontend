@@ -134,6 +134,10 @@ struct SearchBarFilterButton: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
 
         //summoning filter roll-up sheet
         .sheet(isPresented: $isShowingFilterSheet) {

@@ -32,7 +32,7 @@ public struct ExpenseCategorySheetContent: View {
                             .foregroundStyle(.orange)
                         Text(errorMessage)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                     }
                     .frame(maxHeight: .infinity)
                 } else {

@@ -42,18 +42,19 @@ public struct InvoiceView: View {
                     .padding(.top, 16)
                     .padding(.bottom, 16)
                 
-                VStack(spacing: 16) {
+                VStack{
                     if !isFullyPaid {
                         Button {
                             self.showCatatPembayaran = true
                         } label: {
                             Text("Catat Pembayaran")
-                                .font(.title3.bold())
+                                .font(.headline)
+                                .fontWeight(.bold)
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
-                                .padding()
+                                .padding(.vertical, 14)
                                 .background(Color.blue)
-                                .cornerRadius(24)
+                                .clipShape(Capsule())
                         }
                     }
                     
@@ -63,12 +64,12 @@ public struct InvoiceView: View {
                             preview: SharePreview(shareButtonLabel, image: imageToShare)
                         ) {
                             Text(shareButtonLabel)
-                                .font(.title3.bold())
-                                .foregroundColor(isFullyPaid ? .white : .black)
+                                .font(.headline)
+                                .foregroundStyle(isFullyPaid ? .white : .black)
                                 .frame(maxWidth: .infinity)
-                                .padding()
+                                .padding(.vertical, 14)
                                 .background(isFullyPaid ? Color.blue : Color(.systemGray5))
-                                .cornerRadius(24)
+                                .clipShape(Capsule())
                         }
                     }
                 }

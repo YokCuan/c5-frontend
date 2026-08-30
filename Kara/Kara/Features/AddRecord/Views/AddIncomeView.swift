@@ -66,7 +66,7 @@ public struct AddIncomeView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Nama Pembeli")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
                             TextField("Bu Ria", text: $viewModel.customerName)
                                 .onChange(of: viewModel.customerName) { _, newValue in
                                             let formatted = newValue.capitalized
@@ -82,7 +82,7 @@ public struct AddIncomeView: View {
                             HStack {
                                 Text("Nomor Telepon (opsional)")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.gray)
                             }
                             TextField("08.....", text: $viewModel.customerPhone)
                                 .keyboardType(.phonePad)
@@ -107,7 +107,7 @@ public struct AddIncomeView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("DETAIL BARANG")
                             .font(.caption2.bold())
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         
                         ForEach($viewModel.items) { $item in
                             HStack {
@@ -139,7 +139,7 @@ public struct AddIncomeView: View {
                                                 .frame(width: 40)
                                             Text("pcs")
                                                 .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(.gray)
                                         }
                                         .padding(.vertical, 8)
                                         .padding(.horizontal, 10)
@@ -149,7 +149,7 @@ public struct AddIncomeView: View {
                                         HStack(spacing: 4) {
                                             Text("Rp")
                                                 .font(.subheadline)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(.gray)
                                             TextField("15.000", text: $item.unitPriceText)
                                                 .keyboardType(.numberPad)
                                         }
@@ -196,7 +196,7 @@ public struct AddIncomeView: View {
                         HStack {
                             Text("Total")
                                 .font(.body)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
                             Spacer()
                             Text(calculatedTotal.toIDR)
                                 .font(.headline.bold())
@@ -213,7 +213,7 @@ public struct AddIncomeView: View {
                         
                         HStack(spacing: 6) {
                             Text("Rp")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
                             TextField("15.000", text: $viewModel.paidAmountText)
                                 .font(.title3.bold())
                                 .keyboardType(.numberPad)
@@ -254,7 +254,7 @@ public struct AddIncomeView: View {
                             HStack {
                                 Text("Sisa Pembayaran")
                                     .font(.body)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.gray)
                                 Spacer()
                                 Text(remainingAmount.toIDR)
                                     .bold()
@@ -266,7 +266,7 @@ public struct AddIncomeView: View {
                             HStack(alignment: .center) {
                                 Text("Status")
                                     .font(.body)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.gray)
                                 Spacer()
                                 
                                 if remainingAmount == calculatedTotal {
@@ -291,7 +291,7 @@ public struct AddIncomeView: View {
                             HStack(alignment: .center) {
                                 Text("Jatuh Tempo")
                                     .font(.body)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.gray)
                                 Spacer()
                                 DatePicker(
                                     "",
