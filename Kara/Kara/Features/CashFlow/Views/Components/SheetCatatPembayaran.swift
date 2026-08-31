@@ -115,6 +115,10 @@ struct SheetCatatPembayaran: View {
             }
         }
         .padding(24)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
     }
     
     private func recordPayment() {
@@ -157,7 +161,7 @@ struct SheetCatatPembayaran: View {
                         customerName: "Bu Sherin",
                         remainingAmount: 50000
                     )
-                    .presentationDetents([.height(420)])
+                    .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
                 }
         }

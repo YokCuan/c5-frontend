@@ -46,9 +46,9 @@ struct FilterSheetView: View {
             
             HStack {
                 Text("Filter Transaksi")
-                    .font(.title3)
+                    .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -104,6 +104,10 @@ struct FilterSheetView: View {
                     
                     Divider()
                     
+                    Text("Kategori")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.gray)
                     Button {
                         isShowingCategorySheet = true
                     } label: {
@@ -135,7 +139,7 @@ struct FilterSheetView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical)
                     .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: 48))
             }
             .disabled(isAmountRangeInvalid)
             .padding(.vertical)
@@ -236,118 +240,122 @@ struct FilterSheetView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(isInvalid ? Color.red : Color.clear, lineWidth: 2)
         )
-}
-
-private func selectRange(_ range: DateRange) {
-    selectedDateRange = range
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+    }
     
-    let calendar = Calendar.current
-    let today = Date()
-    
-    switch range {
-    case .last7Days:
-        startDate = calendar.date(byAdding: .day, value: -6, to: today) ?? today
-        endDate = today
-        useCustomDateRange = true
+    private func selectRange(_ range: DateRange) {
+        selectedDateRange = range
         
-    case .thisMonth:
+        let calendar = Calendar.current
+        let today = Date()
+        
+        switch range {
+        case .last7Days:
+            startDate = calendar.date(byAdding: .day, value: -6, to: today) ?? today
+            endDate = today
+            useCustomDateRange = true
+            
+        case .thisMonth:
+            let monthStart = monthStartDate(for: viewModel.selectedDate)
+            let monthEnd = monthEndDate(for: viewModel.selectedDate)
+            startDate = monthStart
+            endDate = monthEnd
+            useCustomDateRange = false
+            
+        case .custom:
+            useCustomDateRange = true
+            isShowingDatePickerSheet = true
+        }
+    }
+    
+    private func resetFilter() {
+        minAmountFilter = ""
+        maxAmountFilter = ""
+        selectedCategory = nil
+        selectedPaymentStatus = nil
+        useCustomDateRange = false
         let monthStart = monthStartDate(for: viewModel.selectedDate)
         let monthEnd = monthEndDate(for: viewModel.selectedDate)
         startDate = monthStart
         endDate = monthEnd
-        useCustomDateRange = false
+        viewModel.applyFilters()
+    }
+    
+    private func applyFilter() {
+        viewModel.applyFilters()
+    }
+    
+    private func monthStartDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: date)
+        return calendar.date(from: components) ?? date
+    }
+    
+    private func monthEndDate(for date: Date) -> Date {
+        let calendar = Calendar.current
+        guard
+            let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStartDate(for: date)),
+            let end = calendar.date(byAdding: .day, value: -1, to: nextMonth)
+        else {
+            return date
+        }
+        return end
+    }
+    
+    private func syncSelectedDateRange() {
+        let calendar = Calendar.current
+        let monthStart = monthStartDate(for: viewModel.selectedDate)
+        let monthEnd = monthEndDate(for: viewModel.selectedDate)
         
-    case .custom:
-        useCustomDateRange = true
-        isShowingDatePickerSheet = true
-    }
-}
-
-private func resetFilter() {
-    minAmountFilter = ""
-    maxAmountFilter = ""
-    selectedCategory = nil
-    selectedPaymentStatus = nil
-    useCustomDateRange = false
-    let monthStart = monthStartDate(for: viewModel.selectedDate)
-    let monthEnd = monthEndDate(for: viewModel.selectedDate)
-    startDate = monthStart
-    endDate = monthEnd
-    viewModel.applyFilters()
-}
-
-private func applyFilter() {
-    viewModel.applyFilters()
-}
-
-private func monthStartDate(for date: Date) -> Date {
-    let calendar = Calendar.current
-    let components = calendar.dateComponents([.year, .month], from: date)
-    return calendar.date(from: components) ?? date
-}
-
-private func monthEndDate(for date: Date) -> Date {
-    let calendar = Calendar.current
-    guard
-        let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStartDate(for: date)),
-        let end = calendar.date(byAdding: .day, value: -1, to: nextMonth)
-    else {
-        return date
-    }
-    return end
-}
-
-private func syncSelectedDateRange() {
-    let calendar = Calendar.current
-    let monthStart = monthStartDate(for: viewModel.selectedDate)
-    let monthEnd = monthEndDate(for: viewModel.selectedDate)
-    
-    if startDate == monthStart && endDate == monthEnd && !useCustomDateRange {
-        selectedDateRange = .thisMonth
-        return
-    }
-    
-    if calendar.isDate(startDate, inSameDayAs: calendar.date(byAdding: .day, value: -6, to: Date()) ?? Date())
-        && calendar.isDate(endDate, inSameDayAs: Date())
-        && useCustomDateRange {
-        selectedDateRange = .last7Days
-        return
-    }
-    
-    if useCustomDateRange {
-        selectedDateRange = .custom
-    } else {
-        selectedDateRange = nil
-    }
-}
-
-@ViewBuilder
-private var activeFilterChips: some View {
-    let chips = [
-        selectedPaymentStatus?.title,
-        selectedCategory?.title,
-        selectedDateRange?.rawValue
-    ].compactMap { $0 }
-    
-    if chips.isEmpty {
-        EmptyView()
-    } else {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(chips, id: \.self) { chip in
-                    Text(chip)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.blue)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(Capsule())
-                }
-            }
-            .frame(alignment: .leading)
+        if startDate == monthStart && endDate == monthEnd && !useCustomDateRange {
+            selectedDateRange = .thisMonth
+            return
+        }
+        
+        if calendar.isDate(startDate, inSameDayAs: calendar.date(byAdding: .day, value: -6, to: Date()) ?? Date())
+            && calendar.isDate(endDate, inSameDayAs: Date())
+            && useCustomDateRange {
+            selectedDateRange = .last7Days
+            return
+        }
+        
+        if useCustomDateRange {
+            selectedDateRange = .custom
+        } else {
+            selectedDateRange = nil
         }
     }
-}
+    
+    @ViewBuilder
+    private var activeFilterChips: some View {
+        let chips = [
+            selectedPaymentStatus?.title,
+            selectedCategory?.title,
+            selectedDateRange?.rawValue
+        ].compactMap { $0 }
+        
+        if chips.isEmpty {
+            EmptyView()
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(chips, id: \.self) { chip in
+                        Text(chip)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.blue)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.blue.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+                }
+                .frame(alignment: .leading)
+            }
+        }
+    }
 }
 
 

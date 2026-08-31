@@ -27,7 +27,7 @@ struct DeleteIncome: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             
             Text("Hapus Pemasukan")
-                .font(.title3)
+                .font(.body)
                 .fontWeight(.bold)
             
             Text("Transaksi ini akan dihapus secara permanen dan tidak dapat dibatalkan.")
@@ -64,6 +64,7 @@ struct DeleteIncome: View {
                             .tint(.white)
                     } else {
                         Text("Hapus")
+                            .frame(maxWidth: .infinity)
                     }
                 }
                 .frame(maxWidth: .infinity)

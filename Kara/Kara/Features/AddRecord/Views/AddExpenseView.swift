@@ -10,7 +10,7 @@ import SwiftUI
 public struct ExpenseItemInput: Identifiable {
     public let id: UUID
     public var name: String
-
+    
     public init(id: UUID = UUID(), name: String = "") {
         self.id = id
         self.name = name
@@ -25,11 +25,6 @@ public struct AddExpenseView: View {
     
     @State private var showErrors = false
     @State private var showCategorySheet = false
-    
-    private var selectedCategoryName: String {
-        guard let id = viewModel.selectedExpenseCategoryId else { return "" }
-        return categoryStore.categories.first(where: { $0.id == id })?.name ?? ""
-    }
     
     public var body: some View {
         ScrollView {
@@ -50,8 +45,12 @@ public struct AddExpenseView: View {
                 HStack {
                     Text("Tanggal")
                     Spacer()
-                    DatePicker("", selection: $viewModel.transactionDate, displayedComponents: .date)
-                        .datePickerStyle(.compact)
+                    DatePicker("", selection: $viewModel.transactionDate, displayedComponents: .date)  .datePickerStyle(.compact)
+                        .foregroundStyle(.blue)
+                        .environment(\.locale, Locale (identifier: "id_ID"))
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.bold())
+                        .foregroundStyle(.gray)
                 }
                 .padding(.leading, 6)
                 .padding(10)
@@ -61,7 +60,7 @@ public struct AddExpenseView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("DETAIL BARANG")
                         .font(.caption2.bold())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     ForEach($viewModel.items) { $item in
                         HStack {
@@ -119,11 +118,11 @@ public struct AddExpenseView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Jumlah yang Dibayar")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     HStack(spacing: 6) {
                         Text("Rp")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("15.000", text: $viewModel.paidAmountText)
                             .font(.title3.bold())
                             .keyboardType(.numberPad)
@@ -147,7 +146,7 @@ public struct AddExpenseView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Kategori")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     Button {
                         showCategorySheet = true
@@ -155,7 +154,7 @@ public struct AddExpenseView: View {
                         HStack {
                             Text(selectedCategoryName.isEmpty ? "Pilih kategori" : selectedCategoryName)
                                 .font(.body)
-                                .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.primary)
+                                .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.black)
                             
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -172,8 +171,14 @@ public struct AddExpenseView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Dibeli dari")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("Toko Pak El", text: $viewModel.supplierName)
+                            .onChange(of: viewModel.supplierName) { _, newValue in
+                                let formatted = newValue.capitalized
+                                if formatted != newValue {
+                                    viewModel.supplierName = formatted
+                                }
+                            }
                     }
                     
                     Divider()
@@ -182,7 +187,7 @@ public struct AddExpenseView: View {
                         HStack {
                             Text("Nomor Telepon / Kontak (opsional)")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
                         }
                         TextField("08.....", text: $viewModel.supplierPhone)
                             .keyboardType(.phonePad)
@@ -211,14 +216,14 @@ public struct AddExpenseView: View {
                                 .tint(.white)
                         } else {
                             Text("Simpan")
-                                .font(.title3.bold())
+                                .font(.body.bold())
                                 .foregroundStyle(.white)
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.blue)
-                    .cornerRadius(24)
+                    .cornerRadius(48)
                 }
                 .disabled(viewModel.isLoading)
             }
@@ -254,7 +259,31 @@ public struct AddExpenseView: View {
         .task {
             await categoryStore.fetchCategoriesIfNeeded()
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
     }
+    
+    private var selectedCategoryName: String {
+        guard let id = viewModel.selectedExpenseCategoryId else { return "" }
+        return categoryStore.categories.first(where: { $0.id == id })?.name ?? ""
+    }
+    
+    private var isFormValid: Bool {
+        viewModel.areItemsValid
+        && viewModel.isPaidAmountValid
+        && viewModel.selectedExpenseCategoryId != nil
+        //        && isSupplierNameValid
+    }
+    
+//    private var isSupplierNameValid: Bool {
+//#if DEBUG
+//        return true   // bypass sementara pas development
+//#else
+//        return !viewModel.supplierName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+//#endif
+//    }
 }
 
 #Preview {

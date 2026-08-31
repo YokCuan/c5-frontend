@@ -32,7 +32,7 @@ public struct ExpenseCategorySheetContent: View {
                             .foregroundStyle(.orange)
                         Text(errorMessage)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                     }
                     .frame(maxHeight: .infinity)
                 } else {
@@ -61,7 +61,7 @@ public struct ExpenseCategorySheetContent: View {
                         VStack(spacing: 0) {
                             HStack {
                                 Text(category.name)
-                                    .font(.body)
+                                    .font(.callout)
                                     .foregroundStyle(.black)
                                 
                                 Spacer()
@@ -72,7 +72,7 @@ public struct ExpenseCategorySheetContent: View {
                                         .foregroundStyle(.blue)
                                 }
                             }
-                            .padding(.vertical)
+                            .padding(10)
                             
                             Divider()
                         }

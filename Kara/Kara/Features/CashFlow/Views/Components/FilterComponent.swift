@@ -93,7 +93,7 @@ struct FilterComponent: View {
                 dismiss()
             } label: {
                 Text("Terapkan Filter")
-                    .font(.headline)
+                    .font(.body)
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)

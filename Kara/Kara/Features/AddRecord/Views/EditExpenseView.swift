@@ -71,7 +71,7 @@ public struct EditExpenseView: View {
                         .foregroundStyle(.orange)
                     Text(errorMessage)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                 }
             } else {
                 formContent
@@ -101,7 +101,7 @@ public struct EditExpenseView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("APA YANG DIBELI?")
                         .font(.caption2.bold())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     ForEach($items) { $item in
                         VStack(spacing: 8) {
@@ -161,12 +161,12 @@ public struct EditExpenseView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Jumlah yang Dibayar")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     HStack(spacing: 6) {
                         Text("Rp")
                             .font(.title3.bold())
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("100.000", text: $paidAmount)
                             .font(.title3.bold())
                             .keyboardType(.numberPad)
@@ -190,7 +190,7 @@ public struct EditExpenseView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Kategori")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     
                     Button {
                         showCategorySheet = true
@@ -200,7 +200,7 @@ public struct EditExpenseView: View {
                                 selectedCategoryName.isEmpty ? "Pilih kategori" : selectedCategoryName
                             )
                             .font(.body)
-                            .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.primary)
+                            .foregroundStyle(selectedCategoryName.isEmpty ? Color(.placeholderText) : Color.black)
                             
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -217,7 +217,7 @@ public struct EditExpenseView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Dibeli dari")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("Toko Pak El", text: $supplierName)
                             .font(.body)
                     }
@@ -227,7 +227,7 @@ public struct EditExpenseView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Nomor Telepon / Kontak (opsional)")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                         TextField("08.....", text: $supplierPhone)
                             .keyboardType(.phonePad)
                             .font(.body)
@@ -306,6 +306,10 @@ public struct EditExpenseView: View {
         }
         .sheet(isPresented: $showCategorySheet) {
             ExpenseCategorySheetContent(selectedExpenseCategoryId: $selectedExpenseCategory)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
     
