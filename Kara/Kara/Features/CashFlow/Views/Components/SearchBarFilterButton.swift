@@ -134,8 +134,7 @@ struct SearchBarFilterButton: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+
         //summoning filter roll-up sheet
         .sheet(isPresented: $isShowingFilterSheet) {
             FilterSheetView(

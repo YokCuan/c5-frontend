@@ -14,16 +14,11 @@ public struct CashFlowView: View {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea(.all)
                 
-                Color.karaBlue
-                       .frame(height: 250)                       .ignoresSafeArea(edges: .top)
-                
                 VStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: 24) {                            Text("Arus Kas")
                             .font(isScrolled ? .title2 : .largeTitle)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
-                            .padding(.top, 10)
-                            .padding(.horizontal, 16)
                             .animation(.easeOut(duration: 0.2), value: isScrolled)
                         
                         SearchBarFilterButton(
@@ -38,7 +33,9 @@ public struct CashFlowView: View {
                             maxAmountFilter: $viewModel.maxAmountFilter
                         )
                     }
-                    .padding(.vertical)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 16)
                     .background(
                         LinearGradient(
                             gradient: Gradient(colors: [.karaBlueDark, .karaBlue]),
@@ -121,7 +118,6 @@ public struct CashFlowView: View {
                     }
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
             .task {
                 await viewModel.loadTransactions(shopId: AppMockData.primaryShop.id)
             }
