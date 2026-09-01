@@ -38,7 +38,7 @@ public struct MainTabView: View {
                 case .addIncome:
                     AddIncomeView()
                 case .addExpense:
-                    AddExpenseView()
+                    ExpenseFormView(viewModel: ExpenseFormViewModel(mode: .add))
                 }
             }
         }

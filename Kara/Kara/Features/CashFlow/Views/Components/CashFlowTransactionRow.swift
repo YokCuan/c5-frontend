@@ -21,7 +21,7 @@ public struct CashFlowTransactionRow: View {
                 if isIncome {
                     DetailPemasukanView(salesNoteId: transaction.id)
                 } else {
-                    EditExpenseView(expenseId: transaction.id)
+                    ExpenseFormView(viewModel: ExpenseFormViewModel(mode: .edit(expenseId: transaction.id)))
                 }
             }
         } label: {
