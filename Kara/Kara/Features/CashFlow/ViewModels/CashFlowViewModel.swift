@@ -68,20 +68,42 @@ public class CashFlowViewModel: ObservableObject {
         }
     }
     
+    private var fetchTask: Task<Void, Never>?
+
     @MainActor
     public func loadTransactions(shopId: UUID) async {
-        isLoading = true
-        errorMessage = nil
+        fetchTask?.cancel()
         
-        do {
-            self.allTransactions = try await service
-                .fetchCashFlows(shopId: shopId)
-            applyFilters()
-            self.isLoading = false
-        } catch {
-            self.errorMessage = error.localizedDescription
-            self.isLoading = false
+        fetchTask = Task {
+            if allTransactions.isEmpty {
+                isLoading = true
+            }
+            errorMessage = nil
+             
+            do {
+                let fetchedData = try await service.fetchCashFlows(shopId: shopId)
+                
+                if Task.isCancelled { return }
+                
+                print("DEBUG: Refresh/Fetch Sukses, jumlah: \(fetchedData.count)")
+                self.allTransactions = fetchedData
+                applyFilters()
+                self.isLoading = false
+            } catch {
+                if Task.isCancelled { return }
+                
+                self.isLoading = false
+                let errorString = error.localizedDescription.lowercased()
+                
+                if error is CancellationError || errorString.contains("cancel") || (error as NSError).code == -999 {
+                    print("DEBUG: Request dibatalkan (-999)")
+                    return
+                }
+                
+                self.errorMessage = error.localizedDescription
+            }
         }
+        _ = await fetchTask?.result
     }
 
     public func applyFilters() {

@@ -11,8 +11,12 @@ public struct CashFlowView: View {
             let isScrolled = scrollOffset > 30
             
             ZStack(alignment: .top) {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea(.all)
+                VStack{
+                    Color(.karaBlue)
+                        .ignoresSafeArea(.all)
+                    Color(.systemGroupedBackground)
+                        .ignoresSafeArea(.all)
+                }
                 
                 VStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: 24) {                            Text("Arus Kas")
@@ -47,75 +51,87 @@ public struct CashFlowView: View {
                     .zIndex(1)
                     
                     ScrollView {
-                        VStack(spacing: 0) {
+                        ZStack {
+                            Color(.systemGroupedBackground)
+                                .ignoresSafeArea(.all)
+                            
                             VStack(spacing: 0) {
-                                HStack(spacing: 14) {
-                                    CashFlowSummaryCard(
-                                        title: "Uang Masuk",
-                                        amount: Double(viewModel.totalIncome),
-                                        isIncome: true
-                                    )
-                                    CashFlowSummaryCard(
-                                        title: "Uang Keluar",
-                                        amount: Double(viewModel.totalExpense),
-                                        isIncome: false
-                                    )
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 22)
-                            }
-                            .background(
-                                Color.karaBlue
-                                    .clipShape(
-                                        UnevenRoundedRectangle(
-                                            bottomLeadingRadius: 24,
-                                            bottomTrailingRadius: 24,
+                                VStack(spacing: 0) {
+                                    HStack(spacing: 14) {
+                                        CashFlowSummaryCard(
+                                            title: "Uang Masuk",
+                                            amount: Double(viewModel.totalIncome),
+                                            isIncome: true
                                         )
-                                    )
-                            )
-                            VStack(spacing: 16) {
-                                if viewModel.isLoading {
-                                    ProgressView()
-                                        .padding(.top, 40)
-                                } else if viewModel.transactions.isEmpty {
-                                    VStack(spacing: 8) {
-                                        Image(systemName: "doc.text.magnifyingglass")
-                                            .font(.largeTitle)
-                                            .foregroundStyle(.gray)
-                                        Text("Belum ada transaksi")
-                                            .font(.subheadline)
-                                            .foregroundStyle(.gray)
+                                        CashFlowSummaryCard(
+                                            title: "Uang Keluar",
+                                            amount: Double(viewModel.totalExpense),
+                                            isIncome: false
+                                        )
                                     }
-                                    .padding(.top, 60)
-                                } else {
-                                    LazyVStack(spacing: 16) {
-                                        ForEach(viewModel.groupedTransactions, id: \.key) { group in
-                                            VStack(alignment: .leading, spacing: 10) {
-                                                Text(group.key, style: .date)
-                                                    .font(.caption.bold())
-                                                    .foregroundStyle(.gray)
-                                                    .padding(.horizontal, 4)
-                                                
-                                                VStack(spacing: 10) {
-                                                    ForEach(group.value) { transaction in
-                                                        CashFlowTransactionRow(transaction: transaction)
+                                    .padding(.horizontal, 16)
+                                    .padding(.bottom, 22)
+                                }
+                                .background(
+                                    Color.karaBlue
+                                        .clipShape(
+                                            UnevenRoundedRectangle(
+                                                bottomLeadingRadius: 24,
+                                                bottomTrailingRadius: 24,
+                                            )
+                                        )
+                                )
+                                
+                                VStack(spacing: 16) {
+                                    if viewModel.isLoading {
+                                        ProgressView()
+                                            .frame(maxWidth: .infinity, alignment: .center)
+                                            .padding(.top, 80)
+                                    } else if viewModel.transactions.isEmpty {
+                                        VStack(spacing: 8) {
+                                            Image(systemName: "doc.text.magnifyingglass")
+                                                .font(.largeTitle)
+                                                .foregroundStyle(.gray)
+                                            Text("Belum ada transaksi")
+                                                .font(.subheadline)
+                                                .foregroundStyle(.gray)
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.top, 80)
+                                    } else {
+                                        LazyVStack(spacing: 16) {
+                                            ForEach(viewModel.groupedTransactions, id: \.key) { group in
+                                                VStack(alignment: .leading, spacing: 10) {
+                                                    Text(group.key, style: .date)
+                                                        .font(.caption.bold())
+                                                        .foregroundStyle(.gray)
+                                                        .padding(.horizontal, 4)
+                                                    
+                                                    VStack(spacing: 10) {
+                                                        ForEach(group.value) { transaction in
+                                                            CashFlowTransactionRow(transaction: transaction)
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 16)
+                                        .padding(.bottom, 90)
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 16)
-                                    .padding(.bottom, 90)
                                 }
                             }
                         }
+                        .frame(
+                            maxHeight: .infinity)
                     }
-                    .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                        geometry.contentOffset.y
-                    } action: { _, newValue in
-                        scrollOffset = newValue
+                    .refreshable {
+                        await viewModel
+                            .loadTransactions(
+                                shopId: AppMockData.primaryShop.id
+                            )
                     }
+                    
                 }
             }
             .task {
