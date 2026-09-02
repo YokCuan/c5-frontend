@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Penjualan: View {
+    @StateObject private var viewModel = PenjualanViewModel()
     
     @State private var selectedStatus: PaymentStatus? = nil
     @State private var selectedNote: SalesNote? = nil
@@ -19,11 +20,6 @@ struct Penjualan: View {
     @State private var isShowingFilterSheet = false
     @State private var scrollOffset: CGFloat = 0
 
-    @State private var salesNotes: [SalesNote] = []
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-
-    
     private var isAnyFilterActive: Bool {
         selectedStatus != nil
         || !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -55,7 +51,7 @@ struct Penjualan: View {
     }
     
     private var filteredNotes: [SalesNote] {
-        salesNotes.filter { note in
+        let filtered = viewModel.salesNotes.filter { note in
             let matchesStatus = selectedStatus == nil || note.status == selectedStatus
             let matchesDateRange = matchesDateRange(for: note.soldAt)
             let searchableText = [
@@ -73,6 +69,8 @@ struct Penjualan: View {
             
             return matchesStatus && matchesDateRange && matchesSearch
         }
+        
+        return filtered.sorted { $0.soldAt > $1.soldAt }
     }
     
     var body: some View {
@@ -81,12 +79,12 @@ struct Penjualan: View {
             VStack(alignment: .leading, spacing: 0) {
                 
                 VStack(alignment: .leading, spacing: 20) {
-                    
                     Text("Penjualan")
                         .font(isScrolled ? .title2 : .largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .animation(.easeOut(duration: 0.2), value: isScrolled)
+                    
                     HStack(spacing: 12) {
                         HStack(spacing: 8) {
                             Image(systemName: "magnifyingglass")
@@ -158,10 +156,10 @@ struct Penjualan: View {
                 
                 ScrollView {
                     VStack(spacing: 16) {
-                        if isLoading && salesNotes.isEmpty {
+                        if viewModel.isLoading && viewModel.salesNotes.isEmpty {
                             ProgressView()
                                 .padding(.top, 40)
-                        } else if let errorMessage {
+                        } else if let errorMessage = viewModel.errorMessage {
                             VStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.largeTitle)
@@ -199,6 +197,9 @@ struct Penjualan: View {
                     .padding(.top, 16)
                     .padding(.bottom, 16)
                 }
+                .refreshable {
+                    await viewModel.loadSalesNotes(shopId: AppMockData.primaryShop.id)
+                }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(.systemGray6))
                 .onScrollGeometryChange(for: CGFloat.self) { geometry in
@@ -226,7 +227,7 @@ struct Penjualan: View {
             }
         }
         .task {
-            await loadSalesNotes()
+            await viewModel.loadSalesNotes(shopId: AppMockData.primaryShop.id)
         }
     }
     
@@ -295,20 +296,6 @@ struct Penjualan: View {
             return date
         }
         return end
-    }
-    
-    @MainActor
-    private func loadSalesNotes() async {
-        isLoading = true
-        errorMessage = nil
-        
-        do {
-            salesNotes = try await APIService.shared.fetchSalesNotes(shopId: AppMockData.primaryShop.id)
-        } catch {
-            errorMessage = "Gagal memuat penjualan: \(error.localizedDescription)"
-        }
-        
-        isLoading = false
     }
 }
 
