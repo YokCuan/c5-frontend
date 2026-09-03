@@ -90,7 +90,7 @@ struct FilterSheetView: View {
                     
                     HStack(spacing: 16) {
                         amountField(label: "Dari", value: $minAmountFilter, isInvalid: isAmountRangeInvalid)
-                        amountField(label: "Ke", value: $maxAmountFilter, isInvalid: isAmountRangeInvalid)                    }
+                        amountField(label: "Sampai", value: $maxAmountFilter, isInvalid: isAmountRangeInvalid)                    }
                     .font(.subheadline)
                     .cornerRadius(8)
                     .frame(maxWidth: .infinity, alignment:.center)
