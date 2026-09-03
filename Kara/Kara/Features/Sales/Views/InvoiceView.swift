@@ -117,8 +117,9 @@ public struct InvoiceView: View {
                     dismiss()
                 }
             )
-            .presentationDetents([.height(400)])
+            .presentationDetents([.height(350)])
             .presentationDragIndicator(.visible)
+            .background(Color(.systemBackground))
         }
     }
     @MainActor
