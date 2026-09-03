@@ -282,6 +282,7 @@ struct FilterSheetView: View {
         startDate = monthStart
         endDate = monthEnd
         viewModel.applyFilters()
+        dismiss()
     }
     
     private func applyFilter() {

@@ -90,7 +90,6 @@ struct FilterComponent: View {
             
             Button {
                 applyFilter()
-                dismiss()
             } label: {
                 Text("Terapkan Filter")
                     .font(.body)
@@ -122,6 +121,7 @@ struct FilterComponent: View {
         let today = Date()
         startDate = today
         endDate = today
+        dismiss()
     }
     
     private func applyFilter() {
