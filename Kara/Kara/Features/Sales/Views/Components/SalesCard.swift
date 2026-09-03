@@ -16,8 +16,9 @@ struct SalesCard: View {
             max(0, salesNote.totalAmount - salesNote.paidAmount)
         }
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
+        Button(action: onTapDetail) {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
                 Text (salesNote.customerName)
                     .font(.headline)
                 Spacer()
@@ -70,17 +71,11 @@ struct SalesCard: View {
                 }
             }
             Divider()
-            Button {
-                onTapDetail()
-            } label:{
-                HStack {
-                    Text("Lihat Detail")
-                        .foregroundStyle(.blue)
-                    Spacer()
-                    Image(systemName: "chevron.right.circle")
-                        .foregroundStyle(.blue)
-                }
-            }
+            Text("Lihat Detail")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(.blue)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(16)
         .frame(maxWidth: .infinity)
@@ -103,6 +98,8 @@ struct SalesCard: View {
             x: 0,
             y: 3
         )
+        }
+        .buttonStyle(.plain)
     }
 }
 
