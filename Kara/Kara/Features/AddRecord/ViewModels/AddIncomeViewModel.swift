@@ -31,7 +31,7 @@ public final class AddSalesNoteViewModel: ObservableObject {
     @Published public var hasDueDate: Bool = false
     @Published public var isBelumLunas: Bool = false
     @Published public var items: [SalesNoteItemInput] = [SalesNoteItemInput()]
-    @Published public var paidAmountText: String = ""
+    @Published public var paidAmountText: String = "0"
     
     @Published public var isLoading: Bool = false
     @Published public var isSaved: Bool = false
@@ -63,6 +63,29 @@ public final class AddSalesNoteViewModel: ObservableObject {
         return amount >= 0
     }
     
+    public var remainingAmount: Double {
+        if !isBelumLunas { return 0 }
+        let cleanPaid = parsedPaidAmount ?? 0
+        return max(0, calculatedTotal - cleanPaid)
+    }
+    
+    public var isCustomerNameValid: Bool {
+        !customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    public var isPaidAmountExceedingTotal: Bool {
+        if !isBelumLunas { return false }
+        let paid = parsedPaidAmount ?? 0
+        return calculatedTotal > 0 && paid > calculatedTotal
+    }
+
+    public var isFormValid: Bool {
+        isCustomerNameValid
+        && areItemsValid
+        && isPaidAmountValid
+        && !isPaidAmountExceedingTotal
+    }
+    
     public var parsedPaidAmount: Double? {
         let cleanedText = paidAmountText.replacingOccurrences(of: ",", with: "")
             .replacingOccurrences(of: ".", with: "")
@@ -82,13 +105,18 @@ public final class AddSalesNoteViewModel: ObservableObject {
     }
     
     public func createSalesNote(shopId: UUID, userId: UUID) async {
-        guard !customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard isCustomerNameValid else {
             self.errorMessage = "Nama pembeli tidak boleh kosong."
             return
         }
         
         guard areItemsValid else {
             self.errorMessage = "Pastikan nama barang, jumlah (qty), dan harga satuan terisi dengan benar."
+            return
+        }
+        
+        guard !isPaidAmountExceedingTotal else {
+            self.errorMessage = "Nominal melebihi total harga barang."
             return
         }
         
