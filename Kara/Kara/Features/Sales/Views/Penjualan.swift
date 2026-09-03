@@ -128,12 +128,16 @@ struct Penjualan: View {
                             isShowingFilterSheet = true
                         } label: {
                             ZStack(alignment: .topTrailing) {
-                                Image(systemName: "line.3.horizontal.decrease")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundStyle(Color.white.opacity(0.8))
-                                    .frame(width: 42, height: 42)
-                                    .background(isAnyFilterActive ? Color.white.opacity(0.12) : Color.white.opacity(0.12))
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                VStack (alignment: .center, spacing: 2){
+                                    Image(systemName: "slider.horizontal.3")
+                                        .font(.system(size: 16, weight: .semibold))
+                                    Text("Filter")
+                                        .font(.caption2)
+                                }
+                                .foregroundStyle(Color.white.opacity(0.8))
+                                .frame(width: 44, height: 44)
+                                .background(isAnyFilterActive ? Color.white.opacity(0.12) : Color.white.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                                 
                                 if isAnyFilterActive {
                                     Circle()
@@ -251,7 +255,10 @@ struct Penjualan: View {
                     startDate: $startDate,
                     endDate: $endDate
                 )
+                .presentationDetents([.fraction(0.7), .large])
+                .presentationDragIndicator(.visible)
             }
+            
             .contentShape(Rectangle())
             .onTapGesture {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
