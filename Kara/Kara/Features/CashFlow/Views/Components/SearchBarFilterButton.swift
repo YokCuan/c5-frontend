@@ -86,10 +86,14 @@ struct SearchBarFilterButton: View {
                     isShowingFilterSheet = true
                 } label: {
                     ZStack(alignment: .topTrailing) {
-                        Image(systemName: "line.3.horizontal.decrease")
-                            .font(.system(size: 18, weight: .semibold))
+                        VStack (alignment: .center, spacing: 2){
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("Filter")
+                                .font(.caption2)
+                        }
                             .foregroundStyle(Color.white.opacity(0.8))
-                            .frame(width: 42, height: 42)
+                            .frame(width: 44, height: 44)
                             .background(isAnyFilterActive ? Color.white.opacity(0.12) : Color.white.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         
