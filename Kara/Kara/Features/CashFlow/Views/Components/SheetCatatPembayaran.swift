@@ -42,11 +42,26 @@ struct SheetCatatPembayaran: View {
         return amount > 0 && amount <= remainingAmount
     }
     
+    private var validationErrorMessage: String? {
+        let trimmed = bayar.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmed.isEmpty || parsedBayarAmount == 0 {
+            return nil
+        }
+        
+        if let amount = parsedBayarAmount, amount > remainingAmount {
+            return "Nominal melebihi sisa pembayaran"
+        }
+        
+        return nil
+    }
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading) {
+            Spacer()
             VStack(alignment: .leading, spacing: 4) {
                 Text("Catat Pembayaran")
-                    .font(.headline)
+                    .font(.title2)
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -56,15 +71,13 @@ struct SheetCatatPembayaran: View {
                     Text("· Sisa")
                     Text(remainingAmount.formatted(.currency(code: "IDR")))
                 }
-                .font(.subheadline)
                 .foregroundStyle(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             
             Spacer()
-                .frame(height: 12)
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Jumlah Pembayaran")
                     .font(.footnote)
                     .fontWeight(.regular)
@@ -86,33 +99,43 @@ struct SheetCatatPembayaran: View {
                 .background(Color.secondary.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.caption)
-                        .foregroundStyle(.red)
+            
+                if let errorText = validationErrorMessage {
+                    HStack(spacing: 6) {
+                        Image(systemName: "exclamationmark.circle")
+                        Text(errorText)
+                        Spacer()
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(.top, -8)
                 }
                 
-                Button {
-                    recordPayment()
-                } label: {
-                    Group {
-                        if isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Catat Pembayaran")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                        }
-                    }
-                    .padding(.vertical)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .background(isAmountValid ? Color.blue : Color.gray.opacity(0.4))
-                    .clipShape(RoundedRectangle(cornerRadius: 48))
-                }
-                .disabled(!isAmountValid || isLoading)
             }
+            
+            Spacer()
+            
+            Button {
+                recordPayment()
+            } label: {
+                Group {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text("Catat Pembayaran")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                    }
+                }
+                .padding(.vertical)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .background(isAmountValid ? Color.blue : Color.gray.opacity(0.4))
+                .clipShape(RoundedRectangle(cornerRadius: 48))
+            }
+            .disabled(!isAmountValid || isLoading)
+
         }
         .padding(24)
         .contentShape(Rectangle())
@@ -122,34 +145,34 @@ struct SheetCatatPembayaran: View {
     }
     
     private func recordPayment() {
-            guard let amount = parsedBayarAmount else { return }
-            
-            Task {
-                isLoading = true
-                errorMessage = nil
-                
-                do {
-                    try await APIService.shared.recordPayment(
-                        salesNoteId: salesNoteId,
-                        shopId: shopId,
-                        paidAmount: amount,
-                        userId: userId
-                    )
-                    isLoading = false
-                    dismiss()
-                    onSuccess?()
-                } catch {
-                    errorMessage = "Gagal mencatat pembayaran: \(error.localizedDescription)"
-                    isLoading = false
-                }
+        guard let amount = parsedBayarAmount else { return }
+         
+        Task {
+            isLoading = true
+            errorMessage = nil
+             
+            do {
+                try await APIService.shared.recordPayment(
+                    salesNoteId: salesNoteId,
+                    shopId: shopId,
+                    paidAmount: amount,
+                    userId: userId
+                )
+                isLoading = false
+                dismiss()
+                onSuccess?()
+            } catch {
+                errorMessage = "Gagal mencatat pembayaran: \(error.localizedDescription)"
+                isLoading = false
             }
         }
+    }
 }
 
 #Preview {
     struct PreviewContainer: View {
         @State private var isShowingSheet = true
-        
+         
         var body: some View {
             Color(.systemGroupedBackground)
                 .ignoresSafeArea()
@@ -161,11 +184,11 @@ struct SheetCatatPembayaran: View {
                         customerName: "Bu Sherin",
                         remainingAmount: 50000
                     )
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(350)])
                     .presentationDragIndicator(.visible)
                 }
         }
     }
-    
+     
     return PreviewContainer()
 }
