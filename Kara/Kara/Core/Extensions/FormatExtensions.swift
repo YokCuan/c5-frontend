@@ -31,4 +31,19 @@ public extension Date {
             formatter.dateFormat = format
             return formatter.string(from: self)
         }
+    
+}
+
+public extension String {
+    var formattedWithSeparator: String {
+        let numbersOnly = self.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        
+        guard let number = Int(numbersOnly) else { return self }
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = Locale(identifier: "id_ID") 
+        
+        return formatter.string(from: NSNumber(value: number)) ?? self
+    }
 }

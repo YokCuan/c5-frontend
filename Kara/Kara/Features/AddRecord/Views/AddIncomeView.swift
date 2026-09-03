@@ -152,6 +152,14 @@ public struct AddIncomeView: View {
                                                 .foregroundStyle(.gray)
                                             TextField("15.000", text: $item.unitPriceText)
                                                 .keyboardType(.numberPad)
+                                                .onChange(
+                                                    of: item.unitPriceText
+                                                ) { _, newValue in
+                                                    let formatted = newValue.formattedWithSeparator
+                                                    if formatted != newValue {
+                                                        item.unitPriceText = formatted
+                                                    }
+                                                }
                                         }
                                         .padding(.vertical, 8)
                                         .padding(.horizontal, 12)
@@ -217,6 +225,12 @@ public struct AddIncomeView: View {
                             TextField("15.000", text: $viewModel.paidAmountText)
                                 .font(.title3.bold())
                                 .keyboardType(.numberPad)
+                                .onChange(of: viewModel.paidAmountText) { _, newValue in
+                                    let formatted = newValue.formattedWithSeparator
+                                    if formatted != newValue {
+                                        viewModel.paidAmountText = formatted
+                                    }
+                                }
                         }
                     }
                     .padding()
