@@ -15,6 +15,7 @@ public struct InvoiceView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.displayScale) private var displayScale
     
+    @State private var isShowingDeleteSheet = false
     @State private var showCatatPembayaran: Bool = false
     @State private var renderedInvoiceImage: Image? = nil
     
@@ -57,20 +58,17 @@ public struct InvoiceView: View {
                                 .clipShape(Capsule())
                         }
                     }
-                    
-                    if let imageToShare = renderedInvoiceImage {
-                        ShareLink(
-                            item: imageToShare,
-                            preview: SharePreview(shareButtonLabel, image: imageToShare)
-                        ) {
-                            Text(shareButtonLabel)
-                                .font(.headline)
-                                .foregroundStyle(isFullyPaid ? .white : .black)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(isFullyPaid ? Color.blue : Color(.systemGray5))
-                                .clipShape(Capsule())
-                        }
+                    Button {
+                        isShowingDeleteSheet = true
+                    } label: {
+                        Text("Hapus Penjualan")
+                            .font(.headline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.red)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color(.systemGray5))
+                            .clipShape(Capsule())
                     }
                 }
             }
@@ -102,9 +100,30 @@ public struct InvoiceView: View {
                     .font(.headline.bold())
                     .foregroundStyle(.white)
             }
+            ToolbarItem(placement: .topBarTrailing){
+                if let imageToShare = renderedInvoiceImage {
+                    ShareLink(
+                        item: imageToShare,
+                        preview: SharePreview(shareButtonLabel, image: imageToShare)
+                    ) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
         }
         .task {
             await renderInvoiceToImage()
+        }
+        .sheet(isPresented: $isShowingDeleteSheet) {
+            DeleteIncome(
+                    salesNoteId: note.id,
+                    shopId: note.shopId,
+                    onDeleted: {
+                        dismiss()
+                    }
+                )
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showCatatPembayaran) {
             SheetCatatPembayaran(

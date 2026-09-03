@@ -244,8 +244,8 @@ struct Penjualan: View {
                 }
             }
             .navigationDestination(item: $selectedNote) { note in
-                DetailPenjualan(
-                    salesNote: note,
+                InvoiceView(
+                    note: note,
                     shop: AppMockData.primaryShop
                 )
             }
