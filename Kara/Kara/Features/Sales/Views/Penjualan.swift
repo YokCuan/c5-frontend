@@ -98,6 +98,18 @@ struct Penjualan: View {
                                     .foregroundColor(Color.white.opacity(0.8))
                             )
                             .font(.body)
+                            .foregroundStyle(.white)
+                            
+                            if !searchText.isEmpty {
+                                Button {
+                                    searchText = ""
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(Color.white.opacity(0.7))
+                                        .font(.system(size: 16))
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                         .padding(.horizontal, 14)
                         .frame(height: 42)
@@ -139,7 +151,7 @@ struct Penjualan: View {
                         Text(activeFilterSummary)
                             .font(.footnote)
                             .foregroundStyle(.white.opacity(0.8))
-                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 .padding(.horizontal, 16)
