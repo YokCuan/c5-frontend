@@ -29,14 +29,23 @@ public final class AddSalesNoteViewModel: ObservableObject {
     @Published public var soldAt: Date = Date()
     @Published public var dueAt: Date = Date()
     @Published public var hasDueDate: Bool = false
+    @Published public var isBelumLunas: Bool = false
     @Published public var items: [SalesNoteItemInput] = [SalesNoteItemInput()]
-    @Published public var paidAmountText: String = ""
+    @Published public var paidAmountText: String = "0"
     
     @Published public var isLoading: Bool = false
     @Published public var isSaved: Bool = false
     @Published public var errorMessage: String? = nil
     
     public init() {}
+    
+    public var calculatedTotal: Double {
+        items.reduce(0) { total, item in
+            let qty = Double(item.quantityText.replacingOccurrences(of: ",", with: "")) ?? 0
+            let price = Double(item.unitPriceText.replacingOccurrences(of: ",", with: "").replacingOccurrences(of: ".", with: "")) ?? 0
+            return total + (qty * price)
+        }
+    }
     
     public var areItemsValid: Bool {
         guard !items.isEmpty else { return false }
@@ -49,14 +58,39 @@ public final class AddSalesNoteViewModel: ObservableObject {
     }
     
     public var isPaidAmountValid: Bool {
+        if !isBelumLunas { return true }
         guard let amount = parsedPaidAmount else { return false }
         return amount >= 0
+    }
+    
+    public var remainingAmount: Double {
+        if !isBelumLunas { return 0 }
+        let cleanPaid = parsedPaidAmount ?? 0
+        return max(0, calculatedTotal - cleanPaid)
+    }
+    
+    public var isCustomerNameValid: Bool {
+        !customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    public var isPaidAmountExceedingTotal: Bool {
+        if !isBelumLunas { return false }
+        let paid = parsedPaidAmount ?? 0
+        return calculatedTotal > 0 && paid > calculatedTotal
+    }
+
+    public var isFormValid: Bool {
+        isCustomerNameValid
+        && areItemsValid
+        && isPaidAmountValid
+        && !isPaidAmountExceedingTotal
     }
     
     public var parsedPaidAmount: Double? {
         let cleanedText = paidAmountText.replacingOccurrences(of: ",", with: "")
             .replacingOccurrences(of: ".", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleanedText.isEmpty { return 0 }
         return Double(cleanedText)
     }
     
@@ -71,7 +105,7 @@ public final class AddSalesNoteViewModel: ObservableObject {
     }
     
     public func createSalesNote(shopId: UUID, userId: UUID) async {
-        guard !customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard isCustomerNameValid else {
             self.errorMessage = "Nama pembeli tidak boleh kosong."
             return
         }
@@ -81,9 +115,20 @@ public final class AddSalesNoteViewModel: ObservableObject {
             return
         }
         
-        guard let paidAmount = parsedPaidAmount, isPaidAmountValid else {
-            self.errorMessage = "Jumlah yang dibayar tidak valid."
+        guard !isPaidAmountExceedingTotal else {
+            self.errorMessage = "Nominal melebihi total harga barang."
             return
+        }
+        
+        let finalPaidAmount: Double
+        if isBelumLunas {
+            guard let paidAmount = parsedPaidAmount, isPaidAmountValid else {
+                self.errorMessage = "Jumlah yang dibayar tidak valid."
+                return
+            }
+            finalPaidAmount = paidAmount
+        } else {
+            finalPaidAmount = calculatedTotal
         }
         
         isLoading = true
@@ -108,7 +153,7 @@ public final class AddSalesNoteViewModel: ObservableObject {
             "shopId": shopId.uuidString,
             "customerName": customerName.trimmingCharacters(in: .whitespacesAndNewlines),
             "customerPhone": customerPhone.trimmingCharacters(in: .whitespacesAndNewlines),
-            "paidAmount": paidAmount,
+            "paidAmount": finalPaidAmount,
             "noteFileLink": NSNull(),
             "soldAt": formattedSoldAt,
             "createdBy": userId.uuidString,

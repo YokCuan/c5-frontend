@@ -12,35 +12,7 @@ public struct AddIncomeView: View {
     @StateObject private var viewModel = AddSalesNoteViewModel()
     
     @State private var showErrors = false
-    
-    private var calculatedTotal: Double {
-        viewModel.items.reduce(0) { total, item in
-            let qty = Double(item.quantityText) ?? 0
-            let unitPrice = Double(item.unitPriceText.replacingOccurrences(of: ".", with: "")) ?? 0
-            return total + (qty * unitPrice)
-        }
-    }
-    
-    private var remainingAmount: Double {
-        let cleanPaid = viewModel.parsedPaidAmount ?? 0
-        return max(0, calculatedTotal - cleanPaid)
-    }
-    
-    private var isCustomerNameValid: Bool {
-        !viewModel.customerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-    
-    private var isPaidAmountExceedingTotal: Bool {
-        let paid = viewModel.parsedPaidAmount ?? 0
-        return calculatedTotal > 0 && paid > calculatedTotal
-    }
-
-    private var isFormValid: Bool {
-        isCustomerNameValid
-        && viewModel.areItemsValid
-        && viewModel.isPaidAmountValid
-        && !isPaidAmountExceedingTotal
-    }
+    @FocusState private var isPaidAmountFocused: Bool
     
     public var body: some View {
         ZStack {
@@ -93,7 +65,7 @@ public struct AddIncomeView: View {
                     .background(Color.white)
                     .cornerRadius(24)
                     
-                    if showErrors && !isCustomerNameValid {
+                    if showErrors && !viewModel.isCustomerNameValid {
                         HStack(spacing: 4) {
                             Image(systemName: "exclamationmark.circle")
                             Text("Nama pembeli wajib diisi")
@@ -146,11 +118,15 @@ public struct AddIncomeView: View {
                                         .background(Color(.systemGray6))
                                         .cornerRadius(10)
                                         
+                                        Text("x")
+                                            .font(.body.bold())
+                                            .foregroundStyle(.gray)
+                                        
                                         HStack(spacing: 4) {
                                             Text("Rp")
                                                 .font(.subheadline)
                                                 .foregroundStyle(.gray)
-                                            TextField("15.000", text: $item.unitPriceText)
+                                            TextField("Harga satuan", text: $item.unitPriceText)
                                                 .keyboardType(.numberPad)
                                                 .onChange(
                                                     of: item.unitPriceText
@@ -200,46 +176,63 @@ public struct AddIncomeView: View {
                         .padding(.top, -8)
                     }
                     
-                    if calculatedTotal > 0 {
+                    VStack(spacing: 12) {
                         HStack {
                             Text("Total")
                                 .font(.body)
                                 .foregroundStyle(.gray)
                             Spacer()
-                            Text(calculatedTotal.toIDR)
+                            Text(viewModel.calculatedTotal.toIDR)
                                 .font(.headline.bold())
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(24)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Sudah Dibayar")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                         
-                        HStack(spacing: 6) {
-                            Text("Rp")
-                                .foregroundStyle(.gray)
-                            TextField("15.000", text: $viewModel.paidAmountText)
-                                .font(.title3.bold())
-                                .keyboardType(.numberPad)
-                                .onChange(of: viewModel.paidAmountText) { _, newValue in
-                                    let formatted = newValue.formattedWithSeparator
-                                    if formatted != newValue {
-                                        viewModel.paidAmountText = formatted
-                                    }
-                                }
-                        }
+                        Divider()
+                        
+                        Toggle("Belum lunas?", isOn: $viewModel.isBelumLunas)
+                            .font(.body)
+                            .tint(.blue)
                     }
                     .padding()
                     .background(Color.white)
                     .cornerRadius(24)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .stroke(isPaidAmountExceedingTotal ? Color.red : Color.clear, lineWidth: 2)
-                    )
+                    
+                    if viewModel.isBelumLunas {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Sudah Dibayar")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            
+                            HStack(spacing: 6) {
+                                Text("Rp")
+                                    .foregroundStyle(.gray)
+                                TextField("0", text: $viewModel.paidAmountText)
+                                    .font(.title3.bold())
+                                    .keyboardType(.numberPad)
+                                    .focused($isPaidAmountFocused)
+                                    .onChange(of: isPaidAmountFocused) { _, isFocused in
+                                        if isFocused && viewModel.paidAmountText == "0" {
+                                            viewModel.paidAmountText = ""
+                                        }
+                                        if !isFocused && viewModel.paidAmountText.isEmpty {
+                                            viewModel.paidAmountText = "0"
+                                        }
+                                    }
+                                    .onChange(of: viewModel.paidAmountText) { _, newValue in
+                                        let formatted = newValue.formattedWithSeparator
+                                        if formatted != newValue {
+                                            viewModel.paidAmountText = formatted
+                                        }
+                                    }
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(24)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(viewModel.isPaidAmountExceedingTotal ? Color.red : Color.clear, lineWidth: 2)
+                        )
+                    }
                     
                     if showErrors && !viewModel.isPaidAmountValid {
                         HStack(spacing: 6) {
@@ -252,7 +245,7 @@ public struct AddIncomeView: View {
                         .padding(.top, -8)
                     }
                     
-                    if isPaidAmountExceedingTotal {
+                    if viewModel.isPaidAmountExceedingTotal {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
                             Text("Nominal melebihi total harga barang")
@@ -263,14 +256,14 @@ public struct AddIncomeView: View {
                         .padding(.top, -8)
                     }
                     
-                    if remainingAmount > 0 && !viewModel.paidAmountText.isEmpty {
+                    if viewModel.isBelumLunas {
                         VStack {
                             HStack {
                                 Text("Sisa Pembayaran")
                                     .font(.body)
                                     .foregroundStyle(.gray)
                                 Spacer()
-                                Text(remainingAmount.toIDR)
+                                Text(viewModel.remainingAmount.toIDR)
                                     .bold()
                                     .foregroundStyle(.red)
                             }
@@ -283,7 +276,7 @@ public struct AddIncomeView: View {
                                     .foregroundStyle(.gray)
                                 Spacer()
                                 
-                                if remainingAmount == calculatedTotal {
+                                if viewModel.remainingAmount == viewModel.calculatedTotal {
                                     Text("Belum Bayar")
                                         .foregroundStyle(.white)
                                         .padding(.vertical, 4)
@@ -336,7 +329,7 @@ public struct AddIncomeView: View {
                     }
                     
                     Button {
-                        if isCustomerNameValid && viewModel.areItemsValid && viewModel.isPaidAmountValid {
+                        if viewModel.isFormValid {
                             Task {
                                 await viewModel.createSalesNote(
                                     shopId: AppMockData.primaryShop.id,
