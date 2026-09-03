@@ -25,9 +25,15 @@ struct DetailPenjualan: View {
                 VStack(alignment: .leading, spacing: 20) {
                     
                     HStack {
-                        Text(salesNote.customerName)
-                            .font(.title3)
-                            .fontWeight(.bold)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(salesNote.customerName)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                            
+                            Text("\(salesNote.soldAt.formatted(date: .long, time: .omitted)) • \(formatTime(salesNote.soldAt))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                         
                         Spacer()
                         
@@ -248,6 +254,12 @@ private func formatRupiah(_ amount: Double) -> String {
     return formatter.string(
         from: NSNumber(value: amount)
     ) ?? "Rp0"
+}
+
+private func formatTime(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "HH.mm"
+    return formatter.string(from: date)
 }
 
 #Preview {
