@@ -76,16 +76,18 @@ struct DeleteIncome: View {
             }
             .disabled(isLoading)
             
-            Button("Batalkan") {
+            Button {
                 dismiss()
+            } label: {
+                Text("Batalkan")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .foregroundColor(.black)
+                    .fontWeight(.semibold)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.gray.opacity(0.5))
-            .foregroundColor(.black)
-            .fontWeight(.semibold)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .disabled(isLoading)
+                        .disabled(isLoading)
 
         }
         .padding(20)
