@@ -12,27 +12,55 @@ public struct AddIncomeView: View {
     @StateObject private var viewModel = AddSalesNoteViewModel()
     
     @State private var showErrors = false
+    @State private var showDatePicker = false
+    
     @FocusState private var isPaidAmountFocused: Bool
     
     public var body: some View {
         ZStack {
             ScrollView {
                 VStack(spacing: 12) {
-                    HStack {
-                        Text("Tanggal")
-                        Spacer()
-                        DatePicker("", selection: $viewModel.soldAt, displayedComponents: .date)
-                            .datePickerStyle(.compact)
+                    Button {
+                        showDatePicker = true
+                    } label: {
+                        HStack {
+                            Text("Tanggal")
+                            
+                            Spacer()
+                            
+                            Text(
+                                viewModel.soldAt.formatted(
+                                    .dateTime
+                                        .day()
+                                        .month(.wide)
+                                        .year()
+                                )
+                            )
                             .foregroundStyle(.blue)
-                            .environment(\.locale, Locale (identifier: "id_ID"))
-                        Image(systemName: "chevron.right")
-                            .font(.footnote.bold())
-                            .foregroundStyle(.gray)
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.bold())
+                                .foregroundStyle(.gray)
+                        }
+                        .padding(.leading, 6)
+                        .padding(10)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
                     }
-                    .padding(.leading, 6)
-                    .padding(10)
-                    .background(Color.white)
-                    .cornerRadius(24)
+                    .buttonStyle(.plain)
+                    .sheet(isPresented: $showDatePicker) {
+                        VStack {
+                            DatePicker(
+                                "Tanggal",
+                                selection: $viewModel.soldAt,
+                                displayedComponents: .date
+                            )
+                            .datePickerStyle(.graphical)
+                            .environment(\.locale, Locale(identifier: "id_ID"))
+                            .padding()
+                        }
+                        .presentationDetents([.medium])
+                    }
                     
                     VStack(alignment: .leading, spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
@@ -41,11 +69,11 @@ public struct AddIncomeView: View {
                                 .foregroundStyle(.gray)
                             TextField("Bu Ria", text: $viewModel.customerName)
                                 .onChange(of: viewModel.customerName) { _, newValue in
-                                            let formatted = newValue.capitalized
-                                            if formatted != newValue {
-                                                viewModel.customerName = formatted
-                                            }
-                                        }
+                                    let formatted = newValue.capitalized
+                                    if formatted != newValue {
+                                        viewModel.customerName = formatted
+                                    }
+                                }
                         }
                         
                         Divider()
