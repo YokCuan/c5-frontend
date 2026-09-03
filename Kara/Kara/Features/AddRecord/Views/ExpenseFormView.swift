@@ -130,6 +130,12 @@ public struct ExpenseFormView: View {
                         TextField("15.000", text: $viewModel.paidAmountText)
                             .font(.title3.bold())
                             .keyboardType(.numberPad)
+                            .onChange(of: viewModel.paidAmountText) { _, newValue in
+                                let formatted = newValue.formattedWithSeparator
+                                if formatted != newValue {
+                                    viewModel.paidAmountText = formatted
+                                }
+                            }
                     }
                 }
                 .padding()

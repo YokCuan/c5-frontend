@@ -200,51 +200,54 @@ struct FilterSheetView: View {
     }
     
     @ViewBuilder
-    private func amountField(label: String, value: Binding<String>, isInvalid: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .foregroundStyle(.gray)
-            
-            HStack (spacing: 0){
-                Text("Rp ")
+        private func amountField(label: String, value: Binding<String>, isInvalid: Bool) -> some View {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(label)
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundStyle(.gray)
-                
-                TextField("0", text: value) .keyboardType(.numberPad)
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.black)
-                    .multilineTextAlignment(.leading)
-                    .onChange(of: value.wrappedValue) { _, newValue in
-                        let filtered = newValue.filter { $0.isNumber }
-                        if filtered != newValue {
-                            value.wrappedValue = filtered
+                 
+                HStack (spacing: 0){
+                    Text("Rp ")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.gray)
+                    
+                    TextField("0", text: value)
+                        .keyboardType(.numberPad)
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.black)
+                        .multilineTextAlignment(.leading)
+                        .onChange(of: value.wrappedValue) { _, newValue in
+                            let filtered = newValue.filter { $0.isNumber }
+                            let formatted = filtered.formattedWithSeparator
+                            if formatted != newValue {
+                                value.wrappedValue = formatted
+                            }
+                        }
+                    if !value.wrappedValue.isEmpty{
+                        Button(action: {
+                            value.wrappedValue = ""
+                        }) {
+                            Image(systemName: "xmark.circle")
+                                .foregroundStyle(.black)
                         }
                     }
-                
-                Button(action: {
-                    value.wrappedValue = ""
-                }) {
-                    Image(systemName: "xmark.circle")
-                        .foregroundStyle(.black)
                 }
             }
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isInvalid ? Color.red : Color.clear, lineWidth: 2)
+            )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(isInvalid ? Color.red : Color.clear, lineWidth: 2)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        }
-    }
     
     private func selectRange(_ range: DateRange) {
         selectedDateRange = range

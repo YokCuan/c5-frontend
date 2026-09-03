@@ -93,6 +93,12 @@ struct SheetCatatPembayaran: View {
                         .font(.title2)
                         .fontWeight(.bold)
                         .keyboardType(.numberPad)
+                        .onChange(of: bayar) { _, newValue in
+                            let formatted = newValue.formattedWithSeparator
+                            if formatted != newValue {
+                                bayar = formatted
+                            }
+                        }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
