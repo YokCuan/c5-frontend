@@ -60,7 +60,7 @@ struct SheetDatePicker: View {
                 }
                 
                 dateInputCard(
-                    title: "Ke",
+                    title: "Sampai",
                     dateString: dateFormatter.string(from: endDate),
                     isSelected: activeField == .end
                 ) {
