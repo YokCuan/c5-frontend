@@ -73,6 +73,14 @@ struct Penjualan: View {
         return filtered.sorted { $0.soldAt > $1.soldAt }
     }
     
+    private var groupedFilteredNotes: [(key: Date, value: [SalesNote])] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: filteredNotes) { note in
+            calendar.startOfDay(for: note.soldAt)
+        }
+        return grouped.sorted { $0.key > $1.key }
+    }
+    
     var body: some View {
         NavigationStack {
             let isScrolled = scrollOffset > 30
@@ -194,11 +202,22 @@ struct Penjualan: View {
                             }
                             .padding(.top, 60)
                         } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(filteredNotes) { note in
-                                    SalesCard(salesNote: note, onTapDetail: {
-                                        selectedNote = note
-                                    })
+                            LazyVStack(spacing: 16) {
+                                ForEach(groupedFilteredNotes, id: \.key) { group in
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text(group.key, style: .date)
+                                            .font(.caption.bold())
+                                            .foregroundStyle(.gray)
+                                            .padding(.horizontal, 4)
+                                        
+                                        VStack(spacing: 12) {
+                                            ForEach(group.value) { note in
+                                                SalesCard(salesNote: note, onTapDetail: {
+                                                    selectedNote = note
+                                                })
+                                            }
+                                        }
+                                    }
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
                             }
