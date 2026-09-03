@@ -109,21 +109,23 @@ struct FilterSheetView: View {
                         .fontWeight(.bold)
                         .foregroundStyle(.gray)
                     Button {
-                        isShowingCategorySheet = true
-                    } label: {
-                        HStack {
-                            Text(selectedCategory?.title ?? "Pilih kategori")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundStyle(.black)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(Color.black)
+                            isShowingCategorySheet = true
+                        } label: {
+                            HStack {
+                                Text(selectedCategory?.title ?? "Pilih kategori")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.black)
+                                 
+                                Spacer()
+                                 
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(Color.black)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
-                    }
-                    .buttonStyle(.plain)
+                        .buttonStyle(.plain)
                 }
             }
             
