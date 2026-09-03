@@ -13,17 +13,10 @@ public struct AddIncomeView: View {
     
     @State private var showErrors = false
     
-    private var calculatedTotal: Double {
-        viewModel.items.reduce(0) { total, item in
-            let qty = Double(item.quantityText) ?? 0
-            let unitPrice = Double(item.unitPriceText.replacingOccurrences(of: ".", with: "")) ?? 0
-            return total + (qty * unitPrice)
-        }
-    }
-    
     private var remainingAmount: Double {
+        if !viewModel.isBelumLunas { return 0 }
         let cleanPaid = viewModel.parsedPaidAmount ?? 0
-        return max(0, calculatedTotal - cleanPaid)
+        return max(0, viewModel.calculatedTotal - cleanPaid)
     }
     
     private var isCustomerNameValid: Bool {
@@ -31,8 +24,9 @@ public struct AddIncomeView: View {
     }
     
     private var isPaidAmountExceedingTotal: Bool {
+        if !viewModel.isBelumLunas { return false }
         let paid = viewModel.parsedPaidAmount ?? 0
-        return calculatedTotal > 0 && paid > calculatedTotal
+        return viewModel.calculatedTotal > 0 && paid > viewModel.calculatedTotal
     }
 
     private var isFormValid: Bool {
@@ -146,11 +140,15 @@ public struct AddIncomeView: View {
                                         .background(Color(.systemGray6))
                                         .cornerRadius(10)
                                         
+                                        Text("x")
+                                            .font(.body.bold())
+                                            .foregroundStyle(.gray)
+                                        
                                         HStack(spacing: 4) {
                                             Text("Rp")
                                                 .font(.subheadline)
                                                 .foregroundStyle(.gray)
-                                            TextField("15.000", text: $item.unitPriceText)
+                                            TextField("Harga satuan", text: $item.unitPriceText)
                                                 .keyboardType(.numberPad)
                                                 .onChange(
                                                     of: item.unitPriceText
@@ -200,46 +198,56 @@ public struct AddIncomeView: View {
                         .padding(.top, -8)
                     }
                     
-                    if calculatedTotal > 0 {
-                        HStack {
-                            Text("Total")
+                    if viewModel.calculatedTotal > 0 {
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Total")
+                                    .font(.body)
+                                    .foregroundStyle(.gray)
+                                Spacer()
+                                Text(viewModel.calculatedTotal.toIDR)
+                                    .font(.headline.bold())
+                            }
+                            
+                            Divider()
+                            
+                            Toggle("Belum lunas?", isOn: $viewModel.isBelumLunas)
                                 .font(.body)
-                                .foregroundStyle(.gray)
-                            Spacer()
-                            Text(calculatedTotal.toIDR)
-                                .font(.headline.bold())
+                                .tint(.blue)
                         }
                         .padding()
                         .background(Color.white)
                         .cornerRadius(24)
                     }
                     
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Sudah Dibayar")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        
-                        HStack(spacing: 6) {
-                            Text("Rp")
-                                .foregroundStyle(.gray)
-                            TextField("15.000", text: $viewModel.paidAmountText)
-                                .font(.title3.bold())
-                                .keyboardType(.numberPad)
-                                .onChange(of: viewModel.paidAmountText) { _, newValue in
+                    if viewModel.isBelumLunas {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Sudah Dibayar")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            
+                            HStack(spacing: 6) {
+                                Text("Rp")
+                                    .foregroundStyle(.gray)
+                                TextField("0", text: $viewModel.paidAmountText)
+                                    .font(.title3.bold())
+                                    .keyboardType(.numberPad)
+                                    .onChange(of: viewModel.paidAmountText) { _, newValue in
                                     let formatted = newValue.formattedWithSeparator
                                     if formatted != newValue {
                                         viewModel.paidAmountText = formatted
                                     }
                                 }
                         }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(24)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(isPaidAmountExceedingTotal ? Color.red : Color.clear, lineWidth: 2)
+                        )
                     }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(24)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .stroke(isPaidAmountExceedingTotal ? Color.red : Color.clear, lineWidth: 2)
-                    )
                     
                     if showErrors && !viewModel.isPaidAmountValid {
                         HStack(spacing: 6) {
@@ -263,7 +271,7 @@ public struct AddIncomeView: View {
                         .padding(.top, -8)
                     }
                     
-                    if remainingAmount > 0 && !viewModel.paidAmountText.isEmpty {
+                    if remainingAmount > 0 {
                         VStack {
                             HStack {
                                 Text("Sisa Pembayaran")
@@ -283,7 +291,7 @@ public struct AddIncomeView: View {
                                     .foregroundStyle(.gray)
                                 Spacer()
                                 
-                                if remainingAmount == calculatedTotal {
+                                if remainingAmount == viewModel.calculatedTotal {
                                     Text("Belum Bayar")
                                         .foregroundStyle(.white)
                                         .padding(.vertical, 4)
@@ -336,7 +344,7 @@ public struct AddIncomeView: View {
                     }
                     
                     Button {
-                        if isCustomerNameValid && viewModel.areItemsValid && viewModel.isPaidAmountValid {
+                        if isFormValid {
                             Task {
                                 await viewModel.createSalesNote(
                                     shopId: AppMockData.primaryShop.id,
