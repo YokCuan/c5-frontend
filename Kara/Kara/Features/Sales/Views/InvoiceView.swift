@@ -9,8 +9,9 @@ import SwiftUI
 
 public struct InvoiceView: View {
     
-    public let note: SalesNote
+    @State public var note: SalesNote
     public let shop: Shop
+    public var onNoteUpdated: ((SalesNote) -> Void)?
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.displayScale) private var displayScale
@@ -18,11 +19,13 @@ public struct InvoiceView: View {
     @State private var isShowingDeleteSheet = false
     @State private var showCatatPembayaran: Bool = false
     @State private var renderedInvoiceImage: Image? = nil
+    @State private var isLoadingRefresh = false
     
-    public init(note: SalesNote, shop: Shop) {
-        self.note = note
-        self.shop = shop
-    }
+    public init(note: SalesNote, shop: Shop, onNoteUpdated: ((SalesNote) -> Void)? = nil) {
+            self._note = State(initialValue: note)
+            self.shop = shop
+            self.onNoteUpdated = onNoteUpdated
+        }
     
     private var isFullyPaid: Bool {
         note.status == .paid
@@ -116,24 +119,26 @@ public struct InvoiceView: View {
         }
         .sheet(isPresented: $isShowingDeleteSheet) {
             DeleteIncome(
-                    salesNoteId: note.id,
-                    shopId: note.shopId,
-                    onDeleted: {
-                        dismiss()
-                    }
-                )
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+                salesNoteId: note.id,
+                shopId: note.shopId,
+                onDeleted: {
+                    dismiss()
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showCatatPembayaran) {
             SheetCatatPembayaran(
                 salesNoteId: note.id,
-                        shopId: note.shopId,
-                        userId: AppMockData.currentUser.id,
-                        customerName: note.customerName,
-                        remainingAmount: note.totalAmount - note.paidAmount,
+                shopId: note.shopId,
+                userId: AppMockData.currentUser.id,
+                customerName: note.customerName,
+                remainingAmount: note.totalAmount - note.paidAmount,
                 onSuccess: {
-                    dismiss()
+                    Task {
+                        await fetchLatestNoteDetails()
+                    }
                 }
             )
             .presentationDetents([.height(350)])
@@ -141,6 +146,7 @@ public struct InvoiceView: View {
             .background(Color(.systemBackground))
         }
     }
+    
     @MainActor
     private func renderInvoiceToImage() async {
         let renderer = ImageRenderer(content: InvoiceComponent(note: note, shop: shop))
@@ -150,6 +156,23 @@ public struct InvoiceView: View {
             renderedInvoiceImage = Image(uiImage: uiImage)
         }
     }
+    
+    private func fetchLatestNoteDetails() async {
+            do {
+                let updatedNote = try await APIService.shared.fetchSalesNoteDetail(
+                    id: note.id,
+                    shopId: note.shopId
+                )
+                
+                self.note = updatedNote
+                
+                onNoteUpdated?(updatedNote)
+                
+                await renderInvoiceToImage()
+            } catch {
+                print("Gagal memperbarui data invoice: \(error.localizedDescription)")
+            }
+        }
 }
 
 #Preview("Belum Lunas") {
