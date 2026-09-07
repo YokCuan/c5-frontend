@@ -11,11 +11,11 @@ public struct MainTabView: View {
     public var body: some View {
         NavigationStack{
             TabView(selection: $selectedTab) {
-                Tab("Arus Kas", systemImage: "dollarsign.circle.fill", value: 0) {
+                Tab("Arus Kas", systemImage: "dollarsign.circle", value: 0) {
                     CashFlowView()
                 }
                 
-                Tab("Rekap", systemImage: "chart.bar.fill", value: 1) {
+                Tab("Penjualan", systemImage: "tag", value: 1) {
                     Penjualan()
                 }
                 
