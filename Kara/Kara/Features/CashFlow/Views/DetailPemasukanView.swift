@@ -84,7 +84,7 @@ public struct DetailPemasukanView: View {
              
             HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "exclamationmark.circle")
-                Text("Pemasukan dari penjualan tidak bisa diedit.")
+                Text("Uang Masuk dari penjualan tidak bisa diedit.")
                 Spacer()
             }
             .font(.footnote)
@@ -131,7 +131,7 @@ public struct DetailPemasukanView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Detail Pemasukan")
+                Text("Detail Uang Masuk")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
             }

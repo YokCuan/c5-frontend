@@ -391,7 +391,7 @@ public struct AddIncomeView: View {
                 .padding()
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Tambah Pemasukan")
+            .navigationTitle("Tambah Uang Masuk")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(
                 LinearGradient(
@@ -404,7 +404,7 @@ public struct AddIncomeView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Tambah Pemasukan")
+                    Text("Uang Masuk")
                         .font(.headline.bold())
                         .foregroundStyle(.white)
                 }

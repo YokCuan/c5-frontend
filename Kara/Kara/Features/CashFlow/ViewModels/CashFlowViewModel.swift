@@ -112,8 +112,8 @@ public class CashFlowViewModel: ObservableObject {
         let normalizedStartDate = calendar.startOfDay(for: useCustomDateRange ? startDate : monthStartDate(for: selectedDate))
         let normalizedEndDate = calendar.startOfDay(for: useCustomDateRange ? endDate : monthEndDate(for: selectedDate))
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let minAmount = Double(minAmountFilter.replacingOccurrences(of: ",", with: "")) ?? 0
-        let maxAmount = Double(maxAmountFilter.replacingOccurrences(of: ",", with: "")) ?? .greatestFiniteMagnitude
+        let minAmount = Double(minAmountFilter.replacingOccurrences(of: ".", with: "")) ?? 0
+        let maxAmount = Double(maxAmountFilter.replacingOccurrences(of: ".", with: "")) ?? .greatestFiniteMagnitude
         
         let filtered = allTransactions.filter { transaction in
             let transactionDay = calendar.startOfDay(for: transaction.occurredAt)
