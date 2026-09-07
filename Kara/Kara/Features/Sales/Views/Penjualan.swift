@@ -244,8 +244,8 @@ struct Penjualan: View {
                 }
             }
             .navigationDestination(item: $selectedNote) { note in
-                InvoiceView(
-                    note: note,
+                DetailPenjualan(
+                    salesNote: note,
                     shop: AppMockData.primaryShop,
                     onNoteUpdated: { updatedNote in
                         if let index = viewModel.salesNotes.firstIndex(where: { $0.id == updatedNote.id }) {

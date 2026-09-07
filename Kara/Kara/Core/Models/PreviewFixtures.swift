@@ -8,11 +8,9 @@
 import Foundation
 
 enum PreviewFixtures {
-    private static func dayOffset(_ value: Int, hour: Int = 10, minute: Int = 0) -> Date {
-        let calendar = Calendar.current
-        let base = calendar.startOfDay(for: Date())
-        let date = calendar.date(byAdding: .day, value: value, to: base) ?? Date()
-        return calendar.date(bySettingHour: hour, minute: minute, second: 0, of: date) ?? date
+    private static func parseDate(_ string: String?) -> Date? {
+        guard let string = string else { return nil }
+        return ISO8601DateFormatter().date(from: string)
     }
 
     private static func makeSalesNote(
@@ -24,7 +22,8 @@ enum PreviewFixtures {
         status: PaymentStatus,
         dueAt: Date?,
         soldAt: Date,
-        itemName: String
+        items: [SalesNoteItem] = [],
+        payments: [SalesNotePayment] = []
     ) -> SalesNote {
         let id = UUID(uuidString: idString) ?? UUID()
         return SalesNote(
@@ -39,52 +38,121 @@ enum PreviewFixtures {
             noteFileLink: nil,
             dueAt: dueAt,
             soldAt: soldAt,
-            items: [
-                SalesNoteItem(
-                    id: UUID(),
-                    salesNoteId: id,
-                    name: itemName,
-                    quantity: 1,
-                    unitPrice: totalAmount,
-                    subtotal: totalAmount
-                )
-            ]
+            items: items,
+            payments: payments
         )
     }
 
+    // 1. Paid Sales Note
     static let paidSalesNote = makeSalesNote(
-        idString: "#8612",
-        customerName: "Bu Ria",
-        customerPhone: "08123456789",
-        totalAmount: 96_000,
-        paidAmount: 96_000,
+        idString: "4E6FA395-A11E-4386-81BC-4CE085AED0E7",
+        customerName: "John Doe",
+        customerPhone: "+1234567890",
+        totalAmount: 120000,
+        paidAmount: 120000,
         status: .paid,
         dueAt: nil,
-        soldAt: dayOffset(0, hour: 18),
-        itemName: "Keripik Tempe 100 g"
+        soldAt: parseDate("2026-09-01T15:12:55Z") ?? Date(),
+        items: [
+            SalesNoteItem(
+                id: UUID(uuidString: "5B025B98-3101-4A12-834A-078FEECC6860")!,
+                salesNoteId: UUID(uuidString: "4E6FA395-A11E-4386-81BC-4CE085AED0E7")!,
+                name: "Product A",
+                quantity: 2,
+                unitPrice: 40000,
+                subtotal: 80000
+            ),
+            SalesNoteItem(
+                id: UUID(uuidString: "C25D122D-EE62-4A8B-B27B-8A8E64F44662")!,
+                salesNoteId: UUID(uuidString: "4E6FA395-A11E-4386-81BC-4CE085AED0E7")!,
+                name: "Product B",
+                quantity: 1,
+                unitPrice: 40000,
+                subtotal: 40000
+            )
+        ],
+        payments: [
+            SalesNotePayment(
+                id: UUID(uuidString: "73FDB853-7404-4073-8DA0-168371D677E5")!,
+                salesNoteId: UUID(uuidString: "4E6FA395-A11E-4386-81BC-4CE085AED0E7")!,
+                paymentAttempt: 1,
+                paidAmount: 120000,
+                paidAt: parseDate("2026-09-01T00:00:00Z") ?? Date()
+            )
+        ]
     )
 
+    // 2. DP / Partially Paid Sales Note
     static let dpSalesNote = makeSalesNote(
-        idString: "#8614",
-        customerName: "Pak Andi",
-        customerPhone: "081298765432",
-        totalAmount: 75_000,
-        paidAmount: 25_000,
+        idString: "0A2CEEAB-7EA8-4810-83B5-6A406C1A32AF",
+        customerName: "John Doe",
+        customerPhone: "+1234567890",
+        totalAmount: 120000,
+        paidAmount: 100000,
         status: .dp,
-        dueAt: dayOffset(4, hour: 17),
-        soldAt: dayOffset(-1, hour: 11, minute: 20),
-        itemName: "Keripik Tempe 250 g"
+        dueAt: nil,
+        soldAt: parseDate("2026-08-27T00:00:00Z") ?? Date(),
+        items: [
+            SalesNoteItem(
+                id: UUID(uuidString: "71C946C5-28DB-41A9-A17C-AA3B5D5F529D")!,
+                salesNoteId: UUID(uuidString: "0A2CEEAB-7EA8-4810-83B5-6A406C1A32AF")!,
+                name: "Product A",
+                quantity: 2,
+                unitPrice: 40000,
+                subtotal: 80000
+            ),
+            SalesNoteItem(
+                id: UUID(uuidString: "DFB888D7-2BC0-4627-8F9C-CCA97A2FBC1D")!,
+                salesNoteId: UUID(uuidString: "0A2CEEAB-7EA8-4810-83B5-6A406C1A32AF")!,
+                name: "Product B",
+                quantity: 1,
+                unitPrice: 40000,
+                subtotal: 40000
+            )
+        ],
+        payments: [
+            SalesNotePayment(
+                id: UUID(uuidString: "73FDB853-7404-4073-8DA0-168371D677E5")!,
+                salesNoteId: UUID(uuidString: "0A2CEEAB-7EA8-4810-83B5-6A406C1A32AF")!,
+                paymentAttempt: 1,
+                paidAmount: 100000,
+                paidAt: parseDate("2026-09-01T00:00:00Z") ?? Date()
+            )
+        ]
     )
 
+    // 3. Not Paid Sales Note
     static let notPaidSalesNote = makeSalesNote(
-        idString: "#8622",
-        customerName: "Toko Maju Jaya",
-        customerPhone: "085811223344",
-        totalAmount: 120_000,
+        idString: "D3773A81-32C1-4915-8BC4-68F85E5E3A9B",
+        customerName: "John Doe",
+        customerPhone: "+1234567890",
+        totalAmount: 150000,
         paidAmount: 0,
         status: .notPaid,
-        dueAt: dayOffset(2, hour: 15),
-        soldAt: dayOffset(-2, hour: 15, minute: 40),
-        itemName: "Paket Reseller Keripik"
+        dueAt: parseDate("2026-09-30T00:00:00Z"),
+        soldAt: parseDate("2026-08-27T00:00:00Z") ?? Date(),
+        items: [
+            SalesNoteItem(
+                id: UUID(uuidString: "71C946C5-28DB-41A9-A17C-AA3B5D5F529D")!,
+                salesNoteId: UUID(uuidString: "0A2CEEAB-7EA8-4810-83B5-6A406C1A32AF")!,
+                name: "Product A",
+                quantity: 2,
+                unitPrice: 40000,
+                subtotal: 80000
+            ),
+            SalesNoteItem(
+                id: UUID(uuidString: "DFB888D7-2BC0-4627-8F9C-CCA97A2FBC1D")!,
+                salesNoteId: UUID(uuidString: "0A2CEEAB-7EA8-4810-83B5-6A406C1A32AF")!,
+                name: "Product B",
+                quantity: 1,
+                unitPrice: 40000,
+                subtotal: 40000
+            )
+        ],
+        payments: []
     )
+
+    static let allSalesNotes: [SalesNote] = [
+        paidSalesNote, dpSalesNote, notPaidSalesNote
+    ]
 }

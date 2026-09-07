@@ -36,6 +36,9 @@ public class PenjualanViewModel: ObservableObject {
                 if Task.isCancelled { return }
                 
                 self.isLoading = false
+                
+                print("DETAIL DECODE ERROR: \(error)")
+                
                 let errorString = error.localizedDescription.lowercased()
                 
                 if error is CancellationError || errorString.contains("cancel") || (error as NSError).code == -999 {

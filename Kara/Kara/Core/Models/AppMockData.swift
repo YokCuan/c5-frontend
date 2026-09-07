@@ -9,14 +9,14 @@ import Foundation
 
 public enum AppMockData {
     private enum IDs {
-        static let owner = UUID(uuidString: "D8E82A1A-615C-4FE3-8AB0-DF7A2B24A417")!
-        static let shop = UUID(uuidString: "724E0DB3-6BEC-419F-A03F-81790B55358A")!
+        static let owner = UUID(uuidString: "152CA26B-6AC4-425B-84F0-7732064E85B2")!
+        static let shop = UUID(uuidString: "BE24B313-860E-49F3-B7DD-0CFA08F0E388")!
     }
 
     public static let currentUser = User(
         id: IDs.owner,
         name: "Ria Tan",
-        phone: "08578987666",
+        phone: "+628578987666",
         password: "password123"
     )
 

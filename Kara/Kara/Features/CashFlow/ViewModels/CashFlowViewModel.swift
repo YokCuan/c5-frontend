@@ -85,10 +85,11 @@ public class CashFlowViewModel: ObservableObject {
                 
                 if Task.isCancelled { return }
                 
-                print("DEBUG: Refresh/Fetch Sukses, jumlah: \(fetchedData.count)")
+                print("DEBUG: Refresh/Fetch Sukses, jumlah: \(fetchedData)")
                 self.allTransactions = fetchedData
                 applyFilters()
                 self.isLoading = false
+                
             } catch {
                 if Task.isCancelled { return }
                 
@@ -114,7 +115,7 @@ public class CashFlowViewModel: ObservableObject {
         let minAmount = Double(minAmountFilter.replacingOccurrences(of: ".", with: "")) ?? 0
         let maxAmount = Double(maxAmountFilter.replacingOccurrences(of: ".", with: "")) ?? .greatestFiniteMagnitude
         
-        transactions = allTransactions.filter { transaction in
+        let filtered = allTransactions.filter { transaction in
             let transactionDay = calendar.startOfDay(for: transaction.occurredAt)
             
             guard transactionDay >= normalizedStartDate, transactionDay <= normalizedEndDate else {
@@ -149,12 +150,14 @@ public class CashFlowViewModel: ObservableObject {
                 transaction.categoryType,
                 String(Int(transaction.amount))
             ]
-            .compactMap { $0 }
-            .joined(separator: " ")
-            .lowercased()
+                .compactMap { $0 }
+                .joined(separator: " ")
+                .lowercased()
             
             return searchableText.contains(query)
         }
+        
+        transactions = filtered.sorted { $0.description ?? "" > $1.description ?? "" }
     }
     
     public func resetFilters() {

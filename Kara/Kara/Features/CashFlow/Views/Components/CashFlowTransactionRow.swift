@@ -19,7 +19,9 @@ public struct CashFlowTransactionRow: View {
         NavigationLink {
             Group {
                 if isIncome {
-                    DetailPemasukanView(salesNoteId: transaction.id)
+                    DetailPemasukanView(
+                        transaction: transaction
+                    )
                 } else {
                     ExpenseFormView(viewModel: ExpenseFormViewModel(mode: .edit(expenseId: transaction.id)))
                 }
