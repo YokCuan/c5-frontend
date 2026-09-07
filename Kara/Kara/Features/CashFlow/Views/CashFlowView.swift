@@ -108,7 +108,7 @@ public struct CashFlowView: View {
                                                         .padding(.horizontal, 4)
                                                     
                                                     VStack(spacing: 10) {
-                                                        ForEach(group.value) { transaction in
+                                                        ForEach(group.value, id: \.uniqueId) { transaction in
                                                             CashFlowTransactionRow(transaction: transaction)
                                                         }
                                                     }

@@ -20,4 +20,5 @@ public struct SalesNote: Identifiable, Codable, Hashable {
     public var dueAt: Date?
     public var soldAt: Date
     public var items: [SalesNoteItem]?
+    public var payments: [SalesNotePayment]?
 }
