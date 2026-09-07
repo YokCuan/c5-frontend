@@ -7,6 +7,7 @@ struct KaraApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.light)
                 .environmentObject(categoryStore)
                 .task {
                     await CategoryStore.shared.fetchCategoriesIfNeeded()

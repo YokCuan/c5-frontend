@@ -42,10 +42,12 @@ public struct MainTabView: View {
                 }
             }
         }
+        .preferredColorScheme(.light)
     }
 }
 
 #Preview {
     MainTabView()
+        .preferredColorScheme(.light)
         .environmentObject(CategoryStore.shared)
 }
