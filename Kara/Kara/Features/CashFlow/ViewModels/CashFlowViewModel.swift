@@ -85,7 +85,6 @@ public class CashFlowViewModel: ObservableObject {
                 
                 if Task.isCancelled { return }
                 
-                print("DEBUG: Refresh/Fetch Sukses, jumlah: \(fetchedData)")
                 self.allTransactions = fetchedData
                 applyFilters()
                 self.isLoading = false
