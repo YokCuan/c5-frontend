@@ -34,10 +34,18 @@ struct FilterSheetView: View {
     }
     
     private var isAmountRangeInvalid: Bool {
-        guard let min = Int(minAmountFilter), let max = Int(maxAmountFilter),
-              !minAmountFilter.isEmpty, !maxAmountFilter.isEmpty else {
+        guard !minAmountFilter.isEmpty,
+              !maxAmountFilter.isEmpty
+        else {
             return false
         }
+
+        guard let min = Int(minAmountFilter.replacingOccurrences(of: ".", with: "")),
+              let max = Int(maxAmountFilter.replacingOccurrences(of: ".", with: ""))
+        else {
+            return false
+        }
+
         return min > max
     }
     
@@ -109,23 +117,23 @@ struct FilterSheetView: View {
                         .fontWeight(.bold)
                         .foregroundStyle(.gray)
                     Button {
-                            isShowingCategorySheet = true
-                        } label: {
-                            HStack {
-                                Text(selectedCategory?.title ?? "Pilih kategori")
-                                    .font(.subheadline)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.black)
-                                 
-                                Spacer()
-                                 
-                                Image(systemName: "chevron.right")
-                                    .foregroundStyle(Color.black)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .contentShape(Rectangle())
+                        isShowingCategorySheet = true
+                    } label: {
+                        HStack {
+                            Text(selectedCategory?.title ?? "Pilih kategori")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.black)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(Color.black)
                         }
-                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             
@@ -202,54 +210,54 @@ struct FilterSheetView: View {
     }
     
     @ViewBuilder
-        private func amountField(label: String, value: Binding<String>, isInvalid: Bool) -> some View {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(label)
+    private func amountField(label: String, value: Binding<String>, isInvalid: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.subheadline)
+                .fontWeight(.bold)
+                .foregroundStyle(.gray)
+            
+            HStack (spacing: 0){
+                Text("Rp ")
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundStyle(.gray)
-                 
-                HStack (spacing: 0){
-                    Text("Rp ")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.gray)
-                    
-                    TextField("0", text: value)
-                        .keyboardType(.numberPad)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.black)
-                        .multilineTextAlignment(.leading)
-                        .onChange(of: value.wrappedValue) { _, newValue in
-                            let filtered = newValue.filter { $0.isNumber }
-                            let formatted = filtered.formattedWithSeparator
-                            if formatted != newValue {
-                                value.wrappedValue = formatted
-                            }
+                
+                TextField("0", text: value)
+                    .keyboardType(.numberPad)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.black)
+                    .multilineTextAlignment(.leading)
+                    .onChange(of: value.wrappedValue) { _, newValue in
+                        let filtered = newValue.filter { $0.isNumber }
+                        let formatted = filtered.formattedWithSeparator
+                        if formatted != newValue {
+                            value.wrappedValue = formatted
                         }
-                    if !value.wrappedValue.isEmpty{
-                        Button(action: {
-                            value.wrappedValue = ""
-                        }) {
-                            Image(systemName: "xmark.circle")
-                                .foregroundStyle(.black)
-                        }
+                    }
+                if !value.wrappedValue.isEmpty{
+                    Button(action: {
+                        value.wrappedValue = ""
+                    }) {
+                        Image(systemName: "xmark.circle")
+                            .foregroundStyle(.black)
                     }
                 }
             }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isInvalid ? Color.red : Color.clear, lineWidth: 2)
-            )
-            .contentShape(Rectangle())
-            .onTapGesture {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
         }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(isInvalid ? Color.red : Color.clear, lineWidth: 2)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+    }
     
     private func selectRange(_ range: DateRange) {
         selectedDateRange = range
@@ -366,14 +374,23 @@ struct FilterSheetView: View {
 
 
 #Preview {
-    FilterSheetView(
-        selectedPaymentStatus: .constant(nil),
-        selectedCategory: .constant(nil),
-        startDate: .constant(Date()),
-        endDate: .constant(Date()),
-        useCustomDateRange: .constant(false),
-        minAmountFilter: .constant(""),
-        maxAmountFilter: .constant(""),
-        viewModel: CashFlowViewModel()
-    )
+    FilterSheetPreviewWrapper()
+}
+
+private struct FilterSheetPreviewWrapper: View {
+    @State private var minAmount = ""
+    @State private var maxAmount = ""
+
+    var body: some View {
+        FilterSheetView(
+            selectedPaymentStatus: .constant(nil),
+            selectedCategory: .constant(nil),
+            startDate: .constant(Date()),
+            endDate: .constant(Date()),
+            useCustomDateRange: .constant(false),
+            minAmountFilter: $minAmount,
+            maxAmountFilter: $maxAmount,
+            viewModel: CashFlowViewModel()
+        )
+    }
 }
