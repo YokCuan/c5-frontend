@@ -60,7 +60,7 @@ struct SheetCatatPembayaran: View {
         VStack(alignment: .leading) {
             Spacer()
             VStack(alignment: .leading, spacing: 4) {
-                Text("Catat Pembayaran")
+                Text("Catat Pelunasan")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
@@ -78,7 +78,7 @@ struct SheetCatatPembayaran: View {
             Spacer()
             
             VStack(alignment: .leading, spacing: 12) {
-                Text("Jumlah Pembayaran")
+                Text("Jumlah Uang Diterima")
                     .font(.footnote)
                     .fontWeight(.regular)
                     .foregroundStyle(.secondary)
@@ -129,7 +129,7 @@ struct SheetCatatPembayaran: View {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Text("Catat Pembayaran")
+                        Text("Catat Pelunasan")
                             .font(.headline)
                             .fontWeight(.bold)
                     }

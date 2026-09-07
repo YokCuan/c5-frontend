@@ -26,7 +26,7 @@ struct CashFlowDeleteOutcome: View {
                 .background(Color.red.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             
-            Text("Hapus Pengeluaran?")
+            Text("Hapus Uang Keluar")
                 .font(.body)
                 .fontWeight(.bold)
             

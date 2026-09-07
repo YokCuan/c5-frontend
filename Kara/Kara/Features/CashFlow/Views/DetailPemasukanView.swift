@@ -103,7 +103,7 @@ public struct DetailPemasukanView: View {
             
             HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "exclamationmark.circle")
-                Text("Pemasukan dari penjualan tidak bisa diedit. Ubah data di halaman Penjualan")
+                Text("Uang Masuk dari penjualan tidak bisa diedit. Ubah data di halaman Penjualan")
                 Spacer()
             }
             .font(.footnote)
@@ -113,7 +113,7 @@ public struct DetailPemasukanView: View {
             .cornerRadius(10)
             
             Button(action: { isShowingDelSheet = true }) {
-                Text("Hapus Pemasukan")
+                Text("Hapus")
                     .font(.title3.bold())
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity)
@@ -150,7 +150,7 @@ public struct DetailPemasukanView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Detail Pemasukan")
+                Text("Detail Uang Masuk")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
             }

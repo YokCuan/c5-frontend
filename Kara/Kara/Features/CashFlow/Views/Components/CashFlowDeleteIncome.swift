@@ -26,7 +26,7 @@ struct DeleteIncome: View {
                 .background(Color.red.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             
-            Text("Hapus Pemasukan")
+            Text("Hapus Uang Masuk")
                 .font(.body)
                 .fontWeight(.bold)
             

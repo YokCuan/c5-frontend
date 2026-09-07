@@ -23,7 +23,7 @@ public struct ExpenseFormView: View {
     public var body: some View {
         Group {
             if viewModel.isLoading {
-                ProgressView("Memuat data pengeluaran...")
+                ProgressView("Memuat data Uang keluar...")
             } else if let errorMessage = viewModel.errorMessage, viewModel.mode != .add {
                 VStack(spacing: 12) {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -208,7 +208,7 @@ public struct ExpenseFormView: View {
                 if showErrors && viewModel.selectedExpenseCategoryId == nil {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.circle")
-                        Text("Kategori pengeluaran wajib dipilih")
+                        Text("Kategori Uang keluar wajib dipilih")
                         Spacer()
                     }
                     .font(.caption)
@@ -296,7 +296,7 @@ public struct ExpenseFormView: View {
                 
                 if case .edit(let expenseId) = viewModel.mode {
                     Button(action: { isShowingDelSheet = true }) {
-                        Text("Hapus Pengeluaran")
+                        Text("Hapus Uang keluar")
                             .font(.title3.bold())
                             .foregroundStyle(.red)
                             .frame(maxWidth: .infinity)
@@ -319,7 +319,7 @@ public struct ExpenseFormView: View {
             .padding()
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle(viewModel.mode == .add ? "Tambah Pengeluaran" : "")
+        .navigationTitle(viewModel.mode == .add ? "Tambah Uang keluar" : "")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(
             LinearGradient(
@@ -332,7 +332,7 @@ public struct ExpenseFormView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(viewModel.mode == .add ? "Tambah Pengeluaran" : "Edit Pengeluaran")
+                Text(viewModel.mode == .add ? "Uang keluar" : "Edit Uang keluar")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
             }
