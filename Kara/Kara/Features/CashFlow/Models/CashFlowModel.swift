@@ -13,6 +13,7 @@ public struct CashFlowModel: Identifiable, Codable {
     public let categoryType: String
     public let title: String
     public let description: String?
+    public let referenceId: UUID?
 
     public init(
         id: UUID,
@@ -21,7 +22,8 @@ public struct CashFlowModel: Identifiable, Codable {
         type: CashFlowItemType,
         categoryType: String,
         title: String,
-        description: String? = nil
+        description: String? = nil,
+        referenceId: UUID? = nil
     ) {
         self.id = id
         self.amount = amount
@@ -30,5 +32,6 @@ public struct CashFlowModel: Identifiable, Codable {
         self.categoryType = categoryType
         self.title = title
         self.description = description
+        self.referenceId = referenceId
     }
 }

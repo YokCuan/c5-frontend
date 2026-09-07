@@ -81,12 +81,36 @@ public class CashFlowViewModel: ObservableObject {
             errorMessage = nil
              
             do {
-                let fetchedData = try await service.fetchCashFlows(shopId: shopId)
+                let cashflows = try await service.fetchCashFlows(shopId: shopId)
+                let salesNotes = try await service.fetchSalesNotes(shopId: shopId)
                 
                 if Task.isCancelled { return }
                 
-                print("DEBUG: Refresh/Fetch Sukses, jumlah: \(fetchedData.count)")
-                self.allTransactions = fetchedData
+                var newTransactions: [CashFlowModel] = []
+                
+                let expenses = cashflows.filter { $0.type == .expense }
+                newTransactions.append(contentsOf: expenses)
+                
+                for salesNote in salesNotes {
+                    let payments = salesNote.payments ?? []
+                    for payment in payments {
+                        newTransactions.append(
+                            CashFlowModel(
+                                id: payment.id,
+                                amount: payment.paidAmount,
+                                occurredAt: payment.paidAt,
+                                type: .salesNote,
+                                categoryType: "Penjualan",
+                                title: salesNote.customerName,
+                                description: salesNote.identifier,
+                                referenceId: salesNote.id
+                            )
+                        )
+                    }
+                }
+                
+                allTransactions = newTransactions.sorted { $0.occurredAt > $1.occurredAt }
+                
                 applyFilters()
                 self.isLoading = false
             } catch {
