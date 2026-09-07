@@ -48,6 +48,7 @@ public struct AddIncomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityHint("Ketuk untuk mengganti tanggal")
                     .sheet(isPresented: $showDatePicker) {
                         VStack {
                             DatePicker(
@@ -68,6 +69,8 @@ public struct AddIncomeView: View {
                                 .font(.caption)
                                 .foregroundStyle(.gray)
                             TextField("Bu Ria", text: $viewModel.customerName)
+                                .accessibilityLabel("Nama Pembeli")
+                                .accessibilityHint("Contoh: Bu Ria")
                                 .onChange(of: viewModel.customerName) { _, newValue in
                                     let formatted = newValue.capitalized
                                     if formatted != newValue {
@@ -102,6 +105,8 @@ public struct AddIncomeView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                         .padding(.top, -8)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Error: Nama pembeli wajib diisi")
                     }
                     
                     VStack(alignment: .leading, spacing: 16) {
@@ -137,9 +142,11 @@ public struct AddIncomeView: View {
                                                 .keyboardType(.numberPad)
                                                 .multilineTextAlignment(.center)
                                                 .frame(width: 40)
+                                                .accessibilityLabel("Jumlah barang")
                                             Text("pcs")
                                                 .font(.caption)
                                                 .foregroundStyle(.gray)
+                                                .accessibilityHidden(true)
                                         }
                                         .padding(.vertical, 8)
                                         .padding(.horizontal, 10)
@@ -154,8 +161,11 @@ public struct AddIncomeView: View {
                                             Text("Rp")
                                                 .font(.subheadline)
                                                 .foregroundStyle(.gray)
+                                                .accessibilityHidden(true)
                                             TextField("Harga satuan", text: $item.unitPriceText)
                                                 .keyboardType(.numberPad)
+                                                .accessibilityLabel("Harga satuan")
+                                                .accessibilityHint("Harga satuan")
                                                 .onChange(
                                                     of: item.unitPriceText
                                                 ) { _, newValue in
@@ -202,6 +212,8 @@ public struct AddIncomeView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                         .padding(.top, -8)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Error: Nama barang, jumlah, dan harga wajib diisi valid")
                     }
                     
                     VStack(spacing: 12) {
@@ -212,6 +224,7 @@ public struct AddIncomeView: View {
                             Spacer()
                             Text(viewModel.calculatedTotal.toIDR)
                                 .font(.headline.bold())
+                                .accessibilityLabel("\(Int(viewModel.calculatedTotal)) rupiah")
                         }
                         
                         Divider()
@@ -219,6 +232,7 @@ public struct AddIncomeView: View {
                         Toggle("Belum lunas?", isOn: $viewModel.isBelumLunas)
                             .font(.body)
                             .tint(.blue)
+                            .accessibilityHint("Apakah pembayaran belum lunas? Jika belum, ketuk sekali.")
                     }
                     .padding()
                     .background(Color.white)
@@ -233,9 +247,12 @@ public struct AddIncomeView: View {
                             HStack(spacing: 6) {
                                 Text("Rp")
                                     .foregroundStyle(.gray)
+                                    .accessibilityHidden(true)
                                 TextField("0", text: $viewModel.paidAmountText)
                                     .font(.title3.bold())
                                     .keyboardType(.numberPad)
+                                    .accessibilityLabel("Jumlah sudah dibayar")
+                                    .accessibilityHint("0 adalah nilai awal, ketuk dua kali untuk mengubah")
                                     .focused($isPaidAmountFocused)
                                     .onChange(of: isPaidAmountFocused) { _, isFocused in
                                         if isFocused && viewModel.paidAmountText == "0" {
@@ -271,6 +288,8 @@ public struct AddIncomeView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                         .padding(.top, -8)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Error: Jumlah yang dibayar wajib diisi")
                     }
                     
                     if viewModel.isPaidAmountExceedingTotal {
@@ -282,6 +301,8 @@ public struct AddIncomeView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                         .padding(.top, -8)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Error: Nominal melebihi total harga barang")
                     }
                     
                     if viewModel.isBelumLunas {
@@ -294,6 +315,7 @@ public struct AddIncomeView: View {
                                 Text(viewModel.remainingAmount.toIDR)
                                     .bold()
                                     .foregroundStyle(.red)
+                                    .accessibilityLabel("\(Int(viewModel.remainingAmount)) rupiah")
                             }
                             
                             Divider()
@@ -334,6 +356,8 @@ public struct AddIncomeView: View {
                                     displayedComponents: .date
                                 )
                                 .datePickerStyle(.compact)
+                                .accessibilityLabel("Jatuh Tempo")
+                                .accessibilityHint("Ketuk untuk mengganti tanggal jatuh tempo")
                                 .onAppear {
                                     viewModel.hasDueDate = true
                                 }

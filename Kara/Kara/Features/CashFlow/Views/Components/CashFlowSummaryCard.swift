@@ -36,6 +36,8 @@ public struct CashFlowSummaryCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title), \(Int(amount)) rupiah")
     }
 }
 

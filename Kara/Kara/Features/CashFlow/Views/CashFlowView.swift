@@ -24,6 +24,7 @@ public struct CashFlowView: View {
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
                             .animation(.easeOut(duration: 0.2), value: isScrolled)
+                            .accessibilityAddTraits(.isHeader)
                         
                         SearchBarFilterButton(
                             viewModel: viewModel,
@@ -92,12 +93,14 @@ public struct CashFlowView: View {
                                             Image(systemName: "doc.text.magnifyingglass")
                                                 .font(.largeTitle)
                                                 .foregroundStyle(.gray)
+                                                .accessibilityHidden(true)
                                             Text("Belum ada transaksi")
                                                 .font(.subheadline)
                                                 .foregroundStyle(.gray)
                                         }
                                         .frame(maxWidth: .infinity)
                                         .padding(.top, 80)
+                                        .accessibilityElement(children: .combine)
                                     } else {
                                         LazyVStack(spacing: 16) {
                                             ForEach(viewModel.groupedTransactions, id: \.key) { group in
@@ -106,6 +109,7 @@ public struct CashFlowView: View {
                                                         .font(.caption.bold())
                                                         .foregroundStyle(.gray)
                                                         .padding(.horizontal, 4)
+                                                        .accessibilityAddTraits(.isHeader)
                                                     
                                                     VStack(spacing: 10) {
                                                         ForEach(group.value, id: \.uniqueId) { transaction in

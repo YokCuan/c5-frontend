@@ -29,6 +29,7 @@ public struct DetailPemasukanView: View {
                 Rectangle()
                     .fill(Color.green)
                     .frame(height: 4)
+                    .accessibilityHidden(true)
                  
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -43,6 +44,7 @@ public struct DetailPemasukanView: View {
                                 .foregroundStyle(.blue)
                                 .background(Color.blue.opacity(0.1))
                                 .cornerRadius(16)
+                                .accessibilityLabel(transaction.description != nil ? "ID Transaksi: \(transaction.description!)" : "ID Transaksi Kosong")
                         }
                         Text("Penjualan")
                             .foregroundStyle(.secondary)
@@ -56,6 +58,8 @@ public struct DetailPemasukanView: View {
                             .font(.title.bold())
                             .foregroundStyle(.green)
                     }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Jumlah Diterima, \(Int(transaction.amount)) rupiah")
                      
                     Divider()
                      
@@ -67,6 +71,8 @@ public struct DetailPemasukanView: View {
                             Text(transaction.occurredAt.formattedTime())
                                 .bold()
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Waktu, \(transaction.occurredAt.formattedTime().replacingOccurrences(of: ".", with: ":"))")
                         HStack {
                             Text("Tanggal")
                                 .foregroundStyle(.gray)
@@ -74,6 +80,8 @@ public struct DetailPemasukanView: View {
                             Text(transaction.occurredAt.formattedDate())
                                 .bold()
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Tanggal, \(transaction.occurredAt.formattedDate().replacingOccurrences(of: ".", with: " "))")
                     }
                 }
                 .padding()
@@ -92,6 +100,7 @@ public struct DetailPemasukanView: View {
             .padding(15)
             .background(Color.blue.opacity(0.1))
             .cornerRadius(14)
+            .accessibilityElement(children: .combine)
              
 //            Button(action: { isShowingDelSheet = true }) {
 //                Text("Hapus Pemasukan")
@@ -134,6 +143,7 @@ public struct DetailPemasukanView: View {
                 Text("Detail Uang Masuk")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
+                    .accessibilityAddTraits(.isHeader)
             }
         }
     }

@@ -17,6 +17,7 @@ public struct IncomeExpenseChoiceSheet: View {
                 Spacer()
                 Text("Pilih Tipe Transaksi")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
                 Spacer()
             }
             .padding(.top, 30)
@@ -46,7 +47,9 @@ public struct IncomeExpenseChoiceSheet: View {
                         Spacer()
                     }
                     .padding(.vertical)
+                    .accessibilityElement(children: .ignore)
                 }
+                .accessibilityLabel("Pemasukan, Catat penjualan baru")
                 
                 Divider()
                 
@@ -73,7 +76,9 @@ public struct IncomeExpenseChoiceSheet: View {
                         Spacer()
                     }
                     .padding(.vertical)
+                    .accessibilityElement(children: .ignore)
                 }
+                .accessibilityLabel("Pengeluaran, Catat pengeluaran baru")
             }
             .padding(.horizontal)
             
