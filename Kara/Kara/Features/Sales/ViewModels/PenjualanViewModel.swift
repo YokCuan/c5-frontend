@@ -33,6 +33,9 @@ public class PenjualanViewModel: ObservableObject {
                 
                 self.salesNotes = fetchedData
                 self.isLoading = false
+                
+                self.handleFetchedSalesNotes(fetchedData)
+                
             } catch {
                 if Task.isCancelled { return }
                 
@@ -51,5 +54,11 @@ public class PenjualanViewModel: ObservableObject {
         }
         
         _ = await fetchTask?.result
+    }
+    
+    public func handleFetchedSalesNotes(_ notes: [SalesNote]){
+        for note in notes{
+            scheduleDueNotification(for: note)
+        }
     }
 }
