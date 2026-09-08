@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct SheetCatatPembayaran: View {
     @Environment(\.dismiss) private var dismiss
@@ -164,6 +165,14 @@ struct SheetCatatPembayaran: View {
                     paidAmount: amount,
                     userId: userId
                 )
+                
+                if amount >= remainingAmount{
+                    UNUserNotificationCenter.current()
+                        .removePendingNotificationRequests(
+                            withIdentifiers: [salesNoteId.uuidString]
+                        )
+                }
+                
                 isLoading = false
                 dismiss()
                 onSuccess?()

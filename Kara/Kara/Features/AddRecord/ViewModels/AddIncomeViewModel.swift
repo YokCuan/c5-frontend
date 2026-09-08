@@ -176,4 +176,10 @@ public final class AddSalesNoteViewModel: ObservableObject {
             self.isLoading = false
         }
     }
+    
+    public func handleFetchedSalesNotes(_ notes: [SalesNote]){
+        for note in notes{
+            scheduleDueNotification(for: note)
+        }
+    }
 }

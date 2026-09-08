@@ -34,9 +34,15 @@ public struct CashFlowTransactionRow: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
                     
-                    Text(transaction.categoryType)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    HStack{
+                        Text(transaction.categoryType)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text("•")
+                        Text(transaction.occurredAt.formattedTime())
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 
                 Spacer()

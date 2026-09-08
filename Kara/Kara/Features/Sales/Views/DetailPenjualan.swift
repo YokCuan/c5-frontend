@@ -144,7 +144,7 @@ struct DetailPenjualan: View {
                                                 .foregroundStyle(.secondary)
                                             ForEach(Array(payments.enumerated()), id: \.element.id) { index, payment in
                                                 HStack {
-                                                    Text("\(index + 1). \(payment.paidAt.formatted(date: .long, time: .omitted))")
+                                                    Text(" \(payment.paidAt.formatted(date: .long, time: .omitted)) • \(payment.paidAt.formattedTime())")
                                                         .font(.caption)
                                                     
                                                     Spacer()
