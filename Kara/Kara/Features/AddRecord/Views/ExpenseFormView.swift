@@ -46,49 +46,26 @@ public struct ExpenseFormView: View {
     private var formContent: some View {
         ScrollView {
             VStack(spacing: 12) {
-                Button {
-                    showDatePicker = true
-                } label: {
-                    HStack {
-                        Text("Tanggal")
-
-                        Spacer()
-
-                        Text(
-                            viewModel.transactionDate.formatted(
-                                .dateTime
-                                    .day()
-                                    .month(.wide)
-                                    .year()
-                            )
+                VStack(alignment: .leading, spacing: 12) {
+                    DatePicker(
+                        "Waktu",
+                        selection: $viewModel.transactionDate,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    .datePickerStyle(.compact)
+                    .environment(\.locale, Locale(identifier: "id_ID"))
+                    .accessibilityLabel("Tanggal dan Waktu Transaksi")
+                    .accessibilityValue(
+                        viewModel.transactionDate.formatted(
+                            date: .long,
+                            time: .complete
                         )
-                        .foregroundStyle(.blue)
-
-                        Image(systemName: "chevron.right")
-                            .font(.footnote.bold())
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(.leading, 6)
-                    .padding(10)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    )
+                    .accessibilityHint("Ketuk untuk mengganti tanggal atau waktu")
                 }
-                .buttonStyle(.plain)
-                .accessibilityHint("Ketuk untuk mengganti tanggal")
-                .sheet(isPresented: $showDatePicker) {
-                    
-                    VStack {
-                        DatePicker(
-                            "Tanggal",
-                            selection: $viewModel.transactionDate,
-                            displayedComponents: .date
-                        )
-                        .datePickerStyle(.graphical)
-                        .environment(\.locale, Locale(identifier: "id_ID"))
-                        .padding()
-                    }
-                    .presentationDetents([.medium])
-                }
+                .padding(14)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
                 
                 VStack(alignment: .leading, spacing: 16) {
                     Text(viewModel.mode == .add ? "DETAIL BARANG" : "APA YANG DIBELI?")

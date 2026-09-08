@@ -12,7 +12,6 @@ public struct AddIncomeView: View {
     @StateObject private var viewModel = AddSalesNoteViewModel()
     
     @State private var showErrors = false
-    @State private var showDatePicker = false
     
     @FocusState private var isPaidAmountFocused: Bool
     
@@ -20,49 +19,27 @@ public struct AddIncomeView: View {
         ZStack {
             ScrollView {
                 VStack(spacing: 12) {
-                    Button {
-                        showDatePicker = true
-                    } label: {
-                        HStack {
-                            Text("Tanggal")
-                            
-                            Spacer()
-                            
-                            Text(
-                                viewModel.soldAt.formatted(
-                                    .dateTime
-                                        .day()
-                                        .month(.wide)
-                                        .year()
-                                )
+                    VStack(alignment: .leading, spacing: 12) {
+                        DatePicker(
+                            "Waktu",
+                            selection: $viewModel.soldAt,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .datePickerStyle(.compact)
+                        .environment(\.locale, Locale(identifier: "id_ID"))
+                        .accessibilityLabel("Tanggal dan Waktu Transaksi")
+                        .accessibilityValue(
+                            viewModel.soldAt.formatted(
+                                date: .long,
+                                time: .complete
                             )
-                            .foregroundStyle(.blue)
-                            
-                            Image(systemName: "chevron.right")
-                                .font(.footnote.bold())
-                                .foregroundStyle(.gray)
-                        }
-                        .padding(.leading, 6)
-                        .padding(10)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        )
+                        .accessibilityHint("Ketuk untuk mengganti tanggal atau waktu")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityHint("Ketuk untuk mengganti tanggal")
-                    .sheet(isPresented: $showDatePicker) {
-                        VStack {
-                            DatePicker(
-                                "Tanggal",
-                                selection: $viewModel.soldAt,
-                                displayedComponents: .date
-                            )
-                            .datePickerStyle(.graphical)
-                            .environment(\.locale, Locale(identifier: "id_ID"))
-                            .padding()
-                        }
-                        .presentationDetents([.medium])
-                    }
-                    
+                    .padding(14)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                     
                     VStack(alignment: .leading, spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Nama Pembeli")
@@ -78,9 +55,9 @@ public struct AddIncomeView: View {
                                     }
                                 }
                         }
-                        
+                         
                         Divider()
-                        
+                         
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text("Nomor Telepon (opsional)")
@@ -95,7 +72,7 @@ public struct AddIncomeView: View {
                     .padding()
                     .background(Color.white)
                     .cornerRadius(24)
-                    
+                     
                     if showErrors && !viewModel.isCustomerNameValid {
                         HStack(spacing: 4) {
                             Image(systemName: "exclamationmark.circle")
@@ -108,19 +85,19 @@ public struct AddIncomeView: View {
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("Error: Nama pembeli wajib diisi")
                     }
-                    
+                     
                     VStack(alignment: .leading, spacing: 16) {
                         Text("DETAIL BARANG")
                             .font(.caption2.bold())
                             .foregroundStyle(.gray)
-                        
+                         
                         ForEach($viewModel.items) { $item in
                             HStack {
                                 VStack(spacing: 10) {
                                     HStack {
                                         TextField("Nama barang (cth. Keripik Tempe 250 g)", text: $item.name)
                                         Spacer()
-                                        
+                                         
                                         if viewModel.items.count > 1 {
                                             Button {
                                                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -133,9 +110,9 @@ public struct AddIncomeView: View {
                                             }
                                         }
                                     }
-                                    
+                                     
                                     Divider()
-                                    
+                                     
                                     HStack(spacing: 12) {
                                         HStack(spacing: 4) {
                                             TextField("1", text: $item.quantityText)
@@ -152,11 +129,11 @@ public struct AddIncomeView: View {
                                         .padding(.horizontal, 10)
                                         .background(Color(.systemGray6))
                                         .cornerRadius(10)
-                                        
+                                         
                                         Text("x")
                                             .font(.body.bold())
                                             .foregroundStyle(.gray)
-                                        
+                                         
                                         HStack(spacing: 4) {
                                             Text("Rp")
                                                 .font(.subheadline)
@@ -180,14 +157,14 @@ public struct AddIncomeView: View {
                                         .background(Color(.systemGray6))
                                         .cornerRadius(10)
                                     }
-                                    
+                                     
                                     if viewModel.items.count > 1 {
                                         Divider()
                                     }
                                 }
                             }
                         }
-                        
+                         
                         Button {
                             viewModel.addItem()
                         } label: {
@@ -202,7 +179,7 @@ public struct AddIncomeView: View {
                     .padding()
                     .background(Color.white)
                     .cornerRadius(24)
-                    
+                     
                     if showErrors && !viewModel.areItemsValid {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
@@ -215,7 +192,7 @@ public struct AddIncomeView: View {
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("Error: Nama barang, jumlah, dan harga wajib diisi valid")
                     }
-                    
+                     
                     VStack(spacing: 12) {
                         HStack {
                             Text("Total")
@@ -226,9 +203,9 @@ public struct AddIncomeView: View {
                                 .font(.headline.bold())
                                 .accessibilityLabel("\(Int(viewModel.calculatedTotal)) rupiah")
                         }
-                        
+                         
                         Divider()
-                        
+                         
                         Toggle("Belum lunas?", isOn: $viewModel.isBelumLunas)
                             .font(.body)
                             .tint(.blue)
@@ -237,13 +214,13 @@ public struct AddIncomeView: View {
                     .padding()
                     .background(Color.white)
                     .cornerRadius(24)
-                    
+                     
                     if viewModel.isBelumLunas {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Sudah Dibayar")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            
+                             
                             HStack(spacing: 6) {
                                 Text("Rp")
                                     .foregroundStyle(.gray)
@@ -278,7 +255,7 @@ public struct AddIncomeView: View {
                                 .stroke(viewModel.isPaidAmountExceedingTotal ? Color.red : Color.clear, lineWidth: 2)
                         )
                     }
-                    
+                     
                     if showErrors && !viewModel.isPaidAmountValid {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
@@ -291,7 +268,7 @@ public struct AddIncomeView: View {
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("Error: Jumlah yang dibayar wajib diisi")
                     }
-                    
+                     
                     if viewModel.isPaidAmountExceedingTotal {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
@@ -304,7 +281,7 @@ public struct AddIncomeView: View {
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("Error: Nominal melebihi total harga barang")
                     }
-                    
+                     
                     if viewModel.isBelumLunas {
                         VStack {
                             HStack {
@@ -317,15 +294,15 @@ public struct AddIncomeView: View {
                                     .foregroundStyle(.red)
                                     .accessibilityLabel("\(Int(viewModel.remainingAmount)) rupiah")
                             }
-                            
+                             
                             Divider()
-                            
+                             
                             HStack(alignment: .center) {
                                 Text("Status")
                                     .font(.body)
                                     .foregroundStyle(.gray)
                                 Spacer()
-                                
+                                 
                                 if viewModel.remainingAmount == viewModel.calculatedTotal {
                                     Text("Belum Bayar")
                                         .foregroundStyle(.white)
@@ -342,9 +319,9 @@ public struct AddIncomeView: View {
                                         .cornerRadius(30)
                                 }
                             }
-                            
+                             
                             Divider()
-                            
+                             
                             HStack(alignment: .center) {
                                 Text("Jatuh Tempo")
                                     .font(.body)
@@ -373,13 +350,13 @@ public struct AddIncomeView: View {
                                 viewModel.hasDueDate = false
                             }
                     }
-                    
+                     
                     if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
-                    
+                     
                     Button {
                         if viewModel.isFormValid {
                             Task {
