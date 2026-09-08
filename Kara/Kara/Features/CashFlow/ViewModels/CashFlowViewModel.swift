@@ -82,6 +82,7 @@ public class CashFlowViewModel: ObservableObject {
              
             do {
                 let fetchedData = try await service.fetchCashFlows(shopId: shopId)
+                print(fetchedData)
                 
                 if Task.isCancelled { return }
                 
@@ -156,7 +157,7 @@ public class CashFlowViewModel: ObservableObject {
             return searchableText.contains(query)
         }
         
-        transactions = filtered.sorted { $0.description ?? "" > $1.description ?? "" }
+        transactions = filtered.sorted { $0.occurredAt > $1.occurredAt }
     }
     
     public func resetFilters() {

@@ -27,6 +27,7 @@ public class PenjualanViewModel: ObservableObject {
              
             do {
                 let fetchedData = try await APIService.shared.fetchSalesNotes(shopId: shopId)
+                print(fetchedData)
                 
                 if Task.isCancelled { return }
                 
