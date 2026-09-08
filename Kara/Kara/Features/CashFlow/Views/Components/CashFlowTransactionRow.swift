@@ -68,6 +68,10 @@ public struct CashFlowTransactionRow: View {
                     )
             }
             .shadow(color: Color.black.opacity(0.03), radius: 6, y: 2)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("\(transaction.title), \(transaction.categoryType), \(isIncome ? "Masuk" : "Keluar") \(Int(transaction.amount)) rupiah")
+            .accessibilityHint("Ketuk untuk melihat detail")
+            .accessibilityAddTraits(.isButton)
         }
         .buttonStyle(.plain) 
     }

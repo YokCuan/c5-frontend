@@ -207,6 +207,7 @@ struct FilterSheetView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selectedDateRange == range ? [.isButton, .isSelected] : .isButton)
     }
     
     @ViewBuilder
@@ -222,6 +223,7 @@ struct FilterSheetView: View {
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundStyle(.gray)
+                    .accessibilityHidden(true)
                 
                 TextField("0", text: value)
                     .keyboardType(.numberPad)
@@ -229,6 +231,8 @@ struct FilterSheetView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
                     .multilineTextAlignment(.leading)
+                    .accessibilityLabel("\(label) Rp 0")
+                    .accessibilityHint(label == "Dari" ? "Ketuk dua kali untuk input minimum jumlah terkecil filter" : "Ketuk dua kali untuk input maksimum jumlah terbesar filter")
                     .onChange(of: value.wrappedValue) { _, newValue in
                         let filtered = newValue.filter { $0.isNumber }
                         let formatted = filtered.formattedWithSeparator
@@ -364,6 +368,7 @@ struct FilterSheetView: View {
                             .padding(.vertical, 6)
                             .background(Color.blue.opacity(0.1))
                             .clipShape(Capsule())
+                            .accessibilityLabel("Filter aktif: \(chip)")
                     }
                 }
                 .frame(alignment: .leading)

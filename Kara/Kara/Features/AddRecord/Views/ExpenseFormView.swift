@@ -74,6 +74,7 @@ public struct ExpenseFormView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 24))
                 }
                 .buttonStyle(.plain)
+                .accessibilityHint("Ketuk untuk mengganti tanggal")
                 .sheet(isPresented: $showDatePicker) {
                     
                     VStack {
@@ -136,16 +137,18 @@ public struct ExpenseFormView: View {
                 .background(Color.white)
                 .cornerRadius(24)
                 
-                if showErrors && !viewModel.areItemsValid {
-                    HStack(spacing: 6) {
-                        Image(systemName: "exclamationmark.circle")
-                        Text("Wajib isi minimal satu barang yang dibeli")
-                        Spacer()
+                    if showErrors && !viewModel.areItemsValid {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.circle")
+                            Text("Wajib isi minimal satu barang yang dibeli")
+                            Spacer()
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .padding(.top, -8)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Error: Wajib isi minimal satu barang yang dibeli")
                     }
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .padding(.top, -8)
-                }
                 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Jumlah yang Dibayar")
@@ -158,6 +161,8 @@ public struct ExpenseFormView: View {
                         TextField("15.000", text: $viewModel.paidAmountText)
                             .font(.title3.bold())
                             .keyboardType(.numberPad)
+                            .accessibilityLabel("Jumlah yang dibayar")
+                            .accessibilityHint("15000 adalah nilai awal, ketuk dua kali untuk mengubah")
                             .onChange(of: viewModel.paidAmountText) { _, newValue in
                                 let formatted = newValue.formattedWithSeparator
                                 if formatted != newValue {
@@ -179,6 +184,8 @@ public struct ExpenseFormView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
                     .padding(.top, -8)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Error: Jumlah yang dibayar wajib diisi")
                 }
                 
                 VStack(alignment: .leading, spacing: 6) {
@@ -214,6 +221,8 @@ public struct ExpenseFormView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
                     .padding(.top, -8)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Error: Kategori Uang keluar wajib dipilih")
                 }
                 
                 VStack(alignment: .leading, spacing: 12) {
@@ -221,8 +230,10 @@ public struct ExpenseFormView: View {
                         Text("Dibeli dari")
                             .font(.caption)
                             .foregroundStyle(.gray)
-                        TextField("Toko Pak El", text: $viewModel.supplierName)
-                            .onChange(of: viewModel.supplierName) { _, newValue in
+                            TextField("Toko Pak El", text: $viewModel.supplierName)
+                                .accessibilityLabel("Dibeli dari")
+                                .accessibilityHint("Contoh: Toko Pak El")
+                                .onChange(of: viewModel.supplierName) { _, newValue in
                                 let formatted = newValue.capitalized
                                 if formatted != newValue {
                                     viewModel.supplierName = formatted
@@ -256,6 +267,8 @@ public struct ExpenseFormView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
                     .padding(.top, -8)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Error: Dibeli dari wajib diisi")
                 }
                 
                 if let errorMessage = viewModel.errorMessage, viewModel.mode == .add {

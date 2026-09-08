@@ -45,6 +45,7 @@ struct DetailPenjualan: View {
                     Rectangle()
                         .fill(statusColor)
                         .frame(height: 4)
+                        .accessibilityHidden(true)
                     
                     VStack(alignment: .leading, spacing: 20) {
                         HStack {
@@ -56,6 +57,7 @@ struct DetailPenjualan: View {
                                 Text("\(salesNote.soldAt.formatted(date: .long, time: .omitted)) • \(formatTime(salesNote.soldAt))")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                    .accessibilityLabel("\(salesNote.soldAt.formatted(date: .long, time: .omitted)), pukul \(formatTime(salesNote.soldAt).replacingOccurrences(of: ".", with: ":"))")
                             }
                             
                             Spacer()
@@ -79,6 +81,7 @@ struct DetailPenjualan: View {
                             Text(formatRupiah(salesNote.totalAmount))
                                 .font(.title2)
                                 .fontWeight(.bold)
+                                .accessibilityLabel("\(Int(salesNote.totalAmount)) rupiah")
                         }
                         
                         VStack(alignment: .leading, spacing: 6) {
@@ -91,6 +94,7 @@ struct DetailPenjualan: View {
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundStyle(.green)
+                                .accessibilityLabel("\(Int(salesNote.paidAmount)) rupiah")
                         }
                         
                         Divider()
@@ -109,6 +113,7 @@ struct DetailPenjualan: View {
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundStyle(.red)
+                            .accessibilityLabel("\(Int(salesNote.totalAmount - salesNote.paidAmount)) rupiah")
                         }
                         
                         VStack(alignment: .leading, spacing: 6) {
@@ -202,6 +207,8 @@ struct DetailPenjualan: View {
                                     .font(.subheadline)
                                     .fontWeight(.bold)
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(item.name), \(item.quantity) jumlah barang, dengan harga satuan \(Int(item.unitPrice)) rupiah, total \(Int(item.subtotal)) rupiah")
                             
                             if index < items.count - 1 {
                                 Divider()
@@ -271,6 +278,7 @@ struct DetailPenjualan: View {
                 Text("Detail Penjualan")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
+                    .accessibilityAddTraits(.isHeader)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 if let imageToShare = renderedInvoiceImage {

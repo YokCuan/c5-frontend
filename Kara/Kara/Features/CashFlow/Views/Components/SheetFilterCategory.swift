@@ -144,6 +144,7 @@ struct SheetFilterCategory: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selectedCategory == option ? [.isButton, .isSelected] : .isButton)
     }
 }
 

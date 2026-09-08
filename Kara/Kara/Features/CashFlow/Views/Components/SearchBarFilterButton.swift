@@ -56,6 +56,7 @@ struct SearchBarFilterButton: View {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 20, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.8))
+                        .accessibilityHidden(true)
                     
                     TextField(
                         "",
@@ -65,6 +66,8 @@ struct SearchBarFilterButton: View {
                     )
                     .font(.body)
                     .foregroundStyle(.white)
+                    .accessibilityLabel("Cari transaksi")
+                    .accessibilityHint("Ketuk dua kali untuk memasukkan kata kunci pencarian")
                     
                     if !searchText.isEmpty {
                         Button {
@@ -105,6 +108,8 @@ struct SearchBarFilterButton: View {
                         }
                     }
                 }
+                .accessibilityLabel(isAnyFilterActive ? "Filter aktif" : "Filter")
+                .accessibilityHint("Buka pengaturan filter")
             }
             
             HStack {
@@ -118,6 +123,7 @@ struct SearchBarFilterButton: View {
                         .background(Color.white.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
+                .accessibilityLabel("Bulan sebelumnya")
                 
                 Spacer()
                 
@@ -141,6 +147,7 @@ struct SearchBarFilterButton: View {
                         .background(Color.white.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
+                .accessibilityLabel("Bulan selanjutnya")
             }
             
             if let activeFilterSummary {
@@ -148,6 +155,7 @@ struct SearchBarFilterButton: View {
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.white.opacity(0.8))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityLabel("Filter aktif: \(activeFilterSummary)")
             }
         }
         .contentShape(Rectangle())

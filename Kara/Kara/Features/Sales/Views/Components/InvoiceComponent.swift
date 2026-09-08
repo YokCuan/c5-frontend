@@ -86,6 +86,8 @@ public struct InvoiceComponent: View {
                                 Text(item.subtotal.toIDR)
                                     .font(.body.bold())
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(item.name), \(item.quantity) jumlah barang, dengan harga satuan \(Int(item.unitPrice)) rupiah, total \(Int(item.subtotal)) rupiah")
                         }
                     } else {
                         Text("Tidak ada rincian barang")
@@ -141,6 +143,7 @@ public struct InvoiceComponent: View {
                     Image(systemName: note.status.iconName)
                         .font(.title2.bold())
                         .foregroundStyle(note.status.themeColor)
+                        .accessibilityHidden(true)
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(note.status.title)
