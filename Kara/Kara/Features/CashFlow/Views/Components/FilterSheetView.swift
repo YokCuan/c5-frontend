@@ -26,6 +26,8 @@ struct FilterSheetView: View {
     @State private var isShowingDatePickerSheet = false
     
     @State private var amount: Int = 0
+    @State private var draftMinAmount = ""
+    @State private var draftMaxAmount = ""
     
     enum DateRange: String, CaseIterable {
         case last7Days = "7 hari terakhir"
@@ -34,14 +36,14 @@ struct FilterSheetView: View {
     }
     
     private var isAmountRangeInvalid: Bool {
-        guard !minAmountFilter.isEmpty,
-              !maxAmountFilter.isEmpty
+        guard !draftMinAmount.isEmpty,
+              !draftMaxAmount.isEmpty
         else {
             return false
         }
 
-        guard let min = Int(minAmountFilter.replacingOccurrences(of: ".", with: "")),
-              let max = Int(maxAmountFilter.replacingOccurrences(of: ".", with: ""))
+        guard let min = Int(draftMinAmount.replacingOccurrences(of: ".", with: "")),
+              let max = Int(draftMaxAmount.replacingOccurrences(of: ".", with: ""))
         else {
             return false
         }
@@ -97,8 +99,16 @@ struct FilterSheetView: View {
                         .foregroundStyle(.gray)
                     
                     HStack(spacing: 16) {
-                        amountField(label: "Dari", value: $minAmountFilter, isInvalid: isAmountRangeInvalid)
-                        amountField(label: "Sampai", value: $maxAmountFilter, isInvalid: isAmountRangeInvalid)                    }
+                        amountField(
+                            label: "Dari",
+                            value: $draftMinAmount,
+                            isInvalid: isAmountRangeInvalid
+                        )
+                        amountField(
+                            label: "Sampai",
+                            value: $draftMaxAmount,
+                            isInvalid: isAmountRangeInvalid
+                        )               }
                     .font(.subheadline)
                     .cornerRadius(8)
                     .frame(maxWidth: .infinity, alignment:.center)
@@ -175,6 +185,8 @@ struct FilterSheetView: View {
             .presentationDragIndicator(.visible)
         }
         .onAppear {
+            draftMinAmount = minAmountFilter
+            draftMaxAmount = maxAmountFilter
             syncSelectedDateRange()
         }
         .onChange(of: startDate) { _, _ in
@@ -303,7 +315,13 @@ struct FilterSheetView: View {
     }
     
     private func applyFilter() {
+        guard !isAmountRangeInvalid else { return }
+        
+        minAmountFilter = draftMinAmount
+            maxAmountFilter = draftMaxAmount
+        
         viewModel.applyFilters()
+        dismiss()
     }
     
     private func monthStartDate(for date: Date) -> Date {

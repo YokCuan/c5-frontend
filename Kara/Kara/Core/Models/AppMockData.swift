@@ -23,8 +23,8 @@ public enum AppMockData {
     public static let primaryShop = Shop(
         id: IDs.shop,
         ownerId: IDs.owner,
-        name: "Pempek Palembang 99",
-        description: "#1 Pempek se-Academy",
+        name: "Keripik Tempe KARAOKE",
+        description: "#1 Keripik Tempe se-Academy",
         address: "Thamrin",
         phone: "08578987666"
     )
