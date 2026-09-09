@@ -3,15 +3,22 @@ import SwiftUI
 @main
 struct KaraApp: App {
     @StateObject private var categoryStore = CategoryStore.shared
+    @State private var showSplash = true
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .preferredColorScheme(.light)
-                .environmentObject(categoryStore)
-                .task {
-                    await CategoryStore.shared.fetchCategoriesIfNeeded()
+            if showSplash {
+                SplashView {
+                    showSplash = false
                 }
+            } else {
+                ContentView()
+                    .preferredColorScheme(.light)
+                    .environmentObject(categoryStore)
+                    .task {
+                        await CategoryStore.shared.fetchCategoriesIfNeeded()
+                    }
+            }
         }
     }
 }
